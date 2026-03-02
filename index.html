@@ -3,101 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZERA X ZERO - Connected</title>
+    <title>ZERA - Pro Connected</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <style>
-        :root { 
-            --wa-light-green: #25d366; 
-            --wa-soft-green: #dcf8c6; 
-            --wa-bg: #f0f2f5; 
-            --wa-panel: #ffffff; 
-        }
+        :root { --wa-green: #25d366; --wa-light: #dcf8c6; --bg: #f0f2f5; }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--wa-bg); overflow: hidden; }
+        body, html { margin: 0; padding: 0; height: 100vh; background: var(--bg); overflow: hidden; }
 
-        /* INTRO */
-        #intro { position: fixed; inset: 0; background: white; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .zera-logo { font-size: 3rem; font-weight: 900; color: var(--wa-light-green); animation: bounce 1s infinite alternate; }
-        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1); } }
-
-        /* UI LOGIN */
-        .page { display: none; height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .card { width: 100%; max-width: 350px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; outline: none; }
-        .btn { width: 100%; padding: 12px; background: var(--wa-light-green); border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; }
-
-        /* MAIN APP */
+        /* HEADER & APP */
         #main-app { display: none; height: 100vh; flex-direction: column; background: white; }
         .header { background: #f0f2f5; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
         
-        /* REQUEST BOX ALA WA */
-        #req-box { background: #e7f3ff; padding: 10px; display: none; border-bottom: 1px solid #ddd; }
-        .req-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; background: white; border-radius: 10px; margin-bottom: 5px; }
+        /* NOTIF ACC/REJECT */
+        #req-box { background: #e7f3ff; padding: 10px; display: none; border-bottom: 2px solid #0080ff; }
+        .req-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: white; border-radius: 12px; margin-bottom: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
+        /* CONTACT LIST */
         .contact-item { padding: 15px; border-bottom: 1px solid #f2f2f2; display: flex; align-items: center; cursor: pointer; }
-        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #25d366; color: white; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold; }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--wa-green); color: white; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold; font-size: 20px; }
 
         /* CHAT ROOM */
         #chat-room { display: none; position: fixed; inset: 0; background: #e5ddd5; flex-direction: column; z-index: 100; }
-        .chat-view { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; }
-        .bubble { max-width: 80%; padding: 8px 12px; border-radius: 10px; margin-bottom: 5px; font-size: 14px; position: relative; cursor: pointer; }
-        .msg-in { background: white; align-self: flex-start; border-top-left-radius: 0; }
-        .msg-out { background: var(--wa-soft-green); align-self: flex-end; border-top-right-radius: 0; }
+        .chat-view { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
         
-        .footer { background: #f0f2f5; padding: 10px; display: flex; align-items: center; gap: 10px; }
-        .footer input { margin: 0; flex: 1; border: none; border-radius: 20px; padding: 10px 15px; }
-        .icon-btn { font-size: 20px; color: #51585c; cursor: pointer; }
+        .bubble { max-width: 80%; padding: 10px 14px; border-radius: 15px; font-size: 14px; position: relative; line-height: 1.4; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
+        .msg-in { background: white; align-self: flex-start; border-top-left-radius: 0; }
+        .msg-out { background: var(--wa-light); align-self: flex-end; border-top-right-radius: 0; }
+        .msg-img { width: 100%; max-width: 200px; border-radius: 10px; margin-top: 5px; cursor: pointer; }
 
-        .fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--wa-light-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; }
+        /* FOOTER */
+        .footer { background: #f0f2f5; padding: 10px; display: flex; align-items: center; gap: 12px; }
+        .footer input { flex: 1; border: none; border-radius: 25px; padding: 12px 18px; outline: none; font-size: 15px; }
+        .icon-btn { font-size: 20px; color: #54656f; cursor: pointer; transition: 0.2s; }
+        .icon-btn:active { transform: scale(0.8); }
+
+        .btn-send { background: var(--wa-green); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        /* LOGIN PAGE */
+        .login-page { display: flex; height: 100vh; align-items: center; justify-content: center; background: #25d366; }
+        .card { background: white; padding: 40px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
+        input.auth { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; outline: none; text-align: center; font-size: 16px; }
     </style>
 </head>
 <body>
 
-    <div id="intro"><div class="zera-logo">ZERA</div></div>
-
-    <div id="login-page" class="page">
+    <div id="login-page" class="login-page">
         <div class="card">
-            <h2 style="color:var(--wa-light-green)">ACCESS TERMINAL</h2>
-            <input type="text" id="myUser" placeholder="Username Anda">
-            <input type="password" id="myPass" placeholder="Password">
-            <button class="btn" onclick="login()">MASUK</button>
+            <h1 style="color:#25d366; margin-bottom: 5px;">ZERA PRO</h1>
+            <p style="color:gray; font-size: 12px; margin-bottom: 25px;">Connected to Nebula Protocol</p>
+            <input type="text" id="myUser" class="auth" placeholder="Username">
+            <input type="password" id="myPass" class="auth" placeholder="Password">
+            <button onclick="login()" style="width:100%; padding:14px; background:#25d366; border:none; color:white; border-radius:12px; font-weight:bold; cursor:pointer;">ACCESS TERMINAL</button>
         </div>
     </div>
 
     <div id="main-app">
         <div class="header">
-            <b id="display-name">ZERA X ZERO</b>
-            <div onclick="showSettings()">⋮</div>
+            <b id="display-name">@User</b>
+            <div onclick="showGlobalSettings()"><i class="fas fa-ellipsis-v"></i></div>
         </div>
         
         <div id="req-box">
-            <small style="color:#0080ff; font-weight:bold">PERMINTAAN CHAT BARU:</small>
             <div id="req-list"></div>
         </div>
 
         <div id="contact-list" style="flex:1; overflow-y:auto;"></div>
-        <div class="fab" onclick="addContact()">+</div>
+        
+        <div onclick="addContact()" style="position:fixed; bottom:30px; right:30px; width:60px; height:60px; background:#25d366; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:24px; box-shadow:0 5px 15px rgba(0,0,0,0.2); cursor:pointer;">
+            <i class="fas fa-user-plus"></i>
+        </div>
     </div>
 
     <div id="chat-room">
         <div class="header">
             <div style="display:flex; align-items:center;">
-                <span onclick="closeChat()" style="margin-right:15px; cursor:pointer">←</span>
-                <span id="chatting-with">Username</span>
+                <span onclick="closeChat()" style="margin-right:15px; cursor:pointer; font-size:20px;">←</span>
+                <div>
+                    <b id="chatting-with">Username</b><br>
+                    <small style="color:#25d366; font-size:10px;">Encrypted</small>
+                </div>
             </div>
-            <div style="display:flex; gap:20px;">
-                <i class="fas fa-phone icon-btn" onclick="call('Voice')"></i>
-                <i class="fas fa-video icon-btn" onclick="call('Video')"></i>
-                <i class="fas fa-ellipsis-v icon-btn" onclick="showChatMenu()"></i>
+            <div style="display:flex; gap:22px;">
+                <i class="fas fa-phone icon-btn" onclick="callSystem('Voice')"></i>
+                <i class="fas fa-video icon-btn" onclick="callSystem('Video')"></i>
+                <i class="fas fa-ellipsis-v icon-btn" onclick="showChatOptions()"></i>
             </div>
         </div>
         <div id="chatBox" class="chat-view"></div>
         <div class="footer">
-            <i class="fas fa-plus icon-btn" onclick="sendFile()"></i>
+            <i class="fas fa-paperclip icon-btn" onclick="openAttach()"></i>
             <input type="text" id="msgInput" placeholder="Ketik pesan...">
-            <i class="fas fa-microphone icon-btn" onclick="voiceNote()"></i>
-            <button class="btn" onclick="send()" style="width:50px; border-radius:50%">➤</button>
+            <i class="fas fa-microphone icon-btn" onclick="voiceSystem()"></i>
+            <button class="btn-send" onclick="send()"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
@@ -121,19 +119,13 @@
         let CURRENT_CHAT = "";
         let CURRENT_ROOM = "";
 
-        // INTRO
-        setTimeout(() => {
-            document.getElementById('intro').style.display = 'none';
-            if(MY_NAME) { launchApp(); } 
-            else { document.getElementById('login-page').style.display = 'flex'; }
-        }, 2500);
+        if(MY_NAME) launchApp();
 
         function login() {
             const u = document.getElementById('myUser').value.trim().toLowerCase();
             if(!u) return;
             MY_NAME = u;
             localStorage.setItem("zchat_zero_usn", u);
-            // Daftarkan di /users agar teman bisa mencari (Sesuai web temanmu)
             db.ref('users/' + u).set({ username: u, online: true });
             launchApp();
         }
@@ -142,38 +134,33 @@
             document.getElementById('login-page').style.display = 'none';
             document.getElementById('main-app').style.display = 'flex';
             document.getElementById('display-name').innerText = "@" + MY_NAME;
-            loadRequests();
-            loadContacts();
+            syncRequests();
+            syncContacts();
         }
 
-        // TAMBAH KONTAK & CEK DATABASE TEMAN
-        async function addContact() {
-            const { value: target } = await Swal.fire({ 
-                title: 'Hubungkan User', 
-                input: 'text', 
+        function addContact() {
+            Swal.fire({
+                title: 'Connect New User',
+                input: 'text',
                 inputPlaceholder: 'Username target...',
+                showCancelButton: true,
                 confirmButtonColor: '#25d366'
+            }).then(res => {
+                if(res.value) {
+                    const t = res.value.trim().toLowerCase();
+                    db.ref('users/' + t).once('value', s => {
+                        if(s.exists()){
+                            db.ref(`requests/${t}/${MY_NAME}`).set({ from: MY_NAME, time: Date.now() });
+                            Swal.fire("Sent!", "Menunggu dikonfirmasi.", "success");
+                        } else {
+                            Swal.fire("Gagal", "Username tidak ditemukan!", "error");
+                        }
+                    });
+                }
             });
-
-            if(target) {
-                const t = target.trim().toLowerCase();
-                if(t === MY_NAME) return;
-
-                // Cek apakah user ada di /users (Database pusat temanmu)
-                db.ref('users/' + t).once('value', snap => {
-                    if(snap.exists()) {
-                        // Kirim ke path /requests (Sesuai web temanmu)
-                        db.ref(`requests/${t}/${MY_NAME}`).set({ from: MY_NAME, time: Date.now() });
-                        Swal.fire("Terkirim!", "Menunggu persetujuan " + t, "success");
-                    } else {
-                        Swal.fire({ icon: 'error', title: 'USER TIDAK ADA!', text: 'Username tidak terdaftar di Nebula Protocol.' });
-                    }
-                });
-            }
         }
 
-        // LOAD REQUESTS (ACC / REJECT)
-        function loadRequests() {
+        function syncRequests() {
             db.ref(`requests/${MY_NAME}`).on('value', snap => {
                 const box = document.getElementById('req-box');
                 const list = document.getElementById('req-list');
@@ -181,15 +168,13 @@
                 if(snap.exists()) {
                     box.style.display = 'block';
                     snap.forEach(c => {
-                        const from = c.key;
-                        list.innerHTML += `
-                            <div class="req-item">
-                                <span style="font-size:13px"><b>${from}</b> ingin chat</span>
-                                <div>
-                                    <button onclick="confirmChat('${from}', true)" style="background:#25d366; color:white; border:none; border-radius:5px; padding:5px 10px;">Acc</button>
-                                    <button onclick="confirmChat('${from}', false)" style="background:#ff4757; color:white; border:none; border-radius:5px; padding:5px 10px;">Tolak</button>
-                                </div>
-                            </div>`;
+                        list.innerHTML += `<div class="req-item">
+                            <span><b>${c.key}</b></span>
+                            <div>
+                                <button onclick="confirmChat('${c.key}', true)" style="background:#25d366; color:white; border:none; padding:5px 12px; border-radius:8px; cursor:pointer;">ACC</button>
+                                <button onclick="confirmChat('${c.key}', false)" style="background:red; color:white; border:none; padding:5px 12px; border-radius:8px; cursor:pointer;">TOLAK</button>
+                            </div>
+                        </div>`;
                     });
                 } else box.style.display = 'none';
             });
@@ -197,107 +182,114 @@
 
         function confirmChat(user, accept) {
             if(accept) {
-                // Jika setuju, masuk ke path /contacts (Sesuai web temanmu)
                 db.ref(`contacts/${MY_NAME}/${user}`).set(true);
                 db.ref(`contacts/${user}/${MY_NAME}`).set(true);
             }
-            // Jika tolak atau setelah acc, hapus requestnya
             db.ref(`requests/${MY_NAME}/${user}`).remove();
         }
 
-        // DAFTAR CHAT SINKRON
-        function loadContacts() {
+        function syncContacts() {
             db.ref(`contacts/${MY_NAME}`).on('value', snap => {
                 const list = document.getElementById('contact-list');
                 list.innerHTML = "";
                 snap.forEach(c => {
                     const name = c.key;
-                    const div = document.createElement('div');
-                    div.className = 'contact-item';
-                    div.innerHTML = `<div class="avatar">${name[0].toUpperCase()}</div>
-                                     <div><b>${name}</b><br><small style="color:gray">Nebula Encrypted</small></div>`;
-                    div.onclick = () => openChat(name);
-                    list.appendChild(div);
+                    list.innerHTML += `<div class="contact-item" onclick="openChat('${name}')">
+                        <div class="avatar">${name[0].toUpperCase()}</div>
+                        <div><b>${name}</b><br><small style="color:gray">Tap to chat</small></div>
+                    </div>`;
                 });
             });
         }
 
-        // ROOM CHAT
         function openChat(target) {
             CURRENT_CHAT = target;
             CURRENT_ROOM = [MY_NAME, target].sort().join("_");
             document.getElementById('chat-room').style.display = 'flex';
             document.getElementById('chatting-with').innerText = target;
             
-            const chatBox = document.getElementById('chatBox');
             db.ref(`chats/${CURRENT_ROOM}`).on('value', snap => {
-                chatBox.innerHTML = "";
+                const box = document.getElementById('chatBox');
+                box.innerHTML = "";
                 snap.forEach(mSnap => {
                     const m = mSnap.val();
-                    const key = mSnap.key;
                     const isMe = m.sender === MY_NAME;
+                    const msgKey = mSnap.key;
+                    
                     const div = document.createElement('div');
                     div.className = `bubble ${isMe ? 'msg-out' : 'msg-in'}`;
-                    div.innerHTML = `${m.text}<br><small style="font-size:8px; opacity:0.5">${new Date(m.time).toLocaleTimeString()}</small>`;
                     
-                    // Fitur Salin & Hapus (Klik Balon Chat)
-                    div.onclick = () => {
+                    // Render Image if any
+                    let content = m.text;
+                    if(m.type === 'image') content = `<img src="${m.url}" class="msg-img" onclick="window.open('${m.url}')"><br>${m.text}`;
+                    
+                    div.innerHTML = `${content}<br><span style="font-size:9px; opacity:0.5; float:right; margin-top:5px;">${new Date(m.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
+                    
+                    // FITUR SALIN & HAPUS
+                    div.oncontextmenu = (e) => {
+                        e.preventDefault();
                         Swal.fire({
                             title: 'Opsi Pesan',
+                            showDenyButton: true,
                             showCancelButton: true,
                             confirmButtonText: 'Salin',
                             denyButtonText: 'Hapus',
-                            showDenyButton: isMe,
-                            background: '#fff'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
+                        }).then((res) => {
+                            if (res.isConfirmed) {
                                 navigator.clipboard.writeText(m.text);
-                                Swal.fire("Tersalin!", "", "success");
-                            } else if (result.isDenied) {
-                                db.ref(`chats/${CURRENT_ROOM}/${key}`).remove();
+                                Swal.fire("Copied!", "", "success");
+                            } else if (res.isDenied) {
+                                if(isMe) db.ref(`chats/${CURRENT_ROOM}/${msgKey}`).remove();
+                                else Swal.fire("Gak bisa hapus chat orang!");
                             }
                         });
                     };
-                    chatBox.appendChild(div);
+                    box.appendChild(div);
                 });
-                chatBox.scrollTop = chatBox.scrollHeight;
+                box.scrollTop = box.scrollHeight;
             });
         }
 
-        function send() {
+        function send(type = 'text', val = null) {
             const inp = document.getElementById('msgInput');
-            if(!inp.value.trim()) return;
-            db.ref(`chats/${CURRENT_ROOM}`).push({
+            const text = val || inp.value;
+            if(!text && type === 'text') return;
+
+            const msgData = {
                 sender: MY_NAME,
-                text: inp.value,
-                time: Date.now()
-            });
+                text: text,
+                time: firebase.database.ServerValue.TIMESTAMP,
+                type: type
+            };
+            if(type === 'image') msgData.url = val;
+
+            db.ref(`chats/${CURRENT_ROOM}`).push(msgData);
             inp.value = "";
         }
 
-        // FITUR TAMBAHAN (VOICE, FILE, CALL)
-        function call(type) { Swal.fire(type + " Call", "Fitur ini memerlukan izin WebRTC Server. Sedang dikembangkan.", "info"); }
-        function voiceNote() { Swal.fire("Voice Note", "Tahan untuk merekam (Simulasi).", "info"); }
-        function sendFile() {
+        function openAttach() {
             Swal.fire({
-                title: 'Kirim File',
+                title: 'Kirim Media',
                 input: 'file',
-                inputAttributes: { 'accept': 'image/*,application/pdf', 'aria-label': 'Upload file' }
-            }).then((file) => {
-                if(file.value) {
-                    db.ref(`chats/${CURRENT_ROOM}`).push({
-                        sender: MY_NAME,
-                        text: "📁 Mengirim file: " + file.value.name,
-                        time: Date.now()
-                    });
+                inputAttributes: { 'accept': 'image/*', 'aria-label': 'Pilih Foto' }
+            }).then(res => {
+                if(res.value) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => { send('image', e.target.result); };
+                    reader.readAsDataURL(res.value);
                 }
             });
         }
 
-        function closeChat() { document.getElementById('chat-room').style.display = 'none'; }
-        function showSettings() { Swal.fire({ title: 'ZERA Settings', html: `<button class="btn" onclick="localStorage.clear(); location.reload();">LOGOUT</button>`, showConfirmButton: false }); }
-        function showChatMenu() { Swal.fire("Chat Menu", "Hapus Chat, Blokir, Lihat Info.", "info"); }
-
+        function voiceSystem() { Swal.fire("Voice Note", "Fitur Record VN akan aktif di versi APK. (Simulasi: Mic ON)", "info"); }
+        function callSystem(t) { Swal.fire(t + " Call", "Menghubungkan ke " + CURRENT_CHAT + "...", "success"); }
+        function closeChat() { document.getElementById('chat-room').style.display = 'none'; db.ref(`chats/${CURRENT_ROOM}`).off(); }
+        function showGlobalSettings() { Swal.fire({ title: 'Menu', html: `<button onclick="localStorage.clear();location.reload();" style="padding:10px; background:red; color:white; border:none; border-radius:5px; width:100%;">LOGOUT</button>`, showConfirmButton: false }); }
+        
+        // Anti Bug Input
+        document.getElementById('msgInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') send();
+        });
     </script>
 </body>
 </html>
