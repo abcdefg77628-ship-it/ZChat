@@ -1,381 +1,45 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZChat Core | zZerr44 Original</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-database.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        /* --- Z-CORE THEME ENGINE --- */
-        :root {
-            --z-bg: #050608;
-            --z-panel: #0d1117;
-            --z-accent: #00ff88;
-            --z-accent-glow: rgba(0, 255, 136, 0.3);
-            --z-border: #1f2937;
-            --z-text: #e5e7eb;
-            --z-text-dim: #6b7280;
-            --z-my-bbl: #00ff88;
-            --z-other-bbl: #161b22;
-        }
-
-        * { 
-            margin: 0; padding: 0; box-sizing: border-box; 
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace; 
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body { 
-            background: var(--z-bg); color: var(--z-text); 
-            height: 100vh; width: 100vw; overflow: hidden; 
-            display: flex; justify-content: center; align-items: center;
-        }
-
-        /* --- 1. INTRO: DECRYPTING SYSTEM --- */
-        #z-intro {
-            position: fixed; inset: 0; background: var(--z-bg);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 10000;
-        }
-        .z-box {
-            width: 80px; height: 80px; border: 3px solid var(--z-accent);
-            display: grid; place-items: center; font-size: 40px; font-weight: 900;
-            color: var(--z-accent); box-shadow: 0 0 15px var(--z-accent-glow);
-            animation: boot 2s infinite linear;
-        }
-        @keyframes boot { 
-            0% { transform: rotate(0deg) scale(1); border-color: var(--z-accent); }
-            50% { transform: rotate(180deg) scale(1.1); border-color: #fff; }
-            100% { transform: rotate(360deg) scale(1); border-color: var(--z-accent); }
-        }
-        .z-status { margin-top: 25px; letter-spacing: 5px; font-size: 12px; color: var(--z-accent); text-transform: uppercase; }
-
-        /* --- 2. AUTH: ACCESS PROTOCOL --- */
-        #z-auth {
-            display: none; width: 100%; height: 100vh;
-            flex-direction: column; justify-content: center; align-items: center;
-            background: radial-gradient(circle at center, #0d1117 0%, #050608 100%);
-        }
-        .auth-frame {
-            background: var(--z-panel); padding: 40px; border: 1px solid var(--z-border);
-            width: 90%; max-width: 380px; border-radius: 4px; position: relative;
-        }
-        .auth-frame::before { content: ""; position: absolute; top: -1px; left: -1px; width: 20px; height: 20px; border-top: 2px solid var(--z-accent); border-left: 2px solid var(--z-accent); }
-        .auth-frame::after { content: ""; position: absolute; bottom: -1px; right: -1px; width: 20px; height: 20px; border-bottom: 2px solid var(--z-accent); border-right: 2px solid var(--z-accent); }
-        
-        .auth-frame h2 { margin-bottom: 30px; font-size: 1.2rem; letter-spacing: 3px; color: var(--z-accent); text-align: center; }
-        
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; font-size: 10px; color: var(--z-text-dim); margin-bottom: 8px; text-transform: uppercase; }
-        .input-group input {
-            width: 100%; background: #000; border: 1px solid var(--z-border);
-            padding: 12px; color: var(--z-accent); outline: none; border-radius: 0;
-            transition: 0.3s;
-        }
-        .input-group input:focus { border-color: var(--z-accent); box-shadow: 0 0 10px var(--z-accent-glow); }
-
-        .z-btn {
-            width: 100%; padding: 15px; background: var(--z-accent); color: #000;
-            border: none; font-weight: 900; cursor: pointer; text-transform: uppercase;
-            letter-spacing: 2px; transition: 0.3s;
-        }
-        .z-btn:hover { background: #fff; }
-
-        /* --- 3. MAIN INTERFACE --- */
-        #z-app {
-            display: none; width: 100vw; height: 100vh;
-            grid-template-columns: 320px 1fr;
-        }
-
-        /* Sidebar */
-        #z-sidebar { 
-            background: var(--z-panel); border-right: 1px solid var(--z-border);
-            display: flex; flex-direction: column;
-        }
-        .s-header { padding: 20px; border-bottom: 1px solid var(--z-border); display: flex; justify-content: space-between; align-items: center; background: #090c10; }
-        .s-header strong { color: var(--z-accent); font-size: 1rem; }
-        
-        .s-search { padding: 15px; }
-        .s-search input { background: #000; padding: 10px; font-size: 12px; }
-
-        .contact-list { flex: 1; overflow-y: auto; }
-        .contact-item {
-            padding: 18px 20px; border-bottom: 1px solid #161b22; cursor: pointer;
-            display: flex; align-items: center; gap: 15px; transition: 0.2s;
-        }
-        .contact-item:hover { background: #161b22; }
-        .contact-item.active { background: #1c2128; border-left: 4px solid var(--z-accent); }
-        .contact-item i { color: var(--z-text-dim); }
-
-        /* Chat Area */
-        #z-main-chat { display: flex; flex-direction: column; background: var(--z-bg); position: relative; }
-        .c-header {
-            padding: 15px 25px; border-bottom: 1px solid var(--z-border);
-            display: flex; justify-content: space-between; align-items: center;
-            background: #090c10;
-        }
-        
-        #z-messages { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .msg-line { display: flex; width: 100%; }
-        .msg-line.me { justify-content: flex-end; }
-        
-        .z-bbl {
-            max-width: 75%; padding: 12px 16px; font-size: 13px; line-height: 1.6;
-            position: relative; border-radius: 2px;
-        }
-        .z-bbl.me { background: var(--z-my-bbl); color: #000; font-weight: 600; box-shadow: 4px 4px 0px #008f4c; }
-        .z-bbl.theirs { background: var(--z-other-bbl); color: var(--z-text); border: 1px solid var(--z-border); }
-
-        .z-footer { padding: 20px; background: var(--z-panel); border-top: 1px solid var(--z-border); display: flex; gap: 15px; }
-        .z-footer input { flex: 1; border-radius: 0; }
-        .z-send-btn { width: 55px; background: var(--z-accent); border: none; cursor: pointer; font-size: 1.2rem; display: grid; place-items: center; }
-
-        /* Settings Modal */
-        #z-modal {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: var(--z-panel); border: 1px solid var(--z-accent);
-            padding: 30px; width: 90%; max-width: 350px; z-index: 11000; display: none;
-        }
-
-        /* Responsive Mobile */
-        @media (max-width: 768px) {
-            #z-app { grid-template-columns: 1fr; }
-            #z-main-chat { position: fixed; inset: 0; display: none; z-index: 500; }
-            #z-main-chat.active { display: flex; }
-        }
-    </style>
-</head>
-<body>
-
-    <div id="z-intro">
-        <div class="z-box">Z</div>
-        <div class="z-status" id="boot-text">System.Initializing...</div>
-        <p style="margin-top: 50px; font-size: 9px; opacity: 0.4;">ENCRYPTED BY ZZERR44 CORE</p>
-    </div>
-
-    <div id="z-auth">
-        <div class="auth-frame">
-            <h2 id="auth-title">LOGIN_PROTOCOL</h2>
-            <div class="input-group">
-                <label>Identity_User</label>
-                <input type="text" id="inp-user" placeholder="root@zchat">
-            </div>
-            <div class="input-group">
-                <label>Security_Pass</label>
-                <input type="password" id="inp-pass" placeholder="********">
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:10px;">
-                <span style="color:var(--z-text-dim)">REMEMBER_SESSION</span>
-                <input type="checkbox" id="inp-keep" style="width:15px; height:15px;">
-            </div>
-            <button class="z-btn" onclick="handleAuth()">EXECUTE</button>
-            <p id="switch-auth" onclick="toggleAuth()" style="margin-top:25px; text-align:center; font-size:10px; color:var(--z-accent); cursor:pointer;">[ REGISTER_NEW_ID ]</p>
-        </div>
-    </div>
-
-    <div id="z-app">
-        <aside id="z-sidebar">
-            <div class="s-header">
-                <strong id="display-me">ZZERR44</strong>
-                <div>
-                    <i class="fa fa-user-plus" onclick="addFriend()" style="cursor:pointer; margin-right:20px;" title="Add User"></i>
-                    <i class="fa fa-terminal" onclick="openSettings()" style="cursor:pointer;" title="Settings"></i>
-                </div>
-            </div>
-            <div class="s-search">
-                <input type="text" id="inp-search" placeholder="SEARCH_PROTOCOLS..." onkeyup="searchContact()">
-            </div>
-            <div class="contact-list" id="list-contacts">
-                </div>
-        </aside>
-
-        <main id="z-main-chat">
-            <div class="c-header">
-                <div style="display:flex; align-items:center;">
-                    <i class="fa fa-code-merge" id="m-back" style="display:none; margin-right:15px; cursor:pointer; color:var(--z-accent);" onclick="closeChat()"></i>
-                    <div>
-                        <h4 id="target-id" style="letter-spacing:1px;">NULL_TARGET</h4>
-                        <span id="target-status" style="font-size:9px; color:var(--z-accent);">LISTENING...</span>
-                    </div>
-                </div>
-                <div id="chat-tools" style="display:none;">
-                    <i class="fa fa-user-slash" onclick="blockUser()" style="margin-right:20px; cursor:pointer; opacity:0.6;" title="Block"></i>
-                    <i class="fa fa-trash-can" onclick="clearChat()" style="cursor:pointer; opacity:0.6;" title="Clear"></i>
-                </div>
-            </div>
-            <div id="z-messages">
-                </div>
-            <div class="z-footer" id="input-area" style="display:none;">
-                <input type="text" id="inp-msg" placeholder="TYPE_MESSAGE_HERE...">
-                <button class="z-send-btn" onclick="sendMessage()"><i class="fa fa-bolt"></i></button>
-            </div>
-        </main>
-    </div>
-
-    <div id="z-modal">
-        <h3 style="color:var(--z-accent); margin-bottom:20px; font-size:14px;">SYSTEM_CONFIG</h3>
-        <div style="margin-bottom:20px;">
-            <label style="font-size:10px; color:var(--z-text-dim);">WALLPAPER_HEX</label>
-            <input type="color" onchange="changeWall(this.value)" style="width:100%; height:35px; border:none; background:none; cursor:pointer;">
-        </div>
-        <button class="z-btn" onclick="logout()" style="background:#ff3b3b; margin-bottom:10px;">TERMINATE</button>
-        <button class="z-btn" onclick="closeSettings()" style="background:var(--z-border); color:#fff;">CANCEL</button>
-    </div>
-
-    <script>
-        // --- CORE ENGINE: FIREBASE ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
-            databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "zchat-56639"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        // --- STATE MANAGEMENT ---
-        let me = localStorage.getItem('z_session_core') || null;
-        let activeTarget = null;
-        let authMode = 'login';
-
-        // --- AUTH FUNCTIONS ---
-        function toggleAuth() {
-            authMode = (authMode === 'login') ? 'reg' : 'login';
-            document.getElementById('auth-title').innerText = (authMode === 'login') ? 'LOGIN_PROTOCOL' : 'REGISTER_ID';
-            document.getElementById('switch-auth').innerText = (authMode === 'login') ? '[ REGISTER_NEW_ID ]' : '[ BACK_TO_LOGIN ]';
-        }
-
-        async function handleAuth() {
-            const u = document.getElementById('inp-user').value.toLowerCase().trim();
-            const p = document.getElementById('inp-pass').value;
-            if(!u || !p) return alert("ERR: EMPTY_FIELDS");
-
-            const ref = db.ref('users/' + u);
-            const snap = await ref.once('value');
-
-            if(authMode === 'reg') {
-                if(snap.exists()) return alert("ERR: ID_EXISTS");
-                await ref.set({pass: p});
-                alert("SUCCESS: ID_CREATED"); toggleAuth();
-            } else {
-                if(snap.exists() && snap.val().pass === p) {
-                    me = u;
-                    if(document.getElementById('inp-keep').checked) localStorage.setItem('z_session_core', u);
-                    runApp();
-                } else alert("ERR: INVALID_ACCESS");
-            }
-        }
-
-        function runApp() {
-            document.getElementById('z-auth').style.display = 'none';
-            document.getElementById('z-app').style.display = 'grid';
-            document.getElementById('display-me').innerText = me.toUpperCase();
-            loadContacts();
-        }
-
-        // --- CONTACTS LOGIC ---
-        async function addFriend() {
-            const target = prompt("ENTER_TARGET_ID:").toLowerCase().trim();
-            if(!target || target === me) return;
-            const check = await db.ref('users/' + target).once('value');
-            if(!check.exists()) return alert("ERR: TARGET_NOT_FOUND");
-            await db.ref(`contacts/${me}/${target}`).set(true);
-        }
-
-        function loadContacts() {
-            db.ref('contacts/' + me).on('value', snap => {
-                const container = document.getElementById('list-contacts');
-                container.innerHTML = "";
-                snap.forEach(child => {
-                    const name = child.key;
-                    const div = document.createElement('div');
-                    div.className = 'contact-item';
-                    div.innerHTML = `<i class="fa fa-ghost"></i> <span>${name.toUpperCase()}</span>`;
-                    div.onclick = () => openChat(name);
-                    container.appendChild(div);
-                });
-            });
-        }
-
-        // --- CHAT LOGIC ---
-        function openChat(target) {
-            activeTarget = target;
-            document.getElementById('target-id').innerText = target.toUpperCase();
-            document.getElementById('input-area').style.display = 'flex';
-            document.getElementById('chat-tools').style.display = 'block';
-            
-            if(window.innerWidth <= 768) {
-                document.getElementById('z-main-chat').classList.add('active');
-                document.getElementById('m-back').style.display = 'block';
-            }
-
-            const roomId = [me, target].sort().join("___");
-            db.ref('msgs/' + roomId).off(); // Kill old listener
-            db.ref('msgs/' + roomId).on('value', snap => {
-                const box = document.getElementById('z-messages');
-                box.innerHTML = "";
-                snap.forEach(m => {
-                    const data = m.val();
-                    const line = document.createElement('div');
-                    line.className = `msg-line ${data.s === me ? 'me' : ''}`;
-                    line.innerHTML = `<div class="z-bbl ${data.s === me ? 'me' : 'theirs'}">${data.t}</div>`;
-                    box.appendChild(line);
-                });
-                box.scrollTop = box.scrollHeight;
-            });
-        }
-
-        async function sendMessage() {
-            const text = document.getElementById('inp-msg').value.trim();
-            if(!text || !activeTarget) return;
-
-            // Security Check: Blocked status
-            const isBlocked = await db.ref(`blocked/${activeTarget}/${me}`).once('value');
-            if(isBlocked.exists()) return alert("SIGNAL_LOST: ACCESS_DENIED_BY_TARGET");
-
-            const roomId = [me, activeTarget].sort().join("___");
-            db.ref('msgs/' + roomId).push({
-                s: me,
-                t: text,
-                ts: Date.now()
-            });
-            document.getElementById('inp-msg').value = "";
-        }
-
-        // --- SYSTEM TOOLS ---
-        window.closeChat = () => document.getElementById('z-main-chat').classList.remove('active');
-        window.openSettings = () => document.getElementById('z-modal').style.display = 'block';
-        window.closeSettings = () => document.getElementById('z-modal').style.display = 'none';
-        window.logout = () => { localStorage.clear(); location.reload(); };
-        window.changeWall = (color) => document.getElementById('z-main-chat').style.background = color;
-        window.clearChat = () => { if(confirm("ERASE_HISTORY?")) db.ref('msgs/' + [me, activeTarget].sort().join("___")).remove(); };
-        window.blockUser = () => { if(confirm("BLOCK_TARGET?")) db.ref(`blocked/${me}/${activeTarget}`).set(true); };
-        window.searchContact = () => {
-            const q = document.getElementById('inp-search').value.toLowerCase();
-            document.querySelectorAll('.contact-item').forEach(el => {
-                el.style.display = el.innerText.toLowerCase().includes(q) ? 'flex' : 'none';
-            });
-        };
-
-        // --- BOOT SEQUENCE ---
-        window.onload = () => {
-            const bootText = document.getElementById('boot-text');
-            setTimeout(() => { bootText.innerText = "Security.Bypassing..."; }, 800);
-            setTimeout(() => { bootText.innerText = "Z-Core.Ready."; }, 1600);
-            
-            setTimeout(() => {
-                document.getElementById('z-intro').style.display = 'none';
-                if(me) runApp();
-                else document.getElementById('z-auth').style.display = 'flex';
-            }, 2500);
-        };
-
-        // Event: Enter to send
-        document.getElementById('inp-msg').onkeydown = (e) => { if(e.key === 'Enter') sendMessage(); };
-    </script>
-</body>
-                    </html>
-    
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ZChat | zZerr44</title>
+<script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-database.js"></script>
+<style>
+  :root{--a:#00ff88;--b:#050608;--p:#0d1117;--t:#e5e7eb}
+  *{margin:0;padding:0;box-sizing:border-box;font-family:monospace}
+  body{background:var(--b);color:var(--t);height:100vh;display:flex;overflow:hidden}
+  #auth{position:fixed;inset:0;background:var(--b);z-index:9;display:flex;justify-content:center;align-items:center}
+  .box{background:var(--p);padding:30px;border:1px solid #1f2937;width:320px;text-align:center}
+  input{width:100%;background:#000;border:1px solid #1f2937;padding:12px;color:var(--a);margin:10px 0;outline:none}
+  button{width:100%;padding:12px;background:var(--a);color:#000;font-weight:900;border:none;cursor:pointer}
+  #app{display:none;width:100%;grid-template-columns:250px 1fr}
+  #side{background:var(--p);border-right:1px solid #1f2937;display:flex;flex-direction:column}
+  .h{padding:15px;border-bottom:1px solid #1f2937;display:flex;justify-content:space-between;align-items:center;background:#090c10}
+  #msg{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+  .b{max-width:80%;padding:10px;border-radius:2px;font-size:14px}
+  .me{align-self:flex-end;background:var(--a);color:#000;font-weight:bold}
+  .ot{align-self:flex-start;background:#161b22;border:1px solid #1f2937}
+  .f{padding:15px;background:var(--p);display:flex;gap:10px}
+  @media(max-width:700px){#app{grid-template-columns:1fr}#chat{position:fixed;inset:0;display:none}#chat.a{display:flex}}
+</style></head><body>
+<div id="auth"><div class="box"><h2 id="at" style="color:var(--a);letter-spacing:2px">Z-LOGIN</h2>
+<input id="iu" placeholder="ID"><input type="password" id="ip" placeholder="KEY">
+<button onclick="hA()">EXECUTE</button><p onclick="tA()" style="font-size:10px;color:var(--a);cursor:pointer;margin-top:15px">[ SWITCH MODE ]</p></div></div>
+<div id="app"><aside id="side"><div class="h"><b id="mi" style="color:var(--a)">ID</b><button onclick="aF()" style="width:30px">+</button></div><div id="lc" style="flex:1;overflow-y:auto"></div></aside>
+<main id="chat" style="display:flex;flex-direction:column;width:100%"><div class="h"><div><button id="bk" style="display:none;margin-right:10px" onclick="cC()"><</button><span id="ti">SELECT_ID</span></div><button onclick="lO()" style="background:red;color:#fff;width:30px">X</button></div>
+<div id="msg"></div><div class="f" id="ia" style="display:none"><input id="im" placeholder="MESSAGE..."><button onclick="sM()" style="width:60px;background:var(--a)">></button></div></main></div>
+<script>
+const c={apiKey:"AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",databaseURL:"https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"zchat-56639"};
+firebase.initializeApp(c);const d=firebase.database();let me=localStorage.getItem('zs'),ac=null,mo='l';
+function tA(){mo=(mo==='l')?'r':'l';document.getElementById('at').innerText=mo==='l'?'Z-LOGIN':'Z-REG';}
+async function hA(){const u=document.getElementById('iu').value.toLowerCase().trim(),p=document.getElementById('ip').value;if(!u||!p)return;const s=await d.ref('users/'+u).once('value');
+if(mo==='r'){if(s.exists())return alert('ID TAKEN');await d.ref('users/'+u).set({pass:p});alert('CREATED');tA();}
+else{if(s.exists()&&s.val().pass===p){me=u;localStorage.setItem('zs',u);st();}else alert('DENIED');}}
+function st(){document.getElementById('auth').style.display='none';document.getElementById('app').style.display='grid';document.getElementById('mi').innerText=me.toUpperCase();
+d.ref('contacts/'+me).on('value',s=>{const l=document.getElementById('lc');l.innerHTML="";s.forEach(c=>{const x=document.createElement('div');x.style.padding="15px";x.style.borderBottom="1px solid #161b22";x.innerText="> "+c.key.toUpperCase();x.onclick=()=>oC(c.key);l.appendChild(x);});});}
+function oC(t){ac=t;document.getElementById('ti').innerText=t.toUpperCase();document.getElementById('ia').style.display='flex';if(window.innerWidth<700){document.getElementById('chat').classList.add('a');document.getElementById('bk').style.display='inline';}
+d.ref('msgs/'+[me,t].sort().join('_')).on('value',s=>{const b=document.getElementById('msg');b.innerHTML="";s.forEach(k=>{const v=k.val(),e=document.createElement('div');e.className=`b ${v.s===me?'me':'ot'}`;e.innerText=v.t;b.appendChild(e);});b.scrollTop=b.scrollHeight;});}
+function sM(){const t=document.getElementById('im').value;if(!t||!ac)return;d.ref('msgs/'+[me,ac].sort().join('_')).push({s:me,t:t});document.getElementById('im').value="";}
+function aF(){const f=prompt("TARGET ID:");if(f&&f.toLowerCase()!==me)d.ref('contacts/'+me+'/'+f.toLowerCase()).set(true);}
+function cC(){document.getElementById('chat').classList.remove('a');}
+function lO(){localStorage.clear();location.reload();}
+window.onload=()=>{if(me)st();};document.getElementById('im').onkeydown=(e)=>{if(e.key==='Enter')sM();};
+</script></body></html>
