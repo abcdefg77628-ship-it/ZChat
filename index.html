@@ -3,57 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZChat Direct</title>
+    <title>ZChat - Anti Google</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
     
     <style>
-        :root { --p: #00a884; --bg: #111b21; --l: #202c33; --t: #e9edef; --out: #005c4b; --in: #202c33; }
+        :root { --p: #00a884; --bg: #0b141a; --l: #202c33; --t: #e9edef; --out: #005c4b; --in: #202c33; }
         * { margin:0; padding:0; box-sizing:border-box; font-family: sans-serif; }
         body { background: var(--bg); color: var(--t); height: 100vh; overflow: hidden; }
 
-        /* Page System */
+        /* UI Auth */
         .page { display:none; height:100vh; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
-        .card { background:var(--l); padding:30px; border-radius:20px; width:100%; max-width:400px; text-align:center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .card { background:var(--l); padding:30px; border-radius:15px; width:100%; max-width:400px; text-align:center; }
+        input { width:100%; padding:15px; margin:10px 0; border-radius:10px; border:none; background:#2a3942; color:#fff; outline:none; }
+        button { width:100%; padding:15px; border-radius:10px; border:none; background:var(--p); color:#fff; font-weight:bold; cursor:pointer; margin-top:10px; }
         
-        input { width:100%; padding:14px; margin:10px 0; border-radius:10px; border:none; background:#2a3942; color:#fff; outline:none; font-size:16px; }
-        button { width:100%; padding:14px; border-radius:10px; border:none; background:var(--p); color:#fff; font-weight:bold; cursor:pointer; margin-top:10px; }
-        
-        /* Foto Profil Setup */
-        .up-box { width:90px; height:90px; background:#333; border-radius:50%; margin:0 auto 15px; cursor:pointer; overflow:hidden; border:2px solid var(--p); display:flex; align-items:center; justify-content:center; }
+        .up-box { width:100px; height:100px; background:#333; border-radius:50%; margin:0 auto 15px; cursor:pointer; overflow:hidden; border:2px solid var(--p); display:flex; align-items:center; justify-content:center; }
         #p-img { width:100%; height:100%; object-fit:cover; display:none; }
 
-        /* Main Layout */
-        #main-app { display:none; height:100vh; grid-template-columns: 320px 1fr; }
+        /* Layout Utama */
+        #main-app { display:none; height:100vh; grid-template-columns: 350px 1fr; }
         .sidebar { background:var(--bg); border-right:1px solid #222; display:flex; flex-direction:column; }
-        .header { padding:15px; background:var(--l); display:flex; justify-content:space-between; align-items:center; color: var(--p); font-weight:bold; }
+        .header { padding:15px; background:var(--l); display:flex; justify-content:space-between; align-items:center; }
         
         .user-list { flex:1; overflow-y:auto; }
-        .u-item { display:flex; padding:15px; border-bottom:1px solid #222; cursor:pointer; align-items:center; transition: 0.2s; }
-        .u-item:hover { background: #1c272d; }
-        .av { width:45px; height:45px; border-radius:50%; margin-right:12px; object-fit:cover; background:#444; }
+        .u-item { display:flex; padding:15px; border-bottom:1px solid #1a2226; cursor:pointer; align-items:center; }
+        .u-item:hover { background: #2a3942; }
+        .av { width:50px; height:50px; border-radius:50%; margin-right:12px; object-fit:cover; background:#444; }
 
-        /* Chat Area */
-        .win { display:flex; flex-direction:column; background:#0b141a; position:relative; }
-        .chat-h { padding:10px 15px; background:var(--l); display:flex; align-items:center; gap:12px; height:60px; }
+        /* Chat Area dengan Wallpaper */
+        .win { display:flex; flex-direction:column; background:#0b141a; background-image: url('https://w0.peakpx.com/wallpaper/580/550/HD-wallpaper-whatsapp-dark-mode-pattern-whatsapp-dark-mode-pattern.jpg'); background-blend-mode: multiply; }
+        .chat-h { padding:10px 15px; background:var(--l); display:flex; align-items:center; gap:12px; height:60px; position:relative; }
+        
+        /* Dropdown Menu Titik 3 */
+        .menu-btn { cursor:pointer; font-size:24px; padding:5px 10px; }
+        .dropdown { position:absolute; right:10px; top:55px; background:var(--l); border-radius:5px; display:none; flex-direction:column; min-width:150px; box-shadow:0 5px 15px rgba(0,0,0,0.5); z-index:500; }
+        .dropdown div { padding:12px 15px; cursor:pointer; font-size:14px; }
+        .dropdown div:hover { background:#2a3942; }
+
         .msgs { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; }
-        .m-wrap { margin-bottom:12px; max-width:80%; padding:10px; border-radius:12px; font-size:15px; position:relative; }
-        .s { background:var(--out); align-self:flex-end; border-bottom-right-radius: 2px; }
-        .r { background:var(--in); align-self:flex-start; border-bottom-left-radius: 2px; }
+        .m-wrap { margin-bottom:10px; max-width:80%; padding:10px; border-radius:10px; font-size:15px; }
+        .s { background:var(--out); align-self:flex-end; }
+        .r { background:var(--in); align-self:flex-start; }
 
-        .in-bar { padding:12px; background:var(--l); display:flex; gap:10px; align-items:center; }
-        .in-bar input { margin:0; border-radius:25px; padding-left:20px; }
-
-        /* Settings Modal */
-        #sett-modal { position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; z-index:1000; }
+        .in-bar { padding:15px; background:var(--l); display:flex; gap:10px; }
+        .in-bar input { margin:0; border-radius:25px; }
 
         @media (max-width: 768px) {
             #main-app { grid-template-columns: 1fr; }
             .win { position:fixed; inset:0; display:none; z-index:100; }
             .win.active { display:flex; }
-            #back-btn { display:block !important; }
         }
     </style>
 </head>
@@ -61,83 +61,71 @@
 
     <div id="login-page" class="page" style="display:flex;">
         <div class="card">
-            <h1 style="color:var(--p); font-size:40px;">Z</h1>
-            <p style="margin-bottom:20px; opacity:0.6;">Chat Original No-Delay</p>
+            <h1 style="color:var(--p); font-size:50px;">Z</h1>
             <input type="text" id="l-u" placeholder="Username">
             <input type="password" id="l-p" placeholder="Password">
             <button onclick="doLogin()">MASUK</button>
-            <p onclick="showPage('reg-page')" style="margin-top:15px; cursor:pointer; font-size:14px; opacity:0.7;">Daftar Akun Baru</p>
+            <p onclick="showPage('reg-page')" style="margin-top:20px; cursor:pointer; opacity:0.7;">Daftar Akun Baru</p>
         </div>
     </div>
 
     <div id="reg-page" class="page">
         <div class="card">
-            <h2 style="color:var(--p)">Buat Profil Z</h2>
+            <h2>Daftar ZChat</h2>
             <div class="up-box" onclick="document.getElementById('f-in').click()">
                 <img id="p-img" src="">
-                <span id="p-plus" style="font-size:30px;">+</span>
+                <span id="p-txt" style="font-size:30px">+</span>
             </div>
-            <input type="file" id="f-in" hidden accept="image/*" onchange="prev(this)">
+            <input type="file" id="f-in" hidden accept="image/*" onchange="encodeImg(this)">
             <input type="text" id="r-u" placeholder="Username">
-            <input type="password" id="r-p" placeholder="Password (Min 6)">
-            <button id="btn-reg" onclick="doReg()">DAFTAR</button>
-            <p onclick="showPage('login-page')" style="margin-top:10px; cursor:pointer; font-size:13px;">Kembali Login</p>
+            <input type="password" id="r-p" placeholder="Password">
+            <button id="btn-reg" onclick="doReg()">DAFTAR & SIMPAN</button>
+            <p onclick="showPage('login-page')" style="margin-top:10px; cursor:pointer;">Balik Login</p>
         </div>
     </div>
 
     <div id="main-app">
         <div class="sidebar">
             <div class="header">
-                <span id="my-display">ZCHAT</span>
-                <div style="display:flex; gap:15px;">
-                    <span onclick="openSett()" style="cursor:pointer;">&#9881;</span>
-                    <span onclick="addUser()" style="cursor:pointer; font-size:22px;">+</span>
-                </div>
+                <b style="color:var(--p)">ZCHAT</b>
+                <span onclick="findFriend()" style="cursor:pointer; font-size:25px">+</span>
             </div>
-            <div id="friend-list" class="user-list"></div>
-            <div onclick="logout()" style="padding:15px; text-align:center; font-size:12px; color:red; cursor:pointer; border-top:1px solid #222;">Logout</div>
+            <div id="u-list" class="user-list"></div>
+            <div onclick="logout()" style="padding:15px; color:red; cursor:pointer; text-align:center; font-size:12px;">LOGOUT</div>
         </div>
         <div id="win" class="win">
             <div class="chat-h">
-                <span onclick="closeChat()" id="back-btn" style="display:none; cursor:pointer; font-size:22px;">&#8592;</span>
-                <img id="c-av" class="av" style="width:35px; height:35px;">
-                <b id="c-n">Nama Teman</b>
+                <span onclick="closeChat()" id="back" style="display:none; cursor:pointer">&#8592;</span>
+                <img id="c-av" class="av" style="width:35px; height:35px">
+                <div style="flex:1;"><b id="c-n">Nama</b></div>
+                <div class="menu-btn" onclick="toggleMenu()">&#8942;</div>
+                <div id="drop" class="dropdown">
+                    <div onclick="alert('Profil user sedang dikembangkan')">Lihat Profil</div>
+                    <div onclick="clearChat()" style="color:red">Hapus Chat</div>
+                </div>
             </div>
             <div id="m-cont" class="msgs"></div>
             <div class="in-bar">
                 <input type="text" id="m-in" placeholder="Ketik pesan..." onkeypress="if(event.key==='Enter') send()">
-                <button onclick="send()" style="width:auto; padding:10px 15px; margin:0; border-radius:50%;">&#10148;</button>
+                <button onclick="send()" style="width:auto; padding:10px 20px; border-radius:50%;">&#10148;</button>
             </div>
-        </div>
-    </div>
-
-    <div id="sett-modal">
-        <div class="card">
-            <h3>Update Status</h3>
-            <input type="text" id="s-stat" placeholder="Status baru...">
-            <button onclick="saveSett()">Simpan</button>
-            <button onclick="document.getElementById('sett-modal').style.display='none'" style="background:transparent; color:#888;">Batal</button>
         </div>
     </div>
 
     <script>
         const config = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
-            authDomain: "zchat-56639.firebaseapp.com",
             databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "zchat-56639",
-            storageBucket: "zchat-56639.firebasestorage.app",
-            appId: "1:773931983053:web:a1c825be9a972e53dcc984"
+            projectId: "zchat-56639"
         };
         firebase.initializeApp(config);
         const db = firebase.database();
-        const st = firebase.storage();
 
-        let me = JSON.parse(localStorage.getItem('z_user_v2'));
+        let me = JSON.parse(localStorage.getItem('z_user_pro'));
         let activeId = null;
+        let base64Img = "";
 
-        // Auto-Check Login (Pengganti Intro)
-        window.onload = () => { if(me) start(); };
+        if(me) start();
 
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.style.display='none');
@@ -145,32 +133,33 @@
             if(id !== 'none') document.getElementById(id).style.display='flex';
         }
 
-        function prev(el) {
-            const f = el.files[0];
-            if(f) {
-                document.getElementById('p-plus').style.display='none';
-                document.getElementById('p-img').src = URL.createObjectURL(f);
+        // Sistem Anti-Google Storage (Pake Base64)
+        function encodeImg(el) {
+            const file = el.files[0];
+            const reader = new FileReader();
+            reader.onloadend = function() {
+                base64Img = reader.result;
+                document.getElementById('p-txt').style.display='none';
+                document.getElementById('p-img').src = base64Img;
                 document.getElementById('p-img').style.display='block';
             }
+            if(file) reader.readAsDataURL(file);
         }
 
         async function doReg() {
             const u = document.getElementById('r-u').value.toLowerCase().trim();
             const p = document.getElementById('r-p').value;
-            const f = document.getElementById('f-in').files[0];
-            if(!u || p.length < 6) return alert("Isi data dengan benar!");
-
+            if(!u || !p) return alert("Isi semua data!");
+            
+            const btn = document.getElementById('btn-reg');
+            btn.innerText = "Saving...";
+            
             const snap = await db.ref('users/'+u).get();
             if(snap.exists()) return alert("Username sudah ada!");
 
-            let url = "https://ui-avatars.com/api/?name="+u;
-            if(f) {
-                const r = st.ref('p/'+u);
-                await r.put(f);
-                url = await r.getDownloadURL();
-            }
-            await db.ref('users/'+u).set({u, p, photo:url, status: 'Online'});
-            alert("Berhasil Daftar!"); showPage('login-page');
+            const photo = base64Img || "https://ui-avatars.com/api/?name="+u;
+            await db.ref('users/'+u).set({u, p, photo});
+            alert("Profil Tersimpan!"); showPage('login-page');
         }
 
         function doLogin() {
@@ -179,29 +168,28 @@
             db.ref('users/'+u).get().then(s => {
                 if(s.exists() && s.val().p === p) {
                     me = s.val();
-                    localStorage.setItem('z_user_v2', JSON.stringify(me));
+                    localStorage.setItem('z_user_pro', JSON.stringify(me));
                     start();
-                } else alert("Username/Password Salah!");
+                } else alert("Gagal!");
             });
         }
 
         function start() {
             showPage('none');
             document.getElementById('main-app').style.display='grid';
-            document.getElementById('my-display').innerText = "ZCHAT (" + me.u + ")";
-            if(window.innerWidth <= 768) document.getElementById('back-btn').style.display='block';
+            if(window.innerWidth <= 768) document.getElementById('back').style.display='block';
             loadFriends();
             listenRequests();
         }
 
-        function addUser() {
-            const t = prompt("Masukkan Username Teman:");
+        function findFriend() {
+            const t = prompt("Masukkan Username:");
             if(!t || t === me.u) return;
             db.ref('users/'+t).get().then(s => {
                 if(s.exists()) {
                     db.ref('req/'+t+'/'+me.u).set({from:me.u, status:'p'});
-                    alert("Izin chat dikirim ke "+t);
-                } else alert("User tidak ditemukan!");
+                    alert("Izin chat terkirim!");
+                } else alert("User tidak ada!");
             });
         }
 
@@ -213,21 +201,20 @@
                         db.ref('f/'+me.u+'/'+r.from).set(true);
                         db.ref('f/'+r.from+'/'+me.u).set(true);
                         db.ref('req/'+me.u+'/'+r.from).update({status:'ok'});
-                    } else db.ref('req/'+me.u+'/'+r.from).remove();
+                    }
                 }
             });
         }
 
         function loadFriends() {
             db.ref('f/'+me.u).on('value', s => {
-                const list = document.getElementById('friend-list'); list.innerHTML = "";
-                if(!s.exists()) list.innerHTML = "<p style='padding:20px; opacity:0.4; font-size:12px; text-align:center;'>Belum ada teman. Klik +</p>";
+                const list = document.getElementById('u-list'); list.innerHTML = "";
                 s.forEach(c => {
                     db.ref('users/'+c.key).get().then(us => {
                         const ud = us.val();
                         const div = document.createElement('div');
                         div.className = 'u-item';
-                        div.innerHTML = `<img src="${ud.photo}" class="av"><div><b>${ud.u}</b><br><small style="opacity:0.5; font-size:11px;">${ud.status}</small></div>`;
+                        div.innerHTML = `<img src="${ud.photo}" class="av"><b>${ud.u}</b>`;
                         div.onclick = () => openChat(ud);
                         list.appendChild(div);
                     });
@@ -241,39 +228,41 @@
             document.getElementById('c-av').src = user.photo;
             if(window.innerWidth <= 768) document.getElementById('win').classList.add('active');
             
-            db.ref('m/'+activeId).off();
             db.ref('m/'+activeId).on('value', s => {
-                const cont = document.getElementById('m-cont'); cont.innerHTML = "";
+                const c = document.getElementById('m-cont'); c.innerHTML = "";
                 s.forEach(ch => {
                     const m = ch.val();
                     const d = document.createElement('div');
                     d.className = `m-wrap ${m.s === me.u ? 's' : 'r'}`;
-                    d.innerHTML = `<div class="msg">${m.t}</div>`;
-                    cont.appendChild(d);
+                    d.innerHTML = m.t;
+                    c.appendChild(d);
                 });
-                cont.scrollTop = cont.scrollHeight;
+                c.scrollTop = c.scrollHeight;
             });
         }
 
         function send() {
             const i = document.getElementById('m-in');
-            if(!i.value.trim() || !activeId) return;
-            db.ref('m/'+activeId).push({s:me.u, t:i.value.trim(), time:Date.now()});
+            if(!i.value || !activeId) return;
+            db.ref('m/'+activeId).push({s:me.u, t:i.value});
             i.value = "";
         }
 
-        function openSett() { document.getElementById('sett-modal').style.display='flex'; }
-        function saveSett() {
-            const ns = document.getElementById('s-stat').value;
-            db.ref('users/'+me.u).update({status: ns});
-            me.status = ns;
-            localStorage.setItem('z_user_v2', JSON.stringify(me));
-            alert("Status diperbarui!");
-            location.reload();
+        function toggleMenu() { 
+            const d = document.getElementById('drop');
+            d.style.display = d.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function clearChat() {
+            if(confirm("Hapus semua pesan?")) {
+                db.ref('m/'+activeId).remove();
+                toggleMenu();
+            }
         }
 
         function logout() { localStorage.clear(); location.reload(); }
         function closeChat() { document.getElementById('win').classList.remove('active'); }
     </script>
 </body>
-</html>
+    </html>
+    
