@@ -2,107 +2,320 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZERA - Pro Connected</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZChat - Realtime Messaging</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        :root { --wa-green: #25d366; --wa-light: #dcf8c6; --bg: #f0f2f5; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body, html { margin: 0; padding: 0; height: 100vh; background: var(--bg); overflow: hidden; }
+        :root {
+            --primary: #075e54;
+            --secondary: #128c7e;
+            --bg-light: #f0f2f5;
+            --bg-dark: #111b21;
+            --text-main: #3b4a54;
+            --my-chat: #d9fdd3;
+            --other-chat: #ffffff;
+            --accent: #25d366;
+            --transition: all 0.3s ease;
+        }
 
-        /* HEADER & APP */
-        #main-app { display: none; height: 100vh; flex-direction: column; background: white; }
-        .header { background: #f0f2f5; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+        /* Dark Mode Toggle */
+        body.dark-mode {
+            --bg-light: #0b141a;
+            --text-main: #e9edef;
+            --other-chat: #202c33;
+            --my-chat: #005c4b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-light);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: var(--text-main);
+        }
+
+        /* --- 1. INTRO SCREEN --- */
+        #intro-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            text-align: center;
+        }
+
+        .intro-logo { font-size: 3rem; font-weight: bold; margin-bottom: 10px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        /* --- 2 & 3. AUTH SCREEN --- */
+        #auth-container {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 100;
+        }
+
+        .auth-title { text-align: center; margin-bottom: 25px; color: var(--primary); }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; }
+        .input-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
         
-        /* NOTIF ACC/REJECT */
-        #req-box { background: #e7f3ff; padding: 10px; display: none; border-bottom: 2px solid #0080ff; }
-        .req-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: white; border-radius: 12px; margin-bottom: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: var(--transition); }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { opacity: 0.9; }
 
-        /* CONTACT LIST */
-        .contact-item { padding: 15px; border-bottom: 1px solid #f2f2f2; display: flex; align-items: center; cursor: pointer; }
-        .avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--wa-green); color: white; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold; font-size: 20px; }
-
-        /* CHAT ROOM */
-        #chat-room { display: none; position: fixed; inset: 0; background: #e5ddd5; flex-direction: column; z-index: 100; }
-        .chat-view { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .switch-auth { text-align: center; margin-top: 15px; font-size: 0.85rem; cursor: pointer; color: var(--secondary); }
         
-        .bubble { max-width: 80%; padding: 10px 14px; border-radius: 15px; font-size: 14px; position: relative; line-height: 1.4; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
-        .msg-in { background: white; align-self: flex-start; border-top-left-radius: 0; }
-        .msg-out { background: var(--wa-light); align-self: flex-end; border-top-right-radius: 0; }
-        .msg-img { width: 100%; max-width: 200px; border-radius: 10px; margin-top: 5px; cursor: pointer; }
+        /* Toggle Switch */
+        .keep-login-wrap { display: flex; align-items: center; justify-content: space-between; margin: 15px 0; font-size: 0.85rem; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
-        /* FOOTER */
-        .footer { background: #f0f2f5; padding: 10px; display: flex; align-items: center; gap: 12px; }
-        .footer input { flex: 1; border: none; border-radius: 25px; padding: 12px 18px; outline: none; font-size: 15px; }
-        .icon-btn { font-size: 20px; color: #54656f; cursor: pointer; transition: 0.2s; }
-        .icon-btn:active { transform: scale(0.8); }
+        /* --- 4. MAIN CHAT INTERFACE --- */
+        #main-app {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            grid-template-columns: 350px 1fr;
+        }
 
-        .btn-send { background: var(--wa-green); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        /* Sidebar */
+        #sidebar {
+            background: var(--other-chat);
+            border-right: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
 
-        /* LOGIN PAGE */
-        .login-page { display: flex; height: 100vh; align-items: center; justify-content: center; background: #25d366; }
-        .card { background: white; padding: 40px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
-        input.auth { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; outline: none; text-align: center; font-size: 16px; }
+        .sidebar-header {
+            padding: 15px;
+            background: var(--bg-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #ccc; display: grid; place-items: center; }
+
+        .search-box { padding: 10px; }
+        .search-box input { width: 100%; padding: 8px 15px; border-radius: 20px; border: none; background: var(--bg-light); outline: none; }
+
+        .contact-list { flex: 1; overflow-y: auto; }
+        .contact-item {
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: var(--transition);
+        }
+        .contact-item:hover { background: var(--bg-light); }
+        .contact-item.active { background: #ebebeb; }
+
+        /* Chat Area */
+        #chat-area {
+            display: flex;
+            flex-direction: column;
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            background-color: #e5ddd5;
+        }
+
+        .chat-header {
+            padding: 10px 20px;
+            background: var(--bg-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        #messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .msg {
+            max-width: 65%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .msg-sent { align-self: flex-end; background: var(--my-chat); }
+        .msg-received { align-self: flex-start; background: var(--other-chat); }
+        .msg-time { font-size: 0.7rem; color: #888; text-align: right; margin-top: 4px; }
+
+        .chat-input-area {
+            padding: 10px 20px;
+            background: var(--bg-light);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+        }
+
+        /* Settings Modal */
+        #settings-modal {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            display: none;
+            z-index: 1000;
+            width: 90%; max-width: 400px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 999;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            #main-app { grid-template-columns: 1fr; }
+            #sidebar { display: block; }
+            #chat-area { display: none; position: absolute; inset: 0; z-index: 10; }
+            #chat-area.active { display: flex; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="login-page" class="login-page">
-        <div class="card">
-            <h1 style="color:#25d366; margin-bottom: 5px;">ZERA PRO</h1>
-            <p style="color:gray; font-size: 12px; margin-bottom: 25px;">Connected to Nebula Protocol</p>
-            <input type="text" id="myUser" class="auth" placeholder="Username">
-            <input type="password" id="myPass" class="auth" placeholder="Password">
-            <button onclick="login()" style="width:100%; padding:14px; background:#25d366; border:none; color:white; border-radius:12px; font-weight:bold; cursor:pointer;">ACCESS TERMINAL</button>
+    <div id="intro-screen">
+        <div class="intro-logo"><i class="fab fa-whatsapp"></i> ZChat</div>
+        <p>Realtime Messaging</p>
+        <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.7;">Created by zZerr44</p>
+    </div>
+
+    <div id="auth-container">
+        <h2 class="auth-title" id="auth-header">Login to ZChat</h2>
+        <div class="input-group">
+            <label>Username</label>
+            <input type="text" id="auth-user" placeholder="Masukkan username">
         </div>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="auth-pass" placeholder="Masukkan password">
+        </div>
+        
+        <div class="keep-login-wrap" id="keep-login-ui">
+            <span>Keep Login</span>
+            <label class="switch">
+                <input type="checkbox" id="keep-login">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <button class="btn btn-primary" id="btn-auth-action">Login</button>
+        <p class="switch-auth" id="btn-switch-mode">Belum punya akun? Daftar sekarang</p>
     </div>
 
     <div id="main-app">
-        <div class="header">
-            <b id="display-name">@User</b>
-            <div onclick="showGlobalSettings()"><i class="fas fa-ellipsis-v"></i></div>
-        </div>
-        
-        <div id="req-box">
-            <div id="req-list"></div>
-        </div>
-
-        <div id="contact-list" style="flex:1; overflow-y:auto;"></div>
-        
-        <div onclick="addContact()" style="position:fixed; bottom:30px; right:30px; width:60px; height:60px; background:#25d366; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:24px; box-shadow:0 5px 15px rgba(0,0,0,0.2); cursor:pointer;">
-            <i class="fas fa-user-plus"></i>
-        </div>
-    </div>
-
-    <div id="chat-room">
-        <div class="header">
-            <div style="display:flex; align-items:center;">
-                <span onclick="closeChat()" style="margin-right:15px; cursor:pointer; font-size:20px;">←</span>
-                <div>
-                    <b id="chatting-with">Username</b><br>
-                    <small style="color:#25d366; font-size:10px;">Encrypted</small>
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-avatar" id="my-profile-btn" style="cursor: pointer;"><i class="fa fa-user"></i></div>
+                <h4 id="display-my-user">User</h4>
+                <div style="display: flex; gap: 15px;">
+                    <i class="fa fa-user-plus" style="cursor: pointer;" onclick="toggleAddUser()"></i>
+                    <i class="fa fa-cog" style="cursor: pointer;" onclick="toggleSettings()"></i>
                 </div>
             </div>
-            <div style="display:flex; gap:22px;">
-                <i class="fas fa-phone icon-btn" onclick="callSystem('Voice')"></i>
-                <i class="fas fa-video icon-btn" onclick="callSystem('Video')"></i>
-                <i class="fas fa-ellipsis-v icon-btn" onclick="showChatOptions()"></i>
+
+            <div class="search-box">
+                <input type="text" id="search-contact" placeholder="Cari teman..." onkeyup="searchFriend()">
             </div>
-        </div>
-        <div id="chatBox" class="chat-view"></div>
-        <div class="footer">
-            <i class="fas fa-paperclip icon-btn" onclick="openAttach()"></i>
-            <input type="text" id="msgInput" placeholder="Ketik pesan...">
-            <i class="fas fa-microphone icon-btn" onclick="voiceSystem()"></i>
-            <button class="btn-send" onclick="send()"><i class="fas fa-paper-plane"></i></button>
+
+            <div class="contact-list" id="contact-list">
+                </div>
+        </aside>
+
+        <main id="chat-area">
+            <div class="chat-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fa fa-arrow-left" id="back-btn" style="display: none; cursor: pointer;"></i>
+                    <div class="user-avatar"><i class="fa fa-user"></i></div>
+                    <div>
+                        <strong id="target-name">Pilih teman</strong>
+                        <p id="target-status" style="font-size: 0.7rem; color: #666;">Klik kontak untuk memulai chat</p>
+                    </div>
+                </div>
+                <div id="chat-options" style="display: none;">
+                    <i class="fa fa-volume-mute" title="Mute" onclick="muteUser()" style="margin-right: 15px; cursor:pointer;"></i>
+                    <i class="fa fa-ban" title="Block" onclick="blockUser()" style="margin-right: 15px; cursor:pointer;"></i>
+                    <i class="fa fa-trash" title="Clear Chat" onclick="deleteHistory()" style="cursor:pointer;"></i>
+                </div>
+            </div>
+
+            <div id="messages-container">
+                </div>
+
+            <div class="chat-input-area" id="input-group-chat" style="display: none;">
+                <i class="far fa-smile" style="font-size: 1.5rem; color: #888;"></i>
+                <input type="text" id="msg-input" placeholder="Ketik pesan...">
+                <button id="send-btn" style="background: none; border: none; color: var(--secondary); font-size: 1.5rem; cursor: pointer;">
+                    <i class="fa fa-paper-plane"></i>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="overlay"></div>
+    <div id="settings-modal">
+        <h3>Settings</h3>
+        <hr style="margin: 15px 0;">
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span>Dark Mode</span>
+                <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode()">
+            </div>
+            <div>
+                <p>Wallpaper Color</p>
+                <input type="color" id="wallpaper-picker" onchange="changeWallpaper(this.value)" style="width: 100%;">
+            </div>
+            <button class="btn" style="background: #ff4b2b; color: white;" onclick="logout()">Logout</button>
+            <div style="font-size: 0.8rem; text-align: center; color: #888; margin-top: 10px;">
+                <strong>ZChat v1.0</strong><br>Created by zZerr44
+            </div>
+            <button class="btn btn-primary" onclick="toggleSettings()">Close</button>
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getDatabase, ref, set, get, child, push, onValue, remove } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
-    <script>
+        // Konfigurasi User
         const firebaseConfig = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
             authDomain: "zchat-56639.firebaseapp.com",
@@ -110,186 +323,168 @@
             projectId: "zchat-56639",
             storageBucket: "zchat-56639.firebasestorage.app",
             messagingSenderId: "773931983053",
-            appId: "1:773931983053:web:a1c825be9a972e53dcc984"
+            appId: "1:773931983053:web:a1c825be9a972e53dcc984",
+            measurementId: "G-ZDMK1DWV6S"
         };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
 
-        let MY_NAME = localStorage.getItem("zchat_zero_usn") || "";
-        let CURRENT_CHAT = "";
-        let CURRENT_ROOM = "";
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-        if(MY_NAME) launchApp();
+        // State Global
+        let currentUser = localStorage.getItem('zchat_user') || null;
+        let activeChat = null;
+        let isRegisterMode = false;
 
-        function login() {
-            const u = document.getElementById('myUser').value.trim().toLowerCase();
-            if(!u) return;
-            MY_NAME = u;
-            localStorage.setItem("zchat_zero_usn", u);
-            db.ref('users/' + u).set({ username: u, online: true });
-            launchApp();
-        }
+        // Elements
+        const intro = document.getElementById('intro-screen');
+        const authCont = document.getElementById('auth-container');
+        const mainApp = document.getElementById('main-app');
+        const btnAuth = document.getElementById('btn-auth-action');
+        const btnSwitch = document.getElementById('btn-switch-mode');
 
-        function launchApp() {
-            document.getElementById('login-page').style.display = 'none';
-            document.getElementById('main-app').style.display = 'flex';
-            document.getElementById('display-name').innerText = "@" + MY_NAME;
-            syncRequests();
-            syncContacts();
-        }
-
-        function addContact() {
-            Swal.fire({
-                title: 'Connect New User',
-                input: 'text',
-                inputPlaceholder: 'Username target...',
-                showCancelButton: true,
-                confirmButtonColor: '#25d366'
-            }).then(res => {
-                if(res.value) {
-                    const t = res.value.trim().toLowerCase();
-                    db.ref('users/' + t).once('value', s => {
-                        if(s.exists()){
-                            db.ref(`requests/${t}/${MY_NAME}`).set({ from: MY_NAME, time: Date.now() });
-                            Swal.fire("Sent!", "Menunggu dikonfirmasi.", "success");
-                        } else {
-                            Swal.fire("Gagal", "Username tidak ditemukan!", "error");
-                        }
-                    });
+        // --- 1. INITIALIZATION ---
+        window.onload = () => {
+            setTimeout(() => {
+                intro.style.display = 'none';
+                if (currentUser) {
+                    showMainApp();
+                } else {
+                    authCont.style.display = 'block';
                 }
-            });
-        }
+            }, 2000);
+        };
 
-        function syncRequests() {
-            db.ref(`requests/${MY_NAME}`).on('value', snap => {
-                const box = document.getElementById('req-box');
-                const list = document.getElementById('req-list');
-                list.innerHTML = "";
-                if(snap.exists()) {
-                    box.style.display = 'block';
-                    snap.forEach(c => {
-                        list.innerHTML += `<div class="req-item">
-                            <span><b>${c.key}</b></span>
-                            <div>
-                                <button onclick="confirmChat('${c.key}', true)" style="background:#25d366; color:white; border:none; padding:5px 12px; border-radius:8px; cursor:pointer;">ACC</button>
-                                <button onclick="confirmChat('${c.key}', false)" style="background:red; color:white; border:none; padding:5px 12px; border-radius:8px; cursor:pointer;">TOLAK</button>
-                            </div>
-                        </div>`;
-                    });
-                } else box.style.display = 'none';
-            });
-        }
+        // --- 2 & 3. AUTH LOGIC ---
+        btnSwitch.onclick = () => {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('auth-header').innerText = isRegisterMode ? 'Register ZChat' : 'Login to ZChat';
+            btnAuth.innerText = isRegisterMode ? 'Daftar' : 'Login';
+            btnSwitch.innerText = isRegisterMode ? 'Sudah punya akun? Login' : 'Belum punya akun? Daftar';
+            document.getElementById('keep-login-ui').style.display = isRegisterMode ? 'none' : 'flex';
+        };
 
-        function confirmChat(user, accept) {
-            if(accept) {
-                db.ref(`contacts/${MY_NAME}/${user}`).set(true);
-                db.ref(`contacts/${user}/${MY_NAME}`).set(true);
+        btnAuth.onclick = async () => {
+            const user = document.getElementById('auth-user').value.trim().toLowerCase();
+            const pass = document.getElementById('auth-pass').value.trim();
+
+            if (!user || !pass) return alert("Isi semua field!");
+
+            const userRef = ref(db, 'users/' + user);
+            const snapshot = await get(userRef);
+
+            if (isRegisterMode) {
+                if (snapshot.exists()) return alert("Username sudah dipakai!");
+                await set(userRef, { password: pass });
+                alert("Registrasi Berhasil! Silakan Login.");
+                btnSwitch.click();
+            } else {
+                if (snapshot.exists() && snapshot.val().password === pass) {
+                    currentUser = user;
+                    if (document.getElementById('keep-login').checked) {
+                        localStorage.setItem('zchat_user', user);
+                    }
+                    showMainApp();
+                } else {
+                    alert("Username atau Password salah!");
+                }
             }
-            db.ref(`requests/${MY_NAME}/${user}`).remove();
+        };
+
+        function showMainApp() {
+            authCont.style.display = 'none';
+            mainApp.style.display = 'grid';
+            document.getElementById('display-my-user').innerText = currentUser;
+            loadContacts();
         }
 
-        function syncContacts() {
-            db.ref(`contacts/${MY_NAME}`).on('value', snap => {
-                const list = document.getElementById('contact-list');
-                list.innerHTML = "";
-                snap.forEach(c => {
-                    const name = c.key;
-                    list.innerHTML += `<div class="contact-item" onclick="openChat('${name}')">
-                        <div class="avatar">${name[0].toUpperCase()}</div>
-                        <div><b>${name}</b><br><small style="color:gray">Tap to chat</small></div>
-                    </div>`;
+        // --- 5. TAMBAH USER ---
+        window.toggleAddUser = async () => {
+            const target = prompt("Masukkan username teman:");
+            if (!target) return;
+            if (target.toLowerCase() === currentUser) return alert("Tidak bisa menambah diri sendiri!");
+
+            const userSnap = await get(ref(db, 'users/' + target.toLowerCase()));
+            if (!userSnap.exists()) return alert("User tidak ditemukan!");
+
+            await set(ref(db, `contacts/${currentUser}/${target}`), true);
+            alert("Teman berhasil ditambahkan!");
+            loadContacts();
+        };
+
+        // --- 6. LOAD CONTACTS ---
+        function loadContacts() {
+            const listEl = document.getElementById('contact-list');
+            onValue(ref(db, `contacts/${currentUser}`), (snapshot) => {
+                listEl.innerHTML = "";
+                const data = snapshot.val();
+                if (!data) return;
+
+                Object.keys(data).forEach(username => {
+                    const item = document.createElement('div');
+                    item.className = 'contact-item';
+                    item.innerHTML = `
+                        <div class="user-avatar" style="margin-right:15px"><i class="fa fa-user"></i></div>
+                        <div><strong>${username}</strong></div>
+                    `;
+                    item.onclick = () => openChat(username);
+                    listEl.appendChild(item);
                 });
             });
         }
 
+        // --- 7. CHAT LOGIC ---
         function openChat(target) {
-            CURRENT_CHAT = target;
-            CURRENT_ROOM = [MY_NAME, target].sort().join("_");
-            document.getElementById('chat-room').style.display = 'flex';
-            document.getElementById('chatting-with').innerText = target;
+            activeChat = target;
+            document.getElementById('target-name').innerText = target;
+            document.getElementById('target-status').innerText = 'Online';
+            document.getElementById('chat-options').style.display = 'block';
+            document.getElementById('input-group-chat').style.display = 'flex';
             
-            db.ref(`chats/${CURRENT_ROOM}`).on('value', snap => {
-                const box = document.getElementById('chatBox');
-                box.innerHTML = "";
-                snap.forEach(mSnap => {
-                    const m = mSnap.val();
-                    const isMe = m.sender === MY_NAME;
-                    const msgKey = mSnap.key;
-                    
-                    const div = document.createElement('div');
-                    div.className = `bubble ${isMe ? 'msg-out' : 'msg-in'}`;
-                    
-                    // Render Image if any
-                    let content = m.text;
-                    if(m.type === 'image') content = `<img src="${m.url}" class="msg-img" onclick="window.open('${m.url}')"><br>${m.text}`;
-                    
-                    div.innerHTML = `${content}<br><span style="font-size:9px; opacity:0.5; float:right; margin-top:5px;">${new Date(m.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
-                    
-                    // FITUR SALIN & HAPUS
-                    div.oncontextmenu = (e) => {
-                        e.preventDefault();
-                        Swal.fire({
-                            title: 'Opsi Pesan',
-                            showDenyButton: true,
-                            showCancelButton: true,
-                            confirmButtonText: 'Salin',
-                            denyButtonText: 'Hapus',
-                        }).then((res) => {
-                            if (res.isConfirmed) {
-                                navigator.clipboard.writeText(m.text);
-                                Swal.fire("Copied!", "", "success");
-                            } else if (res.isDenied) {
-                                if(isMe) db.ref(`chats/${CURRENT_ROOM}/${msgKey}`).remove();
-                                else Swal.fire("Gak bisa hapus chat orang!");
-                            }
-                        });
-                    };
-                    box.appendChild(div);
-                });
-                box.scrollTop = box.scrollHeight;
-            });
-        }
+            if (window.innerWidth <= 768) {
+                document.getElementById('chat-area').classList.add('active');
+                document.getElementById('back-btn').style.display = 'block';
+            }
 
-        function send(type = 'text', val = null) {
-            const inp = document.getElementById('msgInput');
-            const text = val || inp.value;
-            if(!text && type === 'text') return;
+            // Room ID logic (Alphabetical sorting to ensure same room for both users)
+            const roomId = [currentUser, target].sort().join("_");
+            const msgRef = ref(db, 'messages/' + roomId);
 
-            const msgData = {
-                sender: MY_NAME,
-                text: text,
-                time: firebase.database.ServerValue.TIMESTAMP,
-                type: type
-            };
-            if(type === 'image') msgData.url = val;
-
-            db.ref(`chats/${CURRENT_ROOM}`).push(msgData);
-            inp.value = "";
-        }
-
-        function openAttach() {
-            Swal.fire({
-                title: 'Kirim Media',
-                input: 'file',
-                inputAttributes: { 'accept': 'image/*', 'aria-label': 'Pilih Foto' }
-            }).then(res => {
-                if(res.value) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => { send('image', e.target.result); };
-                    reader.readAsDataURL(res.value);
+            onValue(msgRef, (snapshot) => {
+                const container = document.getElementById('messages-container');
+                container.innerHTML = "";
+                const msgs = snapshot.val();
+                if (msgs) {
+                    Object.values(msgs).forEach(m => {
+                        const div = document.createElement('div');
+                        div.className = `msg ${m.sender === currentUser ? 'msg-sent' : 'msg-received'}`;
+                        div.innerHTML = `
+                            <div>${m.text}</div>
+                            <div class="msg-time">${new Date(m.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                        `;
+                        container.appendChild(div);
+                    });
+                    container.scrollTop = container.scrollHeight;
                 }
             });
         }
 
-        function voiceSystem() { Swal.fire("Voice Note", "Fitur Record VN akan aktif di versi APK. (Simulasi: Mic ON)", "info"); }
-        function callSystem(t) { Swal.fire(t + " Call", "Menghubungkan ke " + CURRENT_CHAT + "...", "success"); }
-        function closeChat() { document.getElementById('chat-room').style.display = 'none'; db.ref(`chats/${CURRENT_ROOM}`).off(); }
-        function showGlobalSettings() { Swal.fire({ title: 'Menu', html: `<button onclick="localStorage.clear();location.reload();" style="padding:10px; background:red; color:white; border:none; border-radius:5px; width:100%;">LOGOUT</button>`, showConfirmButton: false }); }
-        
-        // Anti Bug Input
-        document.getElementById('msgInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') send();
-        });
-    </script>
-</body>
-</html>
+        document.getElementById('send-btn').onclick = sendMessage;
+        document.getElementById('msg-input').onkeypress = (e) => { if(e.key === 'Enter') sendMessage(); };
+
+        async function sendMessage() {
+            const text = document.getElementById('msg-input').value.trim();
+            if (!text || !activeChat) return;
+
+            // Check if blocked
+            const blockedSnap = await get(ref(db, `blocked/${activeChat}/${currentUser}`));
+            if (blockedSnap.exists()) return alert("Anda telah diblokir oleh user ini.");
+
+            const roomId = [currentUser, activeChat].sort().join("_");
+            const newMsgRef = push(ref(db, 'messages/' + roomId));
+            await set(newMsgRef, {
+                sender: currentUser,
+                text: text,
+                time: Date.now()
+            });
+
+  
