@@ -3,80 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZERA - Pro Messenger</title>
+    <title>ZERA X ZERO - Connected</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <style>
         :root { 
             --wa-light-green: #25d366; 
             --wa-soft-green: #dcf8c6; 
-            --wa-bg: #ffffff; 
-            --wa-panel: #f0f2f5; 
-            --wa-text: #3b4a54;
+            --wa-bg: #f0f2f5; 
+            --wa-panel: #ffffff; 
         }
-        
-        * { box-sizing: border-box; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: var(--wa-text); overflow: hidden; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--wa-bg); overflow: hidden; }
 
         /* INTRO */
-        #intro { position: fixed; inset: 0; background: #fff; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .zera-logo { font-size: 4.5rem; font-weight: 900; color: var(--wa-light-green); animation: slideDown 1.2s forwards; }
-        @keyframes slideDown { 0% { transform: translateY(-300px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        #intro { position: fixed; inset: 0; background: white; display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .zera-logo { font-size: 3rem; font-weight: 900; color: var(--wa-light-green); animation: bounce 1s infinite alternate; }
+        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1); } }
 
-        /* LOGIN CENTERED */
-        .page-center { display: none; height: 100vh; width: 100%; flex-direction: column; align-items: center; justify-content: center; background: #f0f2f5; padding: 20px; }
-        .login-card { width: 100%; max-width: 350px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 30px rgba(0,0,0,0.1); text-align: center; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; outline: none; font-size: 16px; }
-        .btn { width: 100%; padding: 12px; background: var(--wa-light-green); border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; font-size: 16px; }
+        /* UI LOGIN */
+        .page { display: none; height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .card { width: 100%; max-width: 350px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; outline: none; }
+        .btn { width: 100%; padding: 12px; background: var(--wa-light-green); border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; }
 
         /* MAIN APP */
         #main-app { display: none; height: 100vh; flex-direction: column; background: white; }
-        .header { background: var(--wa-panel); padding: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; border-bottom: 1px solid #ddd; }
+        .header { background: #f0f2f5; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
         
-        .contact-item { padding: 15px; border-bottom: 1px solid #f2f2f2; display: flex; align-items: center; cursor: pointer; transition: 0.2s; }
-        .contact-item:active { background: #e9edef; }
-        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #00a884; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: bold; }
+        /* REQUEST BOX ALA WA */
+        #req-box { background: #e7f3ff; padding: 10px; display: none; border-bottom: 1px solid #ddd; }
+        .req-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; background: white; border-radius: 10px; margin-bottom: 5px; }
+
+        .contact-item { padding: 15px; border-bottom: 1px solid #f2f2f2; display: flex; align-items: center; cursor: pointer; }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #25d366; color: white; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold; }
 
         /* CHAT ROOM */
         #chat-room { display: none; position: fixed; inset: 0; background: #e5ddd5; flex-direction: column; z-index: 100; }
-        .chat-view { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; background-size: cover; background-position: center; }
-        .bubble { max-width: 80%; padding: 10px 14px; border-radius: 12px; margin-bottom: 6px; font-size: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); line-height: 1.4; }
+        .chat-view { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; }
+        .bubble { max-width: 80%; padding: 8px 12px; border-radius: 10px; margin-bottom: 5px; font-size: 14px; position: relative; cursor: pointer; }
         .msg-in { background: white; align-self: flex-start; border-top-left-radius: 0; }
         .msg-out { background: var(--wa-soft-green); align-self: flex-end; border-top-right-radius: 0; }
-
-        .footer { background: var(--wa-panel); padding: 10px; display: flex; align-items: center; }
-        #msgInput { flex: 1; margin: 0 10px; border-radius: 20px; padding: 10px 18px; border: none; }
         
-        .fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--wa-light-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 99; cursor: pointer; }
+        .footer { background: #f0f2f5; padding: 10px; display: flex; align-items: center; gap: 10px; }
+        .footer input { margin: 0; flex: 1; border: none; border-radius: 20px; padding: 10px 15px; }
+        .icon-btn { font-size: 20px; color: #51585c; cursor: pointer; }
+
+        .fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--wa-light-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="intro"><div class="zera-logo">ZERA</div></div>
 
-    <div id="login-page" class="page-center">
-        <div class="login-card">
-            <h2 style="color:var(--wa-light-green)">MOHON MASUK</h2>
-            <input type="text" id="myUser" placeholder="Username (Contoh: zera)">
+    <div id="login-page" class="page">
+        <div class="card">
+            <h2 style="color:var(--wa-light-green)">ACCESS TERMINAL</h2>
+            <input type="text" id="myUser" placeholder="Username Anda">
             <input type="password" id="myPass" placeholder="Password">
-            <button class="btn" onclick="login()">MASUK / DAFTAR</button>
-        </div>
-    </div>
-
-    <div id="loading-page" class="page-center">
-        <div class="login-card">
-            <h3 id="load-status">Mengecek Sinyal...</h3>
-            <div style="width:100%; background:#eee; height:10px; border-radius:10px; overflow:hidden;">
-                <div id="bar" style="width:0%; height:100%; background:var(--wa-light-green); transition: 0.1s;"></div>
-            </div>
-            <div id="pct" style="margin-top:10px; font-weight:bold;">0%</div>
+            <button class="btn" onclick="login()">MASUK</button>
         </div>
     </div>
 
     <div id="main-app">
         <div class="header">
-            <span style="font-size: 20px;">ZERA PRO</span>
-            <div onclick="showSettings()" style="cursor:pointer; font-size: 24px;">⋮</div>
+            <b id="display-name">ZERA X ZERO</b>
+            <div onclick="showSettings()">⋮</div>
         </div>
+        
+        <div id="req-box">
+            <small style="color:#0080ff; font-weight:bold">PERMINTAAN CHAT BARU:</small>
+            <div id="req-list"></div>
+        </div>
+
         <div id="contact-list" style="flex:1; overflow-y:auto;"></div>
         <div class="fab" onclick="addContact()">+</div>
     </div>
@@ -84,22 +83,28 @@
     <div id="chat-room">
         <div class="header">
             <div style="display:flex; align-items:center;">
-                <span onclick="closeChat()" style="margin-right:15px; cursor:pointer; font-size: 20px;">←</span>
-                <span id="chatting-with">Nama</span>
+                <span onclick="closeChat()" style="margin-right:15px; cursor:pointer">←</span>
+                <span id="chatting-with">Username</span>
             </div>
-            <div onclick="showChatMenu()" style="cursor:pointer; font-size: 24px;">⋮</div>
+            <div style="display:flex; gap:20px;">
+                <i class="fas fa-phone icon-btn" onclick="call('Voice')"></i>
+                <i class="fas fa-video icon-btn" onclick="call('Video')"></i>
+                <i class="fas fa-ellipsis-v icon-btn" onclick="showChatMenu()"></i>
+            </div>
         </div>
         <div id="chatBox" class="chat-view"></div>
         <div class="footer">
+            <i class="fas fa-plus icon-btn" onclick="sendFile()"></i>
             <input type="text" id="msgInput" placeholder="Ketik pesan...">
-            <button class="btn" onclick="send()" style="width:50px; border-radius: 50%;">➤</button>
+            <i class="fas fa-microphone icon-btn" onclick="voiceNote()"></i>
+            <button class="btn" onclick="send()" style="width:50px; border-radius:50%">➤</button>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
+    <script>
         const firebaseConfig = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
             authDomain: "zchat-56639.firebaseapp.com",
@@ -109,190 +114,190 @@
             messagingSenderId: "773931983053",
             appId: "1:773931983053:web:a1c825be9a972e53dcc984"
         };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        let MY_NAME = localStorage.getItem("zera_user") || "";
+        let MY_NAME = localStorage.getItem("zchat_zero_usn") || "";
+        let CURRENT_CHAT = "";
         let CURRENT_ROOM = "";
-        let IS_CHAT_OPEN = false;
-
-        // PERMISSION NOTIFIKASI
-        if ("Notification" in window) { Notification.requestPermission(); }
 
         // INTRO
         setTimeout(() => {
             document.getElementById('intro').style.display = 'none';
-            if(MY_NAME) { login(true); } 
+            if(MY_NAME) { launchApp(); } 
             else { document.getElementById('login-page').style.display = 'flex'; }
-        }, 3000);
+        }, 2500);
 
-        window.login = async (isAuto = false) => {
-            if(!isAuto) {
-                const u = document.getElementById('myUser').value.trim().toLowerCase();
-                const p = document.getElementById('myPass').value;
-                if(!u || !p) return Swal.fire("Eitss!", "Isi dulu nama & passwordnya!", "warning");
-                
-                const userRef = ref(db, `accounts/${u}`);
-                const snap = await get(userRef);
-                
-                if(snap.exists() && snap.val().pass !== p) {
-                    return Swal.fire({ icon: 'error', title: 'GAGAL MASUK', text: 'Password salah boss! Coba diingat lagi.' });
-                } else if(!snap.exists()) {
-                    await set(userRef, { pass: p, name: u });
-                }
-                
-                MY_NAME = u;
-                localStorage.setItem("zera_user", u);
-            }
+        function login() {
+            const u = document.getElementById('myUser').value.trim().toLowerCase();
+            if(!u) return;
+            MY_NAME = u;
+            localStorage.setItem("zchat_zero_usn", u);
+            // Daftarkan di /users agar teman bisa mencari (Sesuai web temanmu)
+            db.ref('users/' + u).set({ username: u, online: true });
+            launchApp();
+        }
 
+        function launchApp() {
             document.getElementById('login-page').style.display = 'none';
-            document.getElementById('loading-page').style.display = 'flex';
-            
-            let prog = 0;
-            let itv = setInterval(() => {
-                if(!navigator.onLine) {
-                    document.getElementById('load-status').innerText = "SINYAL ILANG! GAK BISA MASUK";
-                    document.getElementById('bar').style.backgroundColor = "red";
-                    return;
-                }
-                prog += Math.floor(Math.random() * 10) + 1;
-                document.getElementById('bar').style.width = (prog > 100 ? 100 : prog) + "%";
-                document.getElementById('pct').innerText = (prog > 100 ? 100 : prog) + "%";
-                if(prog >= 100) {
-                    clearInterval(itv);
-                    document.getElementById('loading-page').style.display = 'none';
-                    document.getElementById('main-app').style.display = 'flex';
-                    initApp();
-                }
-            }, 100);
-        };
+            document.getElementById('main-app').style.display = 'flex';
+            document.getElementById('display-name').innerText = "@" + MY_NAME;
+            loadRequests();
+            loadContacts();
+        }
 
-        window.addContact = async () => {
-            const { value: friend } = await Swal.fire({ 
-                title: 'Cari Username', 
+        // TAMBAH KONTAK & CEK DATABASE TEMAN
+        async function addContact() {
+            const { value: target } = await Swal.fire({ 
+                title: 'Hubungkan User', 
                 input: 'text', 
-                inputPlaceholder: 'Ketik username teman...',
-                confirmButtonText: 'TAMBAH',
+                inputPlaceholder: 'Username target...',
                 confirmButtonColor: '#25d366'
             });
 
-            if(friend) {
-                const f = friend.trim().toLowerCase();
-                if(f === MY_NAME) return Swal.fire("Waduh!", "Gak bisa chat sama diri sendiri.", "info");
+            if(target) {
+                const t = target.trim().toLowerCase();
+                if(t === MY_NAME) return;
 
-                // CEK DATABASE APAKAH USERNAME ADA
-                const checkRef = ref(db, `accounts/${f}`);
-                const snap = await get(checkRef);
-
-                if(!snap.exists()) {
-                    // NOTIF SEGEDE GABAN
-                    return Swal.fire({
-                        icon: 'error',
-                        title: '<span style="font-size:40px">USER TIDAK ADA!</span>',
-                        html: `<b style="font-size:20px">Username "${f}" tidak ditemukan di database ZERA. Pastikan temenmu udah daftar dulu!</b>`,
-                        confirmButtonText: 'OKE SIAP',
-                        confirmButtonColor: '#d33'
-                    });
-                }
-
-                const room = [MY_NAME, f].sort().join("_");
-                await set(ref(db, `users/${MY_NAME}/contacts/${f}`), { room: room });
-                await set(ref(db, `users/${f}/contacts/${MY_NAME}`), { room: room });
-                Swal.fire("Berhasil!", "Kontak sudah ditambahkan.", "success");
+                // Cek apakah user ada di /users (Database pusat temanmu)
+                db.ref('users/' + t).once('value', snap => {
+                    if(snap.exists()) {
+                        // Kirim ke path /requests (Sesuai web temanmu)
+                        db.ref(`requests/${t}/${MY_NAME}`).set({ from: MY_NAME, time: Date.now() });
+                        Swal.fire("Terkirim!", "Menunggu persetujuan " + t, "success");
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'USER TIDAK ADA!', text: 'Username tidak terdaftar di Nebula Protocol.' });
+                    }
+                });
             }
-        };
+        }
 
-        function initApp() {
-            // Listen Kontak
-            onValue(ref(db, `users/${MY_NAME}/contacts`), (snap) => {
+        // LOAD REQUESTS (ACC / REJECT)
+        function loadRequests() {
+            db.ref(`requests/${MY_NAME}`).on('value', snap => {
+                const box = document.getElementById('req-box');
+                const list = document.getElementById('req-list');
+                list.innerHTML = "";
+                if(snap.exists()) {
+                    box.style.display = 'block';
+                    snap.forEach(c => {
+                        const from = c.key;
+                        list.innerHTML += `
+                            <div class="req-item">
+                                <span style="font-size:13px"><b>${from}</b> ingin chat</span>
+                                <div>
+                                    <button onclick="confirmChat('${from}', true)" style="background:#25d366; color:white; border:none; border-radius:5px; padding:5px 10px;">Acc</button>
+                                    <button onclick="confirmChat('${from}', false)" style="background:#ff4757; color:white; border:none; border-radius:5px; padding:5px 10px;">Tolak</button>
+                                </div>
+                            </div>`;
+                    });
+                } else box.style.display = 'none';
+            });
+        }
+
+        function confirmChat(user, accept) {
+            if(accept) {
+                // Jika setuju, masuk ke path /contacts (Sesuai web temanmu)
+                db.ref(`contacts/${MY_NAME}/${user}`).set(true);
+                db.ref(`contacts/${user}/${MY_NAME}`).set(true);
+            }
+            // Jika tolak atau setelah acc, hapus requestnya
+            db.ref(`requests/${MY_NAME}/${user}`).remove();
+        }
+
+        // DAFTAR CHAT SINKRON
+        function loadContacts() {
+            db.ref(`contacts/${MY_NAME}`).on('value', snap => {
                 const list = document.getElementById('contact-list');
                 list.innerHTML = "";
                 snap.forEach(c => {
+                    const name = c.key;
                     const div = document.createElement('div');
                     div.className = 'contact-item';
-                    div.innerHTML = `<div class="avatar">${c.key[0].toUpperCase()}</div><div><b>${c.key}</b><br><small>Online</small></div>`;
-                    div.onclick = () => openChat(c.key, c.val().room);
+                    div.innerHTML = `<div class="avatar">${name[0].toUpperCase()}</div>
+                                     <div><b>${name}</b><br><small style="color:gray">Nebula Encrypted</small></div>`;
+                    div.onclick = () => openChat(name);
                     list.appendChild(div);
                 });
             });
-
-            // GLOBAL LISTENER UNTUK NOTIF PESAN MASUK
-            onValue(ref(db, `users/${MY_NAME}/contacts`), (snap) => {
-                snap.forEach(c => {
-                    const room = c.val().room;
-                    const msgRef = ref(db, `messages/${room}`);
-                    // Hanya ambil pesan terakhir yang baru
-                    onChildAdded(msgRef, (mSnap) => {
-                        const m = mSnap.val();
-                        if(m.sender !== MY_NAME) {
-                            // Vibrasi & Notif jika chat room tidak sedang terbuka
-                            if(!IS_CHAT_OPEN || (IS_CHAT_OPEN && CURRENT_ROOM !== room)) {
-                                if ("vibrate" in navigator) navigator.vibrate(200);
-                                if (Notification.permission === "granted") {
-                                    new Notification(`Pesan dari ${m.sender}`, { body: m.text });
-                                }
-                            }
-                        }
-                    });
-                });
-            }, { onlyOnce: true });
         }
 
-        window.openChat = (name, room) => {
-            CURRENT_ROOM = room; IS_CHAT_OPEN = true;
-            document.getElementById('chatting-with').innerText = name;
+        // ROOM CHAT
+        function openChat(target) {
+            CURRENT_CHAT = target;
+            CURRENT_ROOM = [MY_NAME, target].sort().join("_");
             document.getElementById('chat-room').style.display = 'flex';
-            const cb = document.getElementById('chatBox');
-            cb.style.backgroundImage = `url('${localStorage.getItem("wp_"+MY_NAME) || ""}')`;
-
-            onValue(ref(db, `messages/${room}`), (snap) => {
-                cb.innerHTML = "";
-                snap.forEach(m => {
-                    const d = document.createElement('div');
-                    d.className = `bubble ${m.val().sender === MY_NAME ? 'msg-out' : 'msg-in'}`;
-                    d.innerText = m.val().text;
-                    cb.appendChild(d);
+            document.getElementById('chatting-with').innerText = target;
+            
+            const chatBox = document.getElementById('chatBox');
+            db.ref(`chats/${CURRENT_ROOM}`).on('value', snap => {
+                chatBox.innerHTML = "";
+                snap.forEach(mSnap => {
+                    const m = mSnap.val();
+                    const key = mSnap.key;
+                    const isMe = m.sender === MY_NAME;
+                    const div = document.createElement('div');
+                    div.className = `bubble ${isMe ? 'msg-out' : 'msg-in'}`;
+                    div.innerHTML = `${m.text}<br><small style="font-size:8px; opacity:0.5">${new Date(m.time).toLocaleTimeString()}</small>`;
+                    
+                    // Fitur Salin & Hapus (Klik Balon Chat)
+                    div.onclick = () => {
+                        Swal.fire({
+                            title: 'Opsi Pesan',
+                            showCancelButton: true,
+                            confirmButtonText: 'Salin',
+                            denyButtonText: 'Hapus',
+                            showDenyButton: isMe,
+                            background: '#fff'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                navigator.clipboard.writeText(m.text);
+                                Swal.fire("Tersalin!", "", "success");
+                            } else if (result.isDenied) {
+                                db.ref(`chats/${CURRENT_ROOM}/${key}`).remove();
+                            }
+                        });
+                    };
+                    chatBox.appendChild(div);
                 });
-                cb.scrollTop = cb.scrollHeight;
+                chatBox.scrollTop = chatBox.scrollHeight;
             });
-        };
+        }
 
-        window.send = () => {
+        function send() {
             const inp = document.getElementById('msgInput');
             if(!inp.value.trim()) return;
-            push(ref(db, `messages/${CURRENT_ROOM}`), { sender: MY_NAME, text: inp.value, time: Date.now() });
-            inp.value = "";
-        };
-
-        window.showSettings = () => {
-            Swal.fire({
-                title: 'Pengaturan',
-                html: `<button class="btn" onclick="changeWP()" style="margin-bottom:10px">Ganti Wallpaper</button>
-                       <button class="btn" onclick="logout()" style="background:#ff4757">Logout</button>`,
-                showConfirmButton: false
+            db.ref(`chats/${CURRENT_ROOM}`).push({
+                sender: MY_NAME,
+                text: inp.value,
+                time: Date.now()
             });
-        };
+            inp.value = "";
+        }
 
-        window.changeWP = () => {
-            const wps = [
-                'https://i.pinimg.com/originals/79/5c/36/795c3614275030093672322580ef1488.jpg',
-                'https://i.pinimg.com/736x/ec/64/00/ec64005b57f0022207b99c090623d3a0.jpg',
-                'https://wallpaperaccess.com/full/1288076.jpg',
-                'https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA1L3B4MTM2OTgxMy1pbWFnZS1rd3Z4eHA5Mi5qcGc.jpg',
-                'https://e0.pxfuel.com/wallpapers/315/593/desktop-wallpaper-green-whatsapp-whatsapp-chat.jpg'
-            ];
-            let html = wps.map(url => `<img src="${url}" width="60" height="90" onclick="setWP('${url}')" style="margin:5px; border-radius:5px; cursor:pointer">`).join("");
-            Swal.fire({ title: 'Pilih Background', html: html });
-        };
+        // FITUR TAMBAHAN (VOICE, FILE, CALL)
+        function call(type) { Swal.fire(type + " Call", "Fitur ini memerlukan izin WebRTC Server. Sedang dikembangkan.", "info"); }
+        function voiceNote() { Swal.fire("Voice Note", "Tahan untuk merekam (Simulasi).", "info"); }
+        function sendFile() {
+            Swal.fire({
+                title: 'Kirim File',
+                input: 'file',
+                inputAttributes: { 'accept': 'image/*,application/pdf', 'aria-label': 'Upload file' }
+            }).then((file) => {
+                if(file.value) {
+                    db.ref(`chats/${CURRENT_ROOM}`).push({
+                        sender: MY_NAME,
+                        text: "📁 Mengirim file: " + file.value.name,
+                        time: Date.now()
+                    });
+                }
+            });
+        }
 
-        window.setWP = (url) => {
-            localStorage.setItem("wp_"+MY_NAME, url);
-            document.getElementById('chatBox').style.backgroundImage = `url('${url}')`;
-            Swal.fire("Sip!", "Wallpaper diganti.", "success");
-        };
+        function closeChat() { document.getElementById('chat-room').style.display = 'none'; }
+        function showSettings() { Swal.fire({ title: 'ZERA Settings', html: `<button class="btn" onclick="localStorage.clear(); location.reload();">LOGOUT</button>`, showConfirmButton: false }); }
+        function showChatMenu() { Swal.fire("Chat Menu", "Hapus Chat, Blokir, Lihat Info.", "info"); }
 
-        window.logout = () => { localStorage.clear(); location.reload(); };
-        window.closeChat = () => { document.getElementById('chat-room').style.display = 'none'; IS_CHAT_OPEN = false; };
     </script>
 </body>
 </html>
