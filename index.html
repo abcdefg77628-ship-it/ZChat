@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZChat - Modern Real-time Messenger</title>
+    <title>ZChat - Official Application</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -15,258 +14,174 @@
         :root {
             --primary: #6366f1;
             --secondary: #a855f7;
-            --bg-dark: #0f172a;
-            --bg-glass: rgba(255, 255, 255, 0.08);
-            --text-main: #f8fafc;
+            --dark: #0f172a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --text: #f8fafc;
             --text-dim: #94a3b8;
-            --sent-bubble: #6366f1;
-            --rcvd-bubble: #1e293b;
-            --danger: #ef4444;
-            --success: #22c55e;
+            --sent: #6366f1;
+            --received: #1e293b;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: #0b0f1a; color: var(--text); height: 100vh; overflow: hidden; display: flex; }
 
-        body {
-            background: radial-gradient(circle at top left, #1e1e2f, #0f172a);
-            color: var(--text-main);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Utility */
         .hidden { display: none !important; }
-        .glass { background: var(--bg-glass); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
 
-        /* AUTH SECTION */
-        #auth-section { width: 100%; max-width: 400px; padding: 20px; z-index: 10; }
-        .auth-card { padding: 30px; border-radius: 24px; text-align: center; }
-        .auth-logo { font-size: 3rem; font-weight: 800; margin-bottom: 10px; background: linear-gradient(45deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 12px; }
-        .auth-tab { flex: 1; padding: 10px; cursor: pointer; border-radius: 8px; transition: 0.3s; color: var(--text-dim); }
-        .auth-tab.active { background: var(--primary); color: white; }
-        
-        .form-group { text-align: left; margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 0.8rem; margin-bottom: 5px; color: var(--text-dim); }
-        .form-group input, .form-group textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; outline: none; }
-        
-        .btn-main { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--primary); color: white; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        .btn-main:hover { opacity: 0.9; transform: translateY(-2px); }
+        /* AUTH SCREEN */
+        #auth-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at top, #1e1e2f, #0b0f1a); }
+        .auth-card { width: 100%; max-width: 400px; padding: 30px; border-radius: 20px; background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .logo { font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; }
+        .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { flex: 1; padding: 10px; cursor: pointer; border-radius: 10px; color: var(--text-dim); }
+        .tab.active { background: var(--primary); color: white; }
+        input, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white; outline: none; }
+        .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--primary); color: white; font-weight: bold; cursor: pointer; }
 
-        /* APP LAYOUT */
-        #app-section { width: 100vw; height: 100vh; display: grid; grid-template-columns: 380px 1fr; }
+        /* MAIN APP LAYOUT */
+        #app-container { width: 100%; height: 100%; display: grid; grid-template-columns: 350px 1fr; }
         
         /* SIDEBAR */
-        #sidebar { border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.6); }
+        #sidebar { border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.5); }
         .sidebar-header { padding: 20px; display: flex; align-items: center; justify-content: space-between; }
-        .my-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .my-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
+        .profile-sm { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .profile-sm img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
         
-        .nav-bar { display: flex; justify-content: space-around; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .nav-btn { color: var(--text-dim); cursor: pointer; font-size: 1.2rem; position: relative; padding: 10px; transition: 0.3s; }
+        .nav-icons { display: flex; justify-content: space-around; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .nav-btn { font-size: 1.2rem; color: var(--text-dim); cursor: pointer; position: relative; padding: 10px; }
         .nav-btn.active { color: var(--primary); }
-        .badge { position: absolute; top: 5px; right: 5px; background: var(--danger); font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; color: white; }
+        .badge { position: absolute; top: 5px; right: 5px; background: red; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; color: white; }
 
-        .search-area { padding: 15px; }
-        .search-area input { width: 100%; padding: 10px 15px; border-radius: 20px; border: none; background: rgba(255,255,255,0.05); color: white; outline: none; }
-
-        .list-box { flex: 1; overflow-y: auto; }
-        .list-item { display: flex; align-items: center; padding: 15px 20px; gap: 15px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .list-area { flex: 1; overflow-y: auto; }
+        .list-item { display: flex; align-items: center; padding: 15px 20px; gap: 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s; }
         .list-item:hover { background: rgba(255,255,255,0.05); }
-        .list-item img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; }
-        .item-body { flex: 1; overflow: hidden; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; }
-        .item-name { font-weight: 600; font-size: 0.95rem; }
-        .item-time { font-size: 0.7rem; color: var(--text-dim); }
-        .item-preview { font-size: 0.85rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .list-item img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+        .item-info { flex: 1; overflow: hidden; }
+        .item-name { font-weight: 600; display: flex; justify-content: space-between; }
+        .item-preview { font-size: 0.8rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* CHAT AREA */
-        #chat-main { display: flex; flex-direction: column; background: #0b0f1a; position: relative; }
-        .chat-header { padding: 15px 25px; display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .chat-info { display: flex; align-items: center; gap: 15px; }
-        .chat-info img { width: 40px; height: 40px; border-radius: 50%; }
-        
-        .msg-display { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-opacity: 0.05; }
-        
-        .bubble { max-width: 65%; padding: 12px 16px; border-radius: 18px; font-size: 0.9rem; line-height: 1.4; position: relative; }
-        .sent { align-self: flex-end; background: var(--sent-bubble); color: white; border-bottom-right-radius: 4px; }
-        .received { align-self: flex-start; background: var(--rcvd-bubble); color: white; border-bottom-left-radius: 4px; }
-        .msg-meta { font-size: 0.65rem; margin-top: 5px; display: flex; justify-content: flex-end; gap: 5px; opacity: 0.7; }
+        #chat-area { display: flex; flex-direction: column; background: #0f172a; position: relative; }
+        .chat-header { padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; background: rgba(15,23,42,0.9); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .target-info { display: flex; align-items: center; gap: 12px; }
+        .target-info img { width: 40px; height: 40px; border-radius: 50%; }
 
-        .chat-input { padding: 20px 30px; background: #0f172a; display: flex; align-items: center; gap: 15px; }
-        .input-box { flex: 1; background: rgba(255,255,255,0.05); border-radius: 30px; padding: 5px 20px; display: flex; align-items: center; }
-        .input-box input { flex: 1; background: transparent; border: none; padding: 10px; color: white; outline: none; }
+        .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-opacity: 0.05; }
+        .bubble { max-width: 70%; padding: 10px 15px; border-radius: 15px; font-size: 0.9rem; position: relative; line-height: 1.4; }
+        .sent { align-self: flex-end; background: var(--sent); border-bottom-right-radius: 2px; }
+        .received { align-self: flex-start; background: var(--received); border-bottom-left-radius: 2px; }
+        .time { font-size: 0.6rem; margin-top: 5px; text-align: right; opacity: 0.6; }
+
+        .input-area { padding: 15px 20px; background: #0b0f1a; display: flex; align-items: center; gap: 10px; }
+        .input-wrap { flex: 1; background: rgba(255,255,255,0.05); border-radius: 25px; padding: 5px 15px; display: flex; }
+        .input-wrap input { border: none; background: transparent; margin-bottom: 0; }
+
+        /* MODAL */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 100; }
+        .modal-content { width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; background: #1e1e2f; }
         
-        .btn-round { width: 45px; height: 45px; border-radius: 50%; border: none; background: var(--primary); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
-
-        /* MODALS */
-        .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-        .modal-content { width: 100%; max-width: 450px; border-radius: 24px; padding: 30px; position: relative; }
-
         @media (max-width: 768px) {
-            #app-section { grid-template-columns: 1fr; }
-            #chat-main { position: fixed; top: 0; left: 0; width: 100%; height: 100%; transform: translateX(100%); transition: 0.3s; z-index: 100; }
-            #chat-main.active { transform: translateX(0); }
+            #app-container { grid-template-columns: 1fr; }
+            #chat-area { position: fixed; top: 0; left: 0; width: 100%; height: 100%; transform: translateX(100%); transition: 0.3s; z-index: 50; }
+            #chat-area.active { transform: translateX(0); }
         }
     </style>
 </head>
 <body>
 
     <div id="auth-section">
-        <div class="auth-card glass">
-            <div class="auth-logo">ZChat</div>
-            <div class="auth-tabs">
-                <div class="auth-tab active" id="tab-l" onclick="toggleAuth('login')">Login</div>
-                <div class="auth-tab" id="tab-r" onclick="toggleAuth('reg')">Register</div>
+        <div id="auth-container">
+            <div class="auth-card">
+                <div class="logo">ZChat</div>
+                <div class="auth-tabs">
+                    <div id="tab-login" class="tab active" onclick="switchAuth('login')">Login</div>
+                    <div id="tab-reg" class="tab" onclick="switchAuth('reg')">Register</div>
+                </div>
+                <div id="auth-form">
+                    <div id="login-fields">
+                        <input type="text" id="l-user" placeholder="Username">
+                        <input type="password" id="l-pass" placeholder="Password">
+                        <button class="btn" onclick="handleLogin()">Login</button>
+                    </div>
+                    <div id="reg-fields" class="hidden">
+                        <input type="file" id="r-img" accept="image/*" style="font-size: 0.8rem">
+                        <input type="text" id="r-user" placeholder="Username Baru">
+                        <input type="text" id="r-bio" placeholder="Bio Singkat">
+                        <input type="password" id="r-pass" placeholder="Password">
+                        <button class="btn" onclick="handleRegister()">Daftar</button>
+                    </div>
+                </div>
             </div>
-
-            <form id="form-login">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="l-user" placeholder="Username" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="l-pass" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn-main">Masuk Sekarang</button>
-            </form>
-
-            <form id="form-reg" class="hidden">
-                <div class="form-group" style="text-align: center;">
-                    <img src="https://ui-avatars.com/api/?name=Z&background=6366f1&color=fff" id="reg-preview" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--primary); margin-bottom: 10px;">
-                    <input type="file" id="reg-file" accept="image/*" style="font-size: 0.7rem;">
-                </div>
-                <div class="form-group">
-                    <label>Username Unik</label>
-                    <input type="text" id="r-user" placeholder="Username" required>
-                </div>
-                <div class="form-group">
-                    <label>Bio</label>
-                    <textarea id="r-bio" placeholder="Tentang kamu..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="r-pass" placeholder="Minimal 6 karakter" required>
-                </div>
-                <button type="submit" class="btn-main">Daftar Akun</button>
-            </form>
         </div>
     </div>
 
     <div id="app-section" class="hidden">
-        <aside id="sidebar" class="glass">
-            <div class="sidebar-header">
-                <div class="my-profile" onclick="openSettings()">
-                    <img id="my-avatar" src="">
-                    <div>
-                        <div id="my-name" style="font-weight: 700;">User</div>
-                        <div style="font-size: 0.7rem; color: var(--success);"><i class="fas fa-circle" style="font-size: 0.5rem;"></i> Online</div>
+        <div id="app-container">
+            <aside id="sidebar">
+                <div class="sidebar-header">
+                    <div class="profile-sm" onclick="showModal('settings')">
+                        <img id="my-pic" src="">
+                        <div id="my-name" style="font-weight: bold;">User</div>
                     </div>
+                    <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer"></i>
                 </div>
-                <i class="fas fa-sign-out-alt nav-btn" onclick="logout()"></i>
-            </div>
-
-            <div class="nav-bar">
-                <div class="nav-btn active" onclick="showTab('chats', this)"><i class="fas fa-comment-alt"></i></div>
-                <div class="nav-btn" onclick="showTab('friends', this)"><i class="fas fa-user-friends"></i></div>
-                <div class="nav-btn" onclick="showTab('reqs', this)">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge hidden" id="req-count">0</span>
+                <div class="nav-icons">
+                    <div class="nav-btn active" onclick="showTab('chats', this)"><i class="fas fa-comment-dots"></i></div>
+                    <div class="nav-btn" onclick="showTab('friends', this)"><i class="fas fa-user-friends"></i></div>
+                    <div class="nav-btn" onclick="showTab('reqs', this)"><i class="fas fa-user-plus"></i><span id="req-badge" class="badge hidden">0</span></div>
+                    <div class="nav-btn" onclick="showTab('groups', this)"><i class="fas fa-users"></i></div>
                 </div>
-                <div class="nav-btn" onclick="showTab('groups', this)"><i class="fas fa-users"></i></div>
-            </div>
-
-            <div class="search-area">
-                <input type="text" placeholder="Cari teman atau grup..." oninput="filterList(this.value)">
-            </div>
-
-            <div id="box-chats" class="list-box"></div>
-            <div id="box-friends" class="list-box hidden">
-                <div style="padding: 15px; color: var(--primary); font-size: 0.8rem; cursor: pointer;" onclick="openAddFriend()">
-                    <i class="fas fa-user-plus"></i> Cari User Baru
+                <div id="list-chats" class="list-area"></div>
+                <div id="list-friends" class="list-area hidden">
+                    <div style="padding: 15px; color: var(--primary); cursor: pointer;" onclick="showModal('addfriend')">+ Tambah Teman</div>
+                    <div id="friends-box"></div>
                 </div>
-                <div id="friends-list"></div>
-            </div>
-            <div id="box-reqs" class="list-box hidden"></div>
-            <div id="box-groups" class="list-box hidden">
-                <div style="padding: 15px; color: var(--secondary); font-size: 0.8rem; cursor: pointer;" onclick="openCreateGroup()">
-                    <i class="fas fa-plus-circle"></i> Buat Grup Baru
+                <div id="list-reqs" class="list-area hidden"></div>
+                <div id="list-groups" class="list-area hidden">
+                    <div style="padding: 15px; color: var(--secondary); cursor: pointer;" onclick="createGroup()">+ Buat Grup</div>
+                    <div id="groups-box"></div>
                 </div>
-                <div id="groups-list"></div>
-            </div>
-        </aside>
+            </aside>
 
-        <main id="chat-main">
-            <div id="welcome" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.3;">
-                <i class="fas fa-comments" style="font-size: 5rem; margin-bottom: 20px;"></i>
-                <h2>ZChat Desktop</h2>
-                <p>Pilih teman untuk mulai berkirim pesan</p>
-            </div>
-
-            <div id="chat-active" class="hidden" style="height: 100%; display: flex; flex-direction: column;">
-                <header class="chat-header">
-                    <div class="chat-info">
-                        <i class="fas fa-arrow-left nav-btn mobile-only" onclick="closeChat()"></i>
-                        <img id="target-img" src="">
-                        <div>
-                            <div id="target-name" style="font-weight: 700;">Username</div>
-                            <div id="target-status" style="font-size: 0.7rem; color: var(--text-dim);">Offline</div>
+            <main id="chat-area">
+                <div id="no-chat" style="flex:1; display:flex; align-items:center; justify-content:center; opacity:0.2; flex-direction:column">
+                    <i class="fas fa-comments" style="font-size: 5rem"></i>
+                    <p>Pilih teman untuk chat</p>
+                </div>
+                <div id="active-chat" class="hidden" style="height:100%; display:flex; flex-direction:column">
+                    <header class="chat-header">
+                        <div class="target-info">
+                            <i class="fas fa-arrow-left" onclick="closeChat()" style="margin-right:10px; cursor:pointer" class="mobile-only"></i>
+                            <img id="chat-img" src="">
+                            <div>
+                                <div id="chat-name" style="font-weight:bold">Username</div>
+                                <div id="chat-status" style="font-size:0.7rem; color: var(--text-dim)">Online</div>
+                            </div>
                         </div>
+                    </header>
+                    <div class="messages" id="msg-box"></div>
+                    <div class="input-area">
+                        <div class="input-wrap">
+                            <input type="text" id="msg-input" placeholder="Ketik pesan..." onkeydown="if(event.key==='Enter') sendMsg()">
+                        </div>
+                        <button class="btn" style="width:50px; border-radius:50%" onclick="sendMsg()"><i class="fas fa-paper-plane"></i></button>
                     </div>
-                    <div style="display: flex; gap: 15px; color: var(--text-dim);">
-                        <i class="fas fa-phone"></i>
-                        <i class="fas fa-video"></i>
-                        <i class="fas fa-ellipsis-v"></i>
-                    </div>
-                </header>
-
-                <div class="msg-display" id="msg-container"></div>
-
-                <div class="chat-input">
-                    <i class="far fa-smile nav-btn"></i>
-                    <i class="fas fa-paperclip nav-btn" onclick="document.getElementById('file-up').click()"></i>
-                    <input type="file" id="file-up" class="hidden" onchange="uploadImage(this)">
-                    <div class="input-box">
-                        <input type="text" id="msg-input" placeholder="Ketik pesan..." onkeypress="checkEnter(event)">
-                    </div>
-                    <button class="btn-round" onclick="sendMsg()"><i class="fas fa-paper-plane"></i></button>
                 </div>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
 
-    <div id="modal-layer" class="modal-bg hidden">
-        <div id="mod-add" class="modal-content glass hidden">
+    <div id="modal-container" class="modal hidden">
+        <div id="modal-addfriend" class="modal-content hidden">
             <h3>Cari Teman</h3>
-            <div class="form-group" style="margin-top: 15px;">
-                <input type="text" id="search-username" placeholder="Masukkan username tepat...">
-            </div>
-            <button class="btn-main" onclick="searchUser()">Cari User</button>
-            <div id="search-res" style="margin-top: 15px;"></div>
-            <button class="btn-main" style="background: #334155; margin-top: 10px;" onclick="closeModals()">Batal</button>
-        </div>
-
-        <div id="mod-set" class="modal-content glass hidden">
-            <h3>Edit Profil</h3>
-            <div class="form-group" style="text-align: center; margin-top: 15px;">
-                <img id="set-preview" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
-            </div>
-            <div class="form-group">
-                <label>Bio Baru</label>
-                <textarea id="set-bio"></textarea>
-            </div>
-            <button class="btn-main" onclick="saveSettings()">Simpan</button>
-            <button class="btn-main" style="background: var(--danger); margin-top: 10px;" onclick="deleteAccount()">Hapus Akun</button>
-            <button class="btn-main" style="background: #334155; margin-top: 10px;" onclick="closeModals()">Tutup</button>
+            <input type="text" id="search-name" placeholder="Username persis..." style="margin-top:15px">
+            <button class="btn" onclick="searchUser()">Cari</button>
+            <div id="search-result" style="margin-top:15px"></div>
+            <button class="btn" style="background:#334155; margin-top:10px" onclick="hideModal()">Batal</button>
         </div>
     </div>
 
     <script>
-        // --- KONFIGURASI FIREBASE ---
+                // --- CONFIGURASI FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
             authDomain: "zchat-56639.firebaseapp.com",
@@ -278,97 +193,446 @@
             measurementId: "G-ZDMK1DWV6S"
         };
 
+        // Inisialisasi Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
         // State Global
-        let me = null;
-        let activeChat = null;
-        let isGroup = false;
+        let currentUser = null;
+        let activeChatId = null;
 
-        // --- AUTH LOGIC ---
-        function toggleAuth(mode) {
-            document.getElementById('form-login').classList.toggle('hidden', mode === 'reg');
-            document.getElementById('form-reg').classList.toggle('hidden', mode === 'login');
-            document.getElementById('tab-l').classList.toggle('active', mode === 'login');
-            document.getElementById('tab-r').classList.toggle('active', mode === 'reg');
+        // --- AUTH FUNCTIONS ---
+        function switchAuth(mode) {
+            const loginFields = document.getElementById('login-fields');
+            const regFields = document.getElementById('reg-fields');
+            const tabLogin = document.getElementById('tab-login');
+            const tabReg = document.getElementById('tab-reg');
+
+            if (mode === 'login') {
+                loginFields.classList.remove('hidden');
+                regFields.classList.add('hidden');
+                tabLogin.classList.add('active');
+                tabReg.classList.remove('active');
+            } else {
+                loginFields.classList.add('hidden');
+                regFields.classList.remove('hidden');
+                tabLogin.classList.remove('active');
+                tabReg.classList.add('active');
+            }
         }
 
-        // Preview Foto Reg
-        document.getElementById('reg-file').onchange = async function(e) {
-            if(e.target.files[0]) {
-                const base64 = await toBase64(e.target.files[0]);
-                document.getElementById('reg-preview').src = base64;
+        // Fungsi Convert Gambar ke Base64 (Supaya bisa simpan di DB tanpa Storage ribet)
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        async function handleRegister() {
+            const user = document.getElementById('r-user').value.trim().toLowerCase();
+            const bio = document.getElementById('r-bio').value.trim();
+            const pass = document.getElementById('r-pass').value;
+            const fileInput = document.getElementById('r-img');
+
+            if (!user || !pass) return alert("Username dan Password wajib diisi!");
+            
+            // Cek apakah username sudah ada
+            const snapshot = await db.ref('users').orderByChild('username').equalTo(user).once('value');
+            if (snapshot.exists()) return alert("Username sudah digunakan!");
+
+            let photoData = "https://ui-avatars.com/api/?name=" + user + "&background=6366f1&color=fff";
+            if (fileInput.files[0]) {
+                photoData = await toBase64(fileInput.files[0]);
+            }
+
+            const uid = "u" + Date.now();
+            const userData = {
+                uid: uid,
+                username: user,
+                password: pass,
+                bio: bio || "Halo, saya menggunakan ZChat!",
+                photo: photoData,
+                status: 'online',
+                lastSeen: Date.now()
+            };
+
+            await db.ref('users/' + uid).set(userData);
+            alert("Registrasi Berhasil! Silakan Login.");
+            switchAuth('login');
+        }
+
+        async function handleLogin() {
+            const user = document.getElementById('l-user').value.trim().toLowerCase();
+            const pass = document.getElementById('l-pass').value;
+
+            const snapshot = await db.ref('users').orderByChild('username').equalTo(user).once('value');
+            
+            if (snapshot.exists()) {
+                const users = snapshot.val();
+                const userData = Object.values(users)[0];
+
+                if (userData.password === pass) {
+                    currentUser = userData;
+                    localStorage.setItem('zchat_session', JSON.stringify(userData));
+                    initApp();
+                } else {
+                    alert("Password Salah!");
+                }
+            } else {
+                alert("Username tidak ditemukan!");
+            }
+        }
+
+        function initApp() {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('app-section').classList.remove('hidden');
+            
+            document.getElementById('my-pic').src = currentUser.photo;
+            document.getElementById('my-name').innerText = currentUser.username;
+
+            // Set status online di DB
+            db.ref('users/' + currentUser.uid).update({ status: 'online' });
+
+            // Panggil Listener (Akan ada di Part 3)
+            startListeners();
+        }
+
+        function logout() {
+            if (currentUser) {
+                db.ref('users/' + currentUser.uid).update({ 
+                    status: 'offline', 
+                    lastSeen: Date.now() 
+                });
+            }
+            localStorage.removeItem('zchat_session');
+            location.reload();
+        }
+
+        // Check Session saat web dibuka
+        window.onload = () => {
+            const saved = localStorage.getItem('zchat_session');
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                // Validasi ulang ke DB (Opsional tapi bagus)
+                db.ref('users/' + currentUser.uid).once('value', snap => {
+                    if(snap.exists()) {
+                        currentUser = snap.val();
+                        initApp();
+                    } else {
+                        logout();
+                    }
+                });
             }
         };
 
-        // Submit Register
-        document.getElementById('form-reg').onsubmit = async (e) => {
-            e.preventDefault();
-            const user = document.getElementById('r-user').value.trim().toLowerCase();
-            const pass = document.getElementById('r-pass').value;
-            const bio = document.getElementById('r-bio').value;
-            const img = document.getElementById('reg-preview').src;
-
-            const snap = await db.ref('users').orderByChild('username').equalTo(user).once('value');
-            if(snap.exists()) return alert("Username sudah terpakai!");
-
-            const uid = "u" + Date.now();
-            const userData = { uid, username: user, password: pass, bio, photo: img, status: 'online', lastSeen: Date.now() };
-            
-            await db.ref('users/' + uid).set(userData);
-            alert("Berhasil Daftar!");
-            doLogin(user, pass);
-        };
-
-        // Submit Login
-        document.getElementById('form-login').onsubmit = (e) => {
-            e.preventDefault();
-            doLogin(document.getElementById('l-user').value.toLowerCase(), document.getElementById('l-pass').value);
-        };
-
-        async function doLogin(user, pass) {
-            const snap = await db.ref('users').orderByChild('username').equalTo(user).once('value');
-            if(!snap.exists()) return alert("User tidak ditemukan!");
-            
-            const data = Object.values(snap.val())[0];
-            if(data.password !== pass) return alert("Password salah!");
-
-            me = data;
-            localStorage.setItem('z_session', JSON.stringify(me));
-            startApp();
+        // --- UI MODAL CONTROL ---
+        function showModal(id) {
+            document.getElementById('modal-container').classList.remove('hidden');
+            document.getElementById('modal-' + id).classList.remove('hidden');
         }
 
-        // --- CORE APP ---
-        function startApp() {
-            document.getElementById('auth-section').classList.add('hidden');
-            document.getElementById('app-section').classList.remove('hidden');
-            document.getElementById('my-avatar').src = me.photo;
-            document.getElementById('my-name').innerText = me.username;
-            
-            db.ref('users/' + me.uid).update({ status: 'online' });
+        function hideModal() {
+            document.getElementById('modal-container').classList.add('hidden');
+            const contents = document.querySelectorAll('.modal-content');
+            contents.forEach(c => c.classList.add('hidden'));
+        }
+                // --- PART 3: FRIEND SYSTEM & CHAT ENGINE ---
 
-            // Listeners
-            initChatListener();
-            initFriendListener();
-            initReqListener();
-            initGroupListener();
+        function startListeners() {
+            listenFriendRequests();
+            listenFriends();
+            listenChats();
+            // Status online/offline listener
+            db.ref('.info/connected').on('value', (snap) => {
+                if (snap.val() === true) {
+                    db.ref('users/' + currentUser.uid).onDisconnect().update({
+                        status: 'offline',
+                        lastSeen: Date.now()
+                    });
+                    db.ref('users/' + currentUser.uid).update({ status: 'online' });
+                }
+            });
+        }
+
+        // Cari User untuk ditambah jadi teman
+        async function searchUser() {
+            const name = document.getElementById('search-name').value.trim().toLowerCase();
+            const resDiv = document.getElementById('search-result');
+            if (name === currentUser.username) return resDiv.innerHTML = "Itu kamu sendiri, kocak!";
+
+            const snap = await db.ref('users').orderByChild('username').equalTo(name).once('value');
+            if (snap.exists()) {
+                const target = Object.values(snap.val())[0];
+                resDiv.innerHTML = `
+                    <div class="list-item" style="background:rgba(255,255,255,0.05); border-radius:10px; margin-top:10px">
+                        <img src="${target.photo}">
+                        <div class="item-info">
+                            <div class="item-name">${target.username}</div>
+                            <div class="item-preview">${target.bio}</div>
+                        </div>
+                        <button class="btn" style="width:auto; padding:5px 15px" onclick="sendFriendRequest('${target.uid}')">Add</button>
+                    </div>
+                `;
+            } else {
+                resDiv.innerHTML = "User tidak ditemukan.";
+            }
+        }
+
+        function sendFriendRequest(targetUid) {
+            const reqId = currentUser.uid + "_" + targetUid;
+            db.ref('friend_requests/' + reqId).set({
+                sender: currentUser.uid,
+                receiver: targetUid,
+                status: 'pending',
+                time: Date.now()
+            }).then(() => {
+                alert("Permintaan terkirim!");
+                hideModal();
+            });
+        }
+
+        // Pantau permintaan pertemanan yang masuk
+        function listenFriendRequests() {
+            db.ref('friend_requests').orderByChild('receiver').equalTo(currentUser.uid).on('value', snap => {
+                const list = document.getElementById('list-reqs');
+                const badge = document.getElementById('req-badge');
+                list.innerHTML = "";
+                let count = 0;
+
+                snap.forEach(child => {
+                    const req = child.val();
+                    if (req.status === 'pending') {
+                        count++;
+                        db.ref('users/' + req.sender).once('value', uSnap => {
+                            const u = uSnap.val();
+                            list.innerHTML += `
+                                <div class="list-item">
+                                    <img src="${u.photo}">
+                                    <div class="item-info">
+                                        <div class="item-name">${u.username}</div>
+                                        <div style="display:flex; gap:5px; margin-top:5px">
+                                            <button class="btn" style="padding:5px" onclick="respondReq('${child.key}', 'accept', '${u.uid}')">Accept</button>
+                                            <button class="btn" style="padding:5px; background:var(--danger)" onclick="respondReq('${child.key}', 'decline')">No</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                });
+                badge.innerText = count;
+                badge.classList.toggle('hidden', count === 0);
+            });
+        }
+
+        async function respondReq(reqId, action, senderUid) {
+            if (action === 'accept') {
+                await db.ref('friends/' + currentUser.uid + '/' + senderUid).set(true);
+                await db.ref('friends/' + senderUid + '/' + currentUser.uid).set(true);
+                // Buat room chat perdana
+                const chatId = [currentUser.uid, senderUid].sort().join("_");
+                db.ref('chats/' + chatId).set({
+                    members: [currentUser.uid, senderUid],
+                    lastMsg: "Kalian sekarang berteman!",
+                    time: Date.now()
+                });
+            }
+            db.ref('friend_requests/' + reqId).remove();
+        }
+
+        // Munculkan daftar teman
+        function listenFriends() {
+            db.ref('friends/' + currentUser.uid).on('value', snap => {
+                const box = document.getElementById('friends-box');
+                box.innerHTML = "";
+                snap.forEach(child => {
+                    db.ref('users/' + child.key).on('value', uSnap => {
+                        const u = uSnap.val();
+                        const isOnline = u.status === 'online';
+                        const existing = document.getElementById('friend-' + u.uid);
+                        const html = `
+                            <div class="list-item" id="friend-${u.uid}" onclick="openChat('${u.uid}')">
+                                <img src="${u.photo}" style="border: 2px solid ${isOnline ? 'var(--success)' : 'transparent'}">
+                                <div class="item-info">
+                                    <div class="item-name">${u.username} ${isOnline ? '🟢' : ''}</div>
+                                    <div class="item-preview">${u.bio}</div>
+                                </div>
+                            </div>
+                        `;
+                        if (existing) existing.outerHTML = html;
+                        else box.innerHTML += html;
+                    });
+                });
+            });
+        }
+
+        // Buka Chat Room
+        async function openChat(targetUid) {
+            activeChatId = [currentUser.uid, targetUid].sort().join("_");
+            document.getElementById('no-chat').classList.add('hidden');
+            document.getElementById('active-chat').classList.remove('hidden');
+            if (window.innerWidth <= 768) document.getElementById('chat-area').classList.add('active');
+
+            const snap = await db.ref('users/' + targetUid).once('value');
+            const u = snap.val();
+            document.getElementById('chat-img').src = u.photo;
+            document.getElementById('chat-name').innerText = u.username;
+            document.getElementById('chat-status').innerText = u.status === 'online' ? 'Online' : 'Offline';
+
+            loadMessages(activeChatId);
+        }
+
+        function loadMessages(chatId) {
+            const box = document.getElementById('msg-box');
+            db.ref('messages/' + chatId).off();
+            db.ref('messages/' + chatId).on('value', snap => {
+                box.innerHTML = "";
+                snap.forEach(child => {
+                    const m = child.val();
+                    const isMe = m.sender === currentUser.uid;
+                    box.innerHTML += `
+                        <div class="bubble ${isMe ? 'sent' : 'received'}">
+                            ${m.text}
+                            <div class="time">${new Date(m.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                        </div>
+                    `;
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        }
+
+        function sendMsg() {
+            const input = document.getElementById('msg-input');
+            const text = input.value.trim();
+            if (!text || !activeChatId) return;
+
+            const msgData = {
+                sender: currentUser.uid,
+                text: text,
+                time: Date.now()
+            };
+
+            db.ref('messages/' + activeChatId).push(msgData);
+            db.ref('chats/' + activeChatId).update({
+                lastMsg: text,
+                time: Date.now()
+            });
+            input.value = "";
+        }
+
+        function listenChats() {
+            db.ref('chats').on('value', snap => {
+                const list = document.getElementById('list-chats');
+                list.innerHTML = "";
+                const myChats = [];
+                snap.forEach(c => {
+                    const data = c.val();
+                    if (data.members && data.members.includes(currentUser.uid)) {
+                        myChats.push({ id: c.key, ...data });
+                    }
+                });
+
+                myChats.sort((a,b) => b.time - a.time).forEach(chat => {
+                    const otherId = chat.members.find(m => m !== currentUser.uid);
+                    db.ref('users/' + otherId).once('value', uSnap => {
+                        const u = uSnap.val();
+                        list.innerHTML += `
+                            <div class="list-item" onclick="openChat('${u.uid}')">
+                                <img src="${u.photo}">
+                                <div class="item-info">
+                                    <div class="item-name"><span>${u.username}</span> <span style="font-size:0.6rem; font-weight:normal">${new Date(chat.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span></div>
+                                    <div class="item-preview">${chat.lastMsg}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                });
+            });
         }
 
         function showTab(tab, el) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.list-box').forEach(b => b.classList.add('hidden'));
+            document.querySelectorAll('.list-area').forEach(l => l.classList.add('hidden'));
             el.classList.add('active');
-            document.getElementById('box-' + tab).classList.remove('hidden');
+            document.getElementById('list-' + tab).classList.remove('hidden');
         }
 
-        // --- CHAT SYSTEM ---
-        async function openChat(targetUid) {
-            activeChat = [me.uid, targetUid].sort().join('_');
-            isGroup = false;
-            
-            document.getElementById('welcome').classList.add('hidden');
-            document.getElementById('chat-active').classList.remove('hidden');
-            if(window.innerWidth < 768) document.getElementById('chat-main').classList.add('active');
+        function closeChat() { document.getElementById('chat-area').classList.remove('active'); }
+                // --- PART 4: GROUP CHAT & FINALIZATION ---
 
-            const snap = await db.ref('users/' + ta
+        function createGroup() {
+            const gName = prompt("Nama Grup Baru:");
+            if (!gName) return;
+
+            const gid = "g" + Date.now();
+            db.ref('groups/' + gid).set({
+                id: gid,
+                name: gName,
+                admin: currentUser.uid,
+                members: [currentUser.uid],
+                lastMsg: "Grup baru dibuat",
+                time: Date.now()
+            }).then(() => {
+                alert("Grup " + gName + " Berhasil Dibuat!");
+            });
+        }
+
+        function listenGroupRequests() {
+            // Kita gunakan sistem invite/join sederhana
+            db.ref('groups').on('value', snap => {
+                const box = document.getElementById('groups-box');
+                box.innerHTML = "";
+                snap.forEach(child => {
+                    const g = child.val();
+                    if (g.members && g.members.includes(currentUser.uid)) {
+                        box.innerHTML += `
+                            <div class="list-item" onclick="openGroup('${g.id}')">
+                                <img src="https://ui-avatars.com/api/?name=${g.name}&background=a855f7&color=fff">
+                                <div class="item-info">
+                                    <div class="item-name">${g.name}</div>
+                                    <div class="item-preview">${g.lastMsg}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+            });
+        }
+
+        async function openGroup(gid) {
+            activeChatId = gid;
+            document.getElementById('no-chat').classList.add('hidden');
+            document.getElementById('active-chat').classList.remove('hidden');
+            if (window.innerWidth <= 768) document.getElementById('chat-area').classList.add('active');
+
+            const snap = await db.ref('groups/' + gid).once('value');
+            const g = snap.val();
+            document.getElementById('chat-img').src = `https://ui-avatars.com/api/?name=${g.name}&background=a855f7&color=fff`;
+            document.getElementById('chat-name').innerText = g.name;
+            document.getElementById('chat-status').innerText = g.members.length + " Anggota";
+
+            loadMessages(activeChatId);
+        }
+
+        // Inisialisasi Listener Tambahan
+        const oldStart = startListeners;
+        startListeners = function() {
+            oldStart();
+            listenGroupRequests();
+        };
+
+        // Fungsi Filter Pencarian Sederhana di Sidebar
+        function filterList(val) {
+            const query = val.toLowerCase();
+            const items = document.querySelectorAll('.list-item');
+            items.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                item.style.display = text.includes(query) ? 'flex' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>
