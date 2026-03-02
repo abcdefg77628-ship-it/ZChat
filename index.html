@@ -3,91 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZERA WA Clone</title>
+    <title>ZERA - Messenger</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root { --wa-bg: #0b141a; --wa-panel: #202c33; --wa-green: #00a884; --glow: #00ffcc; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background: black; color: white; overflow: hidden; }
         
-        /* INTRO */
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: #000; color: white; overflow: hidden; }
+
+        /* INTRO ANIMASI */
         #intro { position: fixed; inset: 0; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .zera-logo { font-size: 4rem; font-weight: 900; animation: slideDown 1.2s forwards; text-shadow: 0 0 20px var(--glow); }
         @keyframes slideDown { 0% { transform: translateY(-300px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
 
-        /* LOGIN & LOADING */
-        .page { display: none; height: 100vh; flex-direction: column; align-items: center; justify-content: center; background: var(--wa-bg); }
-        input { width: 80%; padding: 12px; margin: 8px; border-radius: 8px; border: 1px solid #3b4a54; background: #2a3942; color: white; }
-        .btn { width: 80%; padding: 12px; background: var(--wa-green); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
+        /* UI LOGIN PRESISI TENGAH */
+        .page-center { 
+            display: none; height: 100vh; width: 100%;
+            flex-direction: column; align-items: center; justify-content: center; 
+            background: var(--wa-bg); padding: 20px;
+        }
+        .login-card {
+            width: 100%; max-width: 320px; background: var(--wa-panel);
+            padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .login-card h2 { margin-bottom: 20px; color: var(--wa-green); font-size: 1.5rem; }
+        
+        input { 
+            width: 100%; padding: 12px 15px; margin: 10px 0; border-radius: 10px; 
+            border: 1px solid #3b4a54; background: #2a3942; color: white; outline: none;
+        }
+        .btn { 
+            width: 100%; padding: 12px; background: var(--wa-green); border: none; 
+            border-radius: 10px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+        .btn:active { transform: scale(0.95); }
 
         /* LOADING BAR */
-        .loader-box { width: 70%; background: #3b4a54; height: 6px; border-radius: 10px; overflow: hidden; margin-top: 10px; }
-        #bar { width: 0%; height: 100%; background: var(--wa-green); transition: 0.1s; }
+        .loader-box { width: 100%; background: #3b4a54; height: 8px; border-radius: 10px; overflow: hidden; margin-top: 15px; }
+        #bar { width: 0%; height: 100%; background: var(--wa-green); box-shadow: 0 0 10px var(--wa-green); }
 
         /* MAIN APP */
         #main-app { display: none; height: 100vh; flex-direction: column; background: var(--wa-bg); }
         .header { background: var(--wa-panel); padding: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
         
-        /* CONTACT LIST */
-        #contact-list { flex: 1; overflow-y: auto; }
-        .contact-item { padding: 15px; border-bottom: 1px solid #222; display: flex; align-items: center; cursor: pointer; }
-        .contact-item:active { background: #2a3942; }
-        .avatar { width: 45px; height: 45px; border-radius: 50%; background: #4f5e67; margin-right: 15px; display: flex; align-items: center; justify-content: center; }
+        .contact-item { 
+            padding: 15px; border-bottom: 1px solid #1c262d; display: flex; align-items: center; cursor: pointer; 
+        }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #4f5e67; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
 
         /* CHAT ROOM */
-        #chat-room { display: none; position: fixed; inset: 0; background: var(--wa-bg); flex-direction: column; z-index: 100; }
-        .chat-view { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; }
-        .glowing { animation: colorCycle 10s infinite alternate; }
-        @keyframes colorCycle { 0% { background: #0b141a; } 100% { background: #0d211d; } }
+        #chat-room { 
+            display: none; position: fixed; inset: 0; background: var(--wa-bg); 
+            flex-direction: column; z-index: 100; animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
         
-        .bubble { max-width: 70%; padding: 8px 12px; border-radius: 8px; margin-bottom: 5px; font-size: 14px; }
-        .msg-in { background: var(--wa-panel); align-self: flex-start; }
-        .msg-out { background: #005c4b; align-self: flex-end; }
+        .chat-view { 
+            flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column;
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            background-blend-mode: overlay;
+        }
+        .glowing { animation: colorCycle 15s infinite alternate; }
+        @keyframes colorCycle { 0% { background-color: rgba(11, 20, 26, 0.9); } 100% { background-color: rgba(0, 89, 76, 0.5); } }
+        
+        .bubble { max-width: 80%; padding: 8px 12px; border-radius: 10px; margin-bottom: 4px; font-size: 14px; position: relative; }
+        .msg-in { background: var(--wa-panel); align-self: flex-start; border-top-left-radius: 0; }
+        .msg-out { background: #005c4b; align-self: flex-end; border-top-right-radius: 0; }
 
-        .footer { background: var(--wa-panel); padding: 10px; display: flex; }
-        .fab { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background: var(--wa-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .footer { background: var(--wa-panel); padding: 10px; display: flex; align-items: center; }
+        #msgInput { flex: 1; margin: 0 10px; }
+        
+        .fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--wa-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
     </style>
 </head>
 <body>
 
     <div id="intro"><div class="zera-logo">ZERA</div></div>
 
-    <div id="login-page" class="page">
-        <h2>MOHON MASUK</h2>
-        <input type="text" id="myUser" placeholder="Username Kamu">
-        <input type="password" id="myPass" placeholder="Password">
-        <button class="btn" onclick="login()">MASUK</button>
+    <div id="login-page" class="page-center">
+        <div class="login-card">
+            <h2>MOHON MASUK</h2>
+            <input type="text" id="myUser" placeholder="Username (Tanpa spasi)">
+            <input type="password" id="myPass" placeholder="Password">
+            <button class="btn" onclick="login()">MASUK / DAFTAR</button>
+        </div>
     </div>
 
-    <div id="loading-page" class="page">
-        <div id="load-status">Mengecek Sinyal...</div>
-        <div class="loader-box"><div id="bar"></div></div>
-        <div id="pct">0%</div>
+    <div id="loading-page" class="page-center">
+        <div class="login-card">
+            <h3 id="load-status">Mengecek Sinyal...</h3>
+            <div class="loader-box"><div id="bar"></div></div>
+            <div id="pct" style="margin-top:10px">0%</div>
+        </div>
     </div>
 
     <div id="main-app">
         <div class="header">
-            <span>ZERA WA</span>
+            <span>ZERA MESSENGER</span>
             <div onclick="showSettings()">⋮</div>
         </div>
-        <div id="contact-list">
+        <div id="contact-list" style="flex:1; overflow-y:auto;">
             </div>
         <div class="fab" onclick="addContact()">+</div>
     </div>
 
     <div id="chat-room">
         <div class="header">
-            <span onclick="closeChat()">← <span id="chatting-with">Nama Teman</span></span>
+            <div style="display:flex; align-items:center;">
+                <span onclick="closeChat()" style="margin-right:15px; cursor:pointer; font-size:20px;">←</span>
+                <span id="chatting-with">Nama Teman</span>
+            </div>
         </div>
         <div id="chatBox" class="chat-view glowing"></div>
         <div class="footer">
             <input type="text" id="msgInput" placeholder="Ketik pesan...">
-            <button onclick="send()" style="background:none; border:none; color:var(--wa-green); font-size:20px;">➤</button>
+            <button class="btn" onclick="send()" style="width:50px">➤</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onChildAdded, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
@@ -104,78 +141,118 @@
         let MY_NAME = "";
         let CURRENT_CHAT_ID = "";
 
-        // INTRO
-        setTimeout(() => { document.getElementById('intro').style.display='none'; document.getElementById('login-page').style.display='flex'; }, 3000);
+        // INTRO CONTROL
+        setTimeout(() => { 
+            document.getElementById('intro').style.display='none'; 
+            document.getElementById('login-page').style.display='flex'; 
+        }, 3000);
 
-        // LOGIN & SIGNAL LOADING
+        // LOGIN DENGAN SIGNAL CHECKER
         window.login = () => {
-            MY_NAME = document.getElementById('myUser').value;
-            if(!MY_NAME) return;
+            MY_NAME = document.getElementById('myUser').value.trim().toLowerCase();
+            if(!MY_NAME) return Swal.fire("Isi Username!", "", "error");
+
             document.getElementById('login-page').style.display='none';
             document.getElementById('loading-page').style.display='flex';
             
             let p = 0;
             let itv = setInterval(() => {
-                if(!navigator.onLine) { document.getElementById('load-status').innerText="SINYAL ILANG!"; return; }
-                document.getElementById('load-status').innerText="Menyambungkan...";
-                p += Math.floor(Math.random()*5)+1;
+                if(!navigator.onLine) {
+                    document.getElementById('load-status').innerText="SINYAL ERROR!";
+                    document.getElementById('bar').style.background = "red";
+                    return; 
+                }
+                document.getElementById('load-status').innerText="Menghubungkan Server...";
+                document.getElementById('bar').style.background = "var(--wa-green)";
+                
+                p += Math.floor(Math.random()*7)+1;
                 if(p>100) p=100;
                 document.getElementById('bar').style.width = p+"%";
                 document.getElementById('pct').innerText = p+"%";
-                if(p>=100) { clearInterval(itv); document.getElementById('loading-page').style.display='none'; document.getElementById('main-app').style.display='flex'; loadContacts(); }
-            }, 100);
+                
+                if(p>=100) { 
+                    clearInterval(itv); 
+                    document.getElementById('loading-page').style.display='none'; 
+                    document.getElementById('main-app').style.display='flex'; 
+                    loadMyChats(); 
+                }
+            }, 120);
         };
 
-        // KONTAK SYSTEM
+        // TAMBAH KONTAK (OTOMATIS MUNCUL DI KEDUA PIHAK)
         window.addContact = async () => {
-            const { value: friend } = await Swal.fire({ title: 'Tambah Nama Teman', input: 'text', background: '#202c33', color: '#fff' });
+            const { value: friend } = await Swal.fire({ 
+                title: 'Tambah Username', 
+                input: 'text', 
+                inputPlaceholder: 'Masukkan username teman...',
+                background: '#202c33', color: '#fff' 
+            });
+
             if(friend) {
-                const id = [MY_NAME, friend].sort().join("_"); // ID Unik berdua
-                const contactRef = ref(db, `users/${MY_NAME}/contacts/${friend}`);
-                set(contactRef, { room: id });
-                // Tambahkan sebaliknya biar teman juga punya kontak kita
-                set(ref(db, `users/${friend}/contacts/${MY_NAME}`), { room: id });
+                const friendName = friend.trim().toLowerCase();
+                if(friendName === MY_NAME) return Swal.fire("Gak bisa chat diri sendiri!", "", "warning");
+                
+                const roomID = [MY_NAME, friendName].sort().join("_");
+                
+                // Set kontak di akun saya
+                await set(ref(db, `users/${MY_NAME}/contacts/${friendName}`), { room: roomID });
+                // Set kontak di akun teman (supaya otomatis muncul di HP dia juga)
+                await set(ref(db, `users/${friendName}/contacts/${MY_NAME}`), { room: roomID });
+                
+                Swal.fire("Kontak Ditambahkan!", "", "success");
             }
         };
 
-        function loadContacts() {
+        // LOAD DAFTAR CHAT
+        function loadMyChats() {
             const list = document.getElementById('contact-list');
             onValue(ref(db, `users/${MY_NAME}/contacts`), (snapshot) => {
                 list.innerHTML = "";
+                if(!snapshot.exists()) {
+                    list.innerHTML = "<p style='text-align:center; color:gray; margin-top:20px;'>Belum ada chat. Klik + untuk tambah teman.</p>";
+                }
                 snapshot.forEach(child => {
                     const name = child.key;
                     const room = child.val().room;
                     const div = document.createElement('div');
                     div.className = 'contact-item';
-                    div.innerHTML = `<div class="avatar">👤</div><div><b>${name}</b><br><small>Klik untuk chat</small></div>`;
+                    div.innerHTML = `<div class="avatar">${name[0].toUpperCase()}</div><div><b>${name}</b><br><small>Online</small></div>`;
                     div.onclick = () => openChat(name, room);
                     list.appendChild(div);
                 });
             });
         }
 
-        // CHAT SYSTEM
+        // BUKA ROOM CHAT
         window.openChat = (name, room) => {
             CURRENT_CHAT_ID = room;
             document.getElementById('chatting-with').innerText = name;
             document.getElementById('chat-room').style.display = 'flex';
-            document.getElementById('chatBox').innerHTML = "";
+            const chatBox = document.getElementById('chatBox');
+            chatBox.innerHTML = "";
             
-            // Listen pesan di room ini
-            onChildAdded(ref(db, `messages/${room}`), (snap) => {
-                const m = snap.val();
-                const d = document.createElement('div');
-                d.className = `bubble ${m.sender === MY_NAME ? 'msg-out' : 'msg-in'}`;
-                d.innerText = m.text;
-                document.getElementById('chatBox').appendChild(d);
-                document.getElementById('chatBox').scrollTop = 99999;
+            // Listen pesan real-time
+            onValue(ref(db, `messages/${room}`), (snapshot) => {
+                chatBox.innerHTML = "";
+                snapshot.forEach(snap => {
+                    const m = snap.val();
+                    const d = document.createElement('div');
+                    d.className = `bubble ${m.sender === MY_NAME ? 'msg-out' : 'msg-in'}`;
+                    d.innerText = m.text;
+                    chatBox.appendChild(d);
+                });
+                chatBox.scrollTop = chatBox.scrollHeight;
             });
         };
 
         window.send = () => {
             const inp = document.getElementById('msgInput');
-            if(!inp.value) return;
-            push(ref(db, `messages/${CURRENT_CHAT_ID}`), { sender: MY_NAME, text: inp.value });
+            if(!inp.value.trim()) return;
+            push(ref(db, `messages/${CURRENT_CHAT_ID}`), {
+                sender: MY_NAME,
+                text: inp.value,
+                time: Date.now()
+            });
             inp.value = "";
         };
 
@@ -184,11 +261,12 @@
         window.showSettings = () => {
             Swal.fire({
                 title: 'ZERA Settings',
-                background: '#202c33',
-                color: '#fff',
-                html: '<button class="btn" onclick="localStorage.clear(); location.reload();">Logout</button>'
-            });
+                background: '#202c33', color: '#fff',
+                showCancelButton: true,
+                confirmButtonText: 'Logout'
+            }).then(r => { if(r.isConfirmed) location.reload(); });
         }
     </script>
 </body>
-</html>
+    </html>
+    
