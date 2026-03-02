@@ -3,57 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZChat Ultimate | zZerr44 Mainframe</title>
+    <title>ZChat Ultimate | zZerr44</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* 1. INITIALIZING SYSTEM VARIABLES */
-        :root {
-            --primary: #6366f1;           /* Warna utama (Indigo) */
+        :root 
+        {
+            --primary: #6366f1;
             --primary-glow: rgba(99, 102, 241, 0.3);
-            --bg-deep: #020617;           /* Background dasar paling gelap */
-            --bg-panel: #0a0f1d;          /* Background sidebar dan header */
-            --bg-card: #0f172a;           /* Background kartu dan bubble chat */
-            --text-main: #f8fafc;         /* Warna teks utama (Putih pudar) */
-            --text-dim: #64748b;          /* Warna teks sekunder (Abu-abu) */
-            --danger: #ef4444;            /* Warna untuk aksi hapus/error */
-            --success: #22c55e;           /* Warna untuk status online */
-            --border: rgba(255, 255, 255, 0.08); /* Border tipis transparan */
-            --radius-lg: 20px;            /* Radius sudut besar */
-            --radius-md: 12px;            /* Radius sudut sedang */
+            --bg-deep: #020617;
+            --bg-panel: #0a0f1d;
+            --bg-card: #0f172a;
+            --text-main: #f8fafc;
+            --text-dim: #64748b;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --border: rgba(255, 255, 255, 0.08); 
+            --radius-lg: 20px;
+            --radius-md: 12px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* 2. BASE RESETTING PROTOCOL */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* 3. SCROLLBAR CUSTOMIZATION */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
-        }
-
-        /* 4. LAYOUT UTILITIES */
-        body {
+        body 
+        {
             background-color: var(--bg-deep);
             color: var(--text-main);
             height: 100vh;
@@ -63,989 +45,685 @@
             flex-direction: column;
         }
 
-        .hidden {
-            display: none !important;
-        }
-
-        /* 5. AUTHENTICATION UI ENGINE */
-        #auth-gate {
+        #auth-gate 
+        {
             position: fixed;
-            inset: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9999;
             display: flex;
             align-items: center;
             justify-content: center;
             background: radial-gradient(circle at center, #1e1b4b 0%, #020617 100%);
-            z-index: 9999;
         }
 
-        .auth-card {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(20px);
-            padding: 40px;
-            border-radius: 30px;
+        .auth-card 
+        {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(25px);
+            padding: 50px;
+            border-radius: 40px;
             width: 100%;
-            max-width: 380px;
+            max-width: 450px;
             text-align: center;
             border: 1px solid var(--border);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: authFadeIn 0.8s ease;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8);
         }
 
-        @keyframes authFadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .auth-card h1 {
-            font-size: 2rem;
-            font-weight: 800;
+        h1 
+        {
+            font-size: 2.2rem;
+            letter-spacing: 2px;
             margin-bottom: 10px;
-            background: linear-gradient(to right, #fff, var(--primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text-main);
         }
 
-        .auth-card p {
-            color: var(--text-dim);
-            font-size: 0.9rem;
-            margin-bottom: 30px;
-        }
-
-        /* 6. FORM ELEMENTS STYLING */
-        .field-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .field-group label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-dim);
-            margin-bottom: 8px;
-            margin-left: 5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .z-input {
+        .z-input 
+        {
             width: 100%;
-            padding: 14px 20px;
-            background: rgba(0, 0, 0, 0.3);
+            padding: 18px 25px;
+            margin: 12px 0;
+            background: rgba(0, 0, 0, 0.5);
             border: 1px solid var(--border);
-            border-radius: var(--radius-md);
+            border-radius: 15px;
             color: #fff;
             font-size: 1rem;
+            outline: none;
             transition: var(--transition);
         }
 
-        .z-input:focus {
+        .z-input:focus 
+        {
             border-color: var(--primary);
-            background: rgba(0, 0, 0, 0.5);
-            box-shadow: 0 0 0 4px var(--primary-glow);
-            outline: none;
+            box-shadow: 0 0 15px var(--primary-glow);
         }
 
-        .btn-exec {
+        .btn-exec 
+        {
             width: 100%;
-            padding: 16px;
+            padding: 18px;
+            margin-top: 20px;
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: var(--radius-md);
-            font-size: 1rem;
-            font-weight: 700;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 800;
             cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             transition: var(--transition);
-            margin-top: 10px;
         }
 
-        .btn-exec:hover {
-            filter: brightness(1.1);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px var(--primary-glow);
+        .btn-exec:hover 
+        {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px var(--primary-glow);
         }
 
-        /* 7. MAIN INTERFACE SYSTEM */
-        #z-shell {
+        #z-shell 
+        {
             display: grid;
             grid-template-columns: 350px 1fr;
             height: 100vh;
-            width: 100%;
+            width: 100vw;
         }
 
-        /* 8. SIDEBAR COMPONENT */
-        #sidebar {
+        #sidebar 
+        {
             background: var(--bg-panel);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
         }
 
-        .side-head {
-            padding: 25px;
+        .side-head 
+        {
+            padding: 35px;
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
-            gap: 15px;
-            border-bottom: 1px solid var(--border);
+            gap: 20px;
         }
 
-        .side-head img {
-            width: 50px;
-            height: 50px;
-            border-radius: 15px;
+        .side-head img 
+        {
+            width: 60px;
+            height: 60px;
+            border-radius: 20px;
             border: 2px solid var(--primary);
+            object-fit: cover;
         }
-                /* ============================================================================
-        9. VIEWPORT MESSAGING SYSTEM (CORE)
-        Bagian ini mengatur area utama di mana pesan-pesan akan ditampilkan.
-        Menggunakan Flexbox column-reverse agar pesan terbaru selalu di bawah.
-        ============================================================================
-        */
-        #viewport {
+
+        #viewport 
+        {
             display: flex;
             flex-direction: column;
-            background-color: var(--bg-deep);
             position: relative;
-            height: 100vh;
             overflow: hidden;
-            background-image: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 100%);
+            background: var(--bg-deep);
         }
 
-        /* ============================================================================
-        10. HEADER COMPONENT WITH TITIK TIGA OPTIONS
-        Header ini berisi informasi lawan bicara dan tombol opsi (Titik Tiga).
-        Tombol Titik Tiga diletakkan di dalam container relatif untuk posisi dropdown.
-        ============================================================================
-        */
-        .v-header {
-            padding: 20px 30px;
+        .v-header 
+        {
+            padding: 25px 40px;
             background: var(--bg-panel);
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            backdrop-filter: blur(10px);
-            z-index: 100;
+            z-index: 10;
         }
 
-        .peer-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .peer-info h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        /* TOMBOL TITIK TIGA (TRIGGER) */
-        .opt-trigger {
-            width: 40px;
-            height: 40px;
+        .opt-trigger 
+        {
+            width: 50px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 10px;
+            border-radius: 15px;
             cursor: pointer;
-            transition: var(--transition);
             color: var(--text-dim);
+            transition: var(--transition);
         }
 
-        .opt-trigger:hover {
+        .opt-trigger:hover 
+        {
             background: var(--bg-card);
             color: var(--primary);
         }
 
-        /* ============================================================================
-        11. THE DROPDOWN MENU ARCHITECTURE (TITIK TIGA)
-        Dropdown ini akan muncul ketika tombol .opt-trigger diklik.
-        Menggunakan animasi FadeIn dan Scale untuk efek premium.
-        ============================================================================
-        */
-        .z-dropdown {
+        .z-dropdown 
+        {
             position: absolute;
-            top: 75px;
-            right: 25px;
-            width: 240px;
+            top: 90px;
+            right: 40px;
+            width: 260px;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 18px;
-            overflow: hidden;
-            display: none; /* Default tersembunyi */
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            z-index: 500;
-            padding: 8px;
-            transform-origin: top right;
+            border-radius: 22px;
+            display: none;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            z-index: 9999;
+            padding: 12px;
         }
 
-        /* Class .active ditambahkan via Javascript untuk memunculkan menu */
-        .z-dropdown.active {
+        .z-dropdown.active 
+        {
             display: block;
-            animation: dropShow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: slideIn 0.3s ease-out;
         }
 
-        @keyframes dropShow {
-            from { opacity: 0; transform: scale(0.9) translateY(-10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+        @keyframes slideIn 
+        {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Item di dalam menu dropdown */
-        .z-item {
-            padding: 12px 15px;
-            font-size: 0.9rem;
-            font-weight: 600;
+        .z-item 
+        {
+            padding: 15px 20px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
             cursor: pointer;
-            border-radius: 10px;
-            transition: var(--transition);
             color: var(--text-main);
+            font-size: 0.95rem;
+            transition: var(--transition);
         }
 
-        .z-item i {
-            width: 20px;
-            text-align: center;
-            font-size: 1rem;
-            color: var(--primary);
-        }
-
-        .z-item:hover {
+        .z-item:hover 
+        {
             background: rgba(255, 255, 255, 0.05);
             color: var(--primary);
         }
 
-        /* Item khusus untuk aksi berbahaya (Hapus/Logout) */
-        .z-item.danger {
+        .z-item.danger 
+        {
             color: var(--danger);
         }
 
-        .z-item.danger i {
-            color: var(--danger);
-        }
-
-        .z-item.danger:hover {
-            background: rgba(239, 68, 68, 0.1);
-        }
-
-        /* ============================================================================
-        12. MESSAGE FLOW AREA
-        Container untuk menampilkan deretan pesan chat.
-        Menggunakan flex-direction: column agar bubble tersusun vertikal.
-        ============================================================================
-        */
-        #msg-container {
+        #msg-container 
+        {
             flex: 1;
             overflow-y: auto;
-            padding: 30px;
+            padding: 40px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border) transparent;
+            gap: 20px;
         }
 
-        /* Bubble Chat Styling */
-        .msg-row {
+        .msg-row 
+        {
             display: flex;
             flex-direction: column;
-            max-width: 80%;
-            position: relative;
-            animation: msgFade 0.4s ease;
+            max-width: 75%;
+            animation: fadeInUp 0.5s ease;
         }
 
-        @keyframes msgFade {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes fadeInUp 
+        {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Bubble milik kita sendiri (Kanan) */
-        .msg-row.me {
+        .msg-row.me 
+        {
             align-self: flex-end;
             align-items: flex-end;
         }
 
-        /* Bubble milik orang lain (Kiri) */
-        .msg-row.peer {
-            align-self: flex-start;
-            align-items: flex-start;
+        .bubble 
+        {
+            padding: 18px 25px;
+            border-radius: 25px;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            word-wrap: break-word;
         }
 
-        .bubble {
-            padding: 14px 20px;
-            border-radius: 20px;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .me .bubble {
+        .me .bubble 
+        {
             background: var(--primary);
             color: #fff;
-            border-bottom-right-radius: 4px;
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 10px 20px var(--primary-glow);
         }
 
-        .peer .bubble {
+        .peer .bubble 
+        {
             background: var(--bg-card);
             border: 1px solid var(--border);
             color: var(--text-main);
-            border-bottom-left-radius: 4px;
+            border-bottom-left-radius: 5px;
         }
 
-        /* ============================================================================
-        13. INPUT SECTION ARCHITECTURE
-        Bagian bawah untuk mengetik dan mengirim pesan.
-        Dilengkapi dengan efek fokus yang glowing.
-        ============================================================================
-        */
-        .input-area {
-            padding: 25px 30px;
+        .input-area 
+        {
+            padding: 35px 45px;
             background: var(--bg-panel);
             border-top: 1px solid var(--border);
             display: flex;
+            gap: 25px;
             align-items: center;
-            gap: 15px;
         }
 
-        .input-wrapper {
+        .z-chat-input 
+        {
             flex: 1;
-            position: relative;
-        }
-
-        .z-chat-input {
-            width: 100%;
-            padding: 16px 25px;
+            padding: 20px 30px;
             background: var(--bg-deep);
             border: 1px solid var(--border);
-            border-radius: 100px;
+            border-radius: 60px;
             color: #fff;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            outline: none;
             transition: var(--transition);
         }
 
-        .z-chat-input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 20px var(--primary-glow);
-            outline: none;
-        }
-
-        .btn-send {
-            width: 55px;
-            height: 55px;
+        .btn-send 
+        {
+            width: 65px;
+            height: 65px;
             background: var(--primary);
-            color: white;
             border: none;
             border-radius: 50%;
+            color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
-            transition: var(--transition);
+            font-size: 1.5rem;
             box-shadow: 0 10px 20px var(--primary-glow);
+            transition: var(--transition);
         }
 
-        .btn-send:hover {
-            transform: scale(1.1) rotate(5deg);
-            filter: brightness(1.2);
-        }
-            </style>
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
 
     <div id="auth-gate">
         <div class="auth-card">
-            <div style="font-size:3rem; color:var(--primary); margin-bottom:20px;">
+            
+            <div style="font-size:4rem; color:var(--primary); margin-bottom:30px;">
                 <i class="fas fa-shield-halved"></i>
             </div>
             
-            <h1>ZCHAT MAINFRAME</h1>
-            <p>Authorized access only. Please initialize your operative credentials to establish a secure link.</p>
+            <h1>Z-CHAT SYSTEM</h1>
+            
+            <p style="color:var(--text-dim); margin-bottom:30px; line-height:1.6;">
+                Secure Mainframe Access Initialized. 
+                Please enter your credentials to establish a link.
+            </p>
 
-            <div class="field-group">
-                <label><i class="fas fa-user-secret"></i> OPERATIVE_ID</label>
-                <input type="text" id="in-user" class="z-input" placeholder="Enter username..." autocomplete="off">
+            <div style="text-align:left; margin-bottom:15px;">
+                <label style="font-size:0.75rem; color:var(--primary); font-weight:800; letter-spacing:1px; margin-left:10px;">
+                    OPERATIVE_ID
+                </label>
+                <input type="text" id="in-user" class="z-input" placeholder="e.g. zZerr44" autocomplete="off">
             </div>
 
-            <div class="field-group">
-                <label><i class="fas fa-key"></i> ACCESS_KEY</label>
+            <div style="text-align:left; margin-bottom:25px;">
+                <label style="font-size:0.75rem; color:var(--primary); font-weight:800; letter-spacing:1px; margin-left:10px;">
+                    ACCESS_KEY
+                </label>
                 <input type="password" id="in-pass" class="z-input" placeholder="••••••••">
             </div>
 
             <button class="btn-exec" onclick="handleAuth()">
-                <i class="fas fa-right-to-bracket"></i> INITIALIZE_LINK
+                <i class="fas fa-right-to-bracket" style="margin-right:10px;"></i>
+                INITIALIZE_LINK
             </button>
 
-            <div style="margin-top:25px; font-size:0.75rem; color:var(--text-dim); line-height:1.6;">
-                <p>System monitoring is active. Unauthorized access will be logged and reported to the mainframe administrator.</p>
-                <p style="margin-top:10px;">Build Version: <span style="color:var(--primary);">v10.0.1-STABLE</span></p>
+            <div style="margin-top:40px; border-top:1px solid var(--border); padding-top:20px;">
+                <span style="font-size:0.65rem; color:var(--text-dim); letter-spacing:2px; font-weight:bold;">
+                    MAINFRAME STATUS: <span style="color:var(--success)">ONLINE</span>
+                </span>
             </div>
+
         </div>
     </div>
 
     <main id="z-shell" class="hidden">
         
         <aside id="sidebar">
+            
             <div class="side-head">
                 <div style="position:relative">
-                    <img id="my-avatar" src="https://ui-avatars.com/api/?name=Z&background=6366f1&color=fff" alt="Me">
-                    <div style="position:absolute; bottom:2px; right:2px; width:12px; height:12px; background:var(--success); border:2px solid var(--bg-panel); border-radius:50%;"></div>
+                    <img id="my-avatar" src="" alt="User Avatar">
+                    <div style="position:absolute; bottom:2px; right:2px; width:15px; height:15px; background:var(--success); border:3px solid var(--bg-panel); border-radius:50%;"></div>
                 </div>
                 <div style="overflow:hidden">
-                    <b id="my-name" style="display:block; white-space:nowrap; text-overflow:ellipsis;">OPERATIVE_NULL</b>
-                    <span style="font-size:0.7rem; color:var(--success); font-weight:600; letter-spacing:1px;">ONLINE</span>
+                    <b id="my-name" style="display:block; font-size:1.2rem; white-space:nowrap; text-overflow:ellipsis;">
+                        USER_NULL
+                    </b>
+                    <span style="font-size:0.7rem; color:var(--success); font-weight:bold; letter-spacing:1px;">
+                        ENCRYPTION ACTIVE
+                    </span>
                 </div>
             </div>
 
-            <div style="padding:20px;">
-                <div style="position:relative">
-                    <i class="fas fa-search" style="position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--text-dim);"></i>
-                    <input type="text" placeholder="Search operatives..." style="width:100%; padding:10px 15px 10px 40px; background:var(--bg-card); border:1px solid var(--border); border-radius:10px; color:#fff; font-size:0.85rem;">
-                </div>
+            <div style="padding:25px; color:var(--text-dim); font-size:0.8rem; font-weight:bold; letter-spacing:1px;">
+                ACTIVE_OPERATIVES
             </div>
 
-            <div id="user-list" style="flex:1; overflow-y:auto; padding:0 15px;">
+            <div id="user-list" style="flex:1; padding:0 20px; overflow-y:auto;">
                 </div>
 
-            <div style="padding:20px; border-top:1px solid var(--border);">
-                <button onclick="handleLogout()" style="width:100%; padding:10px; background:rgba(239,68,68,0.1); border:1px solid var(--danger); color:var(--danger); border-radius:10px; cursor:pointer; font-size:0.8rem; font-weight:700;">
+            <div style="padding:30px; border-top:1px solid var(--border);">
+                <button onclick="location.reload()" 
+                        style="width:100%; padding:15px; background:rgba(239,68,68,0.1); border:1px solid var(--danger); color:var(--danger); border-radius:15px; cursor:pointer; font-weight:bold; transition:var(--transition);"
+                        onmouseover="this.style.background='var(--danger)'; this.style.color='#fff';"
+                        onmouseout="this.style.background='rgba(239,68,68,0.1)'; this.style.color='var(--danger)';">
                     <i class="fas fa-power-off"></i> TERMINATE_SESSION
                 </button>
             </div>
+
         </aside>
 
         <section id="viewport">
             
             <header class="v-header">
-                <div class="peer-info">
-                    <img id="peer-avatar" src="https://ui-avatars.com/api/?name=G&background=0f172a&color=fff" style="width:40px; height:40px; border-radius:12px;" alt="Peer">
+                
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <div style="width:50px; height:50px; background:var(--bg-card); border:1px solid var(--border); border-radius:15px; display:flex; align-items:center; justify-content:center; color:var(--primary); font-size:1.4rem;">
+                        <i class="fas fa-globe"></i>
+                    </div>
                     <div>
-                        <h3 id="peer-name">GLOBAL_CHANNEL</h3>
-                        <span id="system-status" style="font-size:0.65rem; color:var(--primary); font-family:monospace; font-weight:bold;">SECURE_TUNNEL_ACTIVE</span>
+                        <h3 id="peer-name" style="font-size:1.3rem;">GLOBAL_MAINFRAME</h3>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div style="width:8px; height:8px; background:var(--success); border-radius:50%; box-shadow:0 0 10px var(--success)"></div>
+                            <span style="font-size:0.65rem; color:var(--primary); font-weight:800; font-family:monospace;">
+                                SECURE_LINK_ESTABLISHED
+                            </span>
+                        </div>
                     </div>
                 </div>
 
                 <div style="position:relative">
-                    <div class="opt-trigger" id="menu-btn" onclick="toggleZMenu()">
-                        <i class="fas fa-ellipsis-vertical"></i>
+                    <div class="opt-trigger" onclick="toggleZMenu()">
+                        <i class="fas fa-ellipsis-vertical" style="font-size:1.2rem;"></i>
                     </div>
 
                     <div id="z-dropdown-menu" class="z-dropdown">
+                        
                         <div class="z-item" onclick="clearData()">
                             <i class="fas fa-trash-can"></i>
                             <div>
-                                <b>PURGE_CHRONOLOGY</b><br>
-                                <span style="font-size:0.6rem; color:var(--text-dim);">Permanently delete all logs</span>
+                                <b style="display:block">PURGE_HISTORY</b>
+                                <span style="font-size:0.6rem; color:var(--text-dim)">Wipe all mainframe logs</span>
                             </div>
                         </div>
 
-                        <div class="z-item" onclick="alert('System: AES-256 Link Active')">
+                        <div class="z-item" onclick="alert('Encryption: AES-256-GCM v10.0')">
                             <i class="fas fa-fingerprint"></i>
                             <div>
-                                <b>SECURE_LAYER_INFO</b><br>
-                                <span style="font-size:0.6rem; color:var(--text-dim);">Verify packet encryption</span>
+                                <b style="display:block">LINK_PROTOCOL</b>
+                                <span style="font-size:0.6rem; color:var(--text-dim)">Verify packet security</span>
                             </div>
                         </div>
 
-                        <hr style="border:none; border-top:1px solid var(--border); margin:5px 0;">
+                        <hr style="border:none; border-top:1px solid var(--border); margin:10px 0;">
 
                         <div class="z-item danger" onclick="location.reload()">
                             <i class="fas fa-door-closed"></i>
                             <div>
-                                <b>FORCE_EXIT</b><br>
-                                <span style="font-size:0.6rem; opacity:0.7;">Close secure bridge</span>
+                                <b style="display:block">FORCE_EXIT</b>
+                                <span style="font-size:0.6rem; opacity:0.7">Immediate disconnect</span>
                             </div>
                         </div>
+
                     </div>
                 </div>
+
             </header>
 
             <div id="msg-container">
                 </div>
 
             <div class="input-area">
-                <div class="input-wrapper">
-                    <input type="text" id="msg-input" class="z-chat-input" placeholder="Transmit data packet..." onkeydown="if(event.key==='Enter')sendPacket()">
-                </div>
+                <input type="text" 
+                       id="msg-input" 
+                       class="z-chat-input" 
+                       placeholder="Transmit data packet to mainframe..." 
+                       onkeydown="if(event.key==='Enter')sendPacket()">
+                
                 <button class="btn-send" onclick="sendPacket()">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
+
         </section>
     </main>
-        <script>
-        /* 16. SYSTEM CONFIGURATION & GLOBAL VARIABLES */
-        // Konfigurasi ini menghubungkan aplikasi ke server database zZerr44.
+
+    <script>
+        
+        /** * FIREBASE INITIALIZATION 
+         * Konfigurasi koneksi ke database pusat.
+         */
         const firebaseConfig = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
-            authDomain: "zchat-56639.firebaseapp.com",
-            databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "zchat-56639",
-            storageBucket: "zchat-56639.firebasestorage.app",
-            messagingSenderId: "773931983053",
-            appId: "1:773931983053:web:a1c825be9a972e53dcc984"
+            databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
 
-        // Inisialisasi Firebase Core Instance
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-            console.log("[SYSTEM]: Firebase connected successfully.");
-        }
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
         
+        // Database Reference
         const db = firebase.database();
-        let currentUser = null;       // Data user yang sedang login
-        let isMenuOpen = false;       // Status menu dropdown (Titik Tiga)
+        
+        // Global State
+        let currentUser = null;
+        let isMenuOpen = false;
 
-        /* ---------------------------------------------------------
-           17. SYSTEM LOGGING UTILITY
-           Fungsi ini digunakan untuk mencatat setiap aktivitas sistem
-           ke dalam konsol pengembang (F12) untuk monitoring trafik.
-           --------------------------------------------------------- */
-        function sysLog(msg, type = "INFO") {
+        /**
+         * SYSTEM LOGGING UTILITY
+         * Mencatat aktivitas ke console.
+         */
+        function sysLog(message, status = "INFO") {
             const time = new Date().toLocaleTimeString();
-            console.log(`%c[${time}] [${type}] >> ${msg}`, "color:#6366f1; font-weight:bold;");
+            console.log(`%c[${time}] [${status}] >> ${message}`, "color:#6366f1; font-weight:bold;");
         }
 
-        /* ---------------------------------------------------------
-           18. AUTHENTICATION LOGIC (LOGIN / REGISTER)
-           Fungsi: Memeriksa apakah user sudah ada di database. 
-           Jika tidak ada, sistem akan membuat user baru otomatis.
-           --------------------------------------------------------- */
+        /**
+         * AUTHENTICATION HANDLER
+         * Memproses login dan registrasi otomatis.
+         */
         async function handleAuth() {
-            const u = document.getElementById('in-user').value.toLowerCase().trim();
-            const p = document.getElementById('in-pass').value.trim();
-
-            // Validasi Input Kosong
-            if (!u || !p) {
-                sysLog("AUTH_ERROR: Empty credentials field.", "ERROR");
-                return alert("ERROR: Operative ID and Access Key are required!");
-            }
-
-            sysLog(`INITIALIZING_AUTH: User[${u}]`, "SYSTEM");
-
-            try {
-                // Mencari data user di node 'users' Firebase
-                const snap = await db.ref('users').orderByChild('un').equalTo(u).once('value');
-
-                if (snap.exists()) {
-                    // USER DITEMUKAN: Validasi Password
-                    const userData = Object.values(snap.val())[0];
-                    if (userData.ps === p) {
-                        sysLog("ACCESS_GRANTED: Password verified.", "SUCCESS");
-                        initializeDashboard(userData);
-                    } else {
-                        sysLog("ACCESS_DENIED: Invalid security key.", "ERROR");
-                        alert("DENIED: Security Key does not match!");
-                    }
-                } else {
-                    // USER TIDAK ADA: Jalankan Protokol Registrasi Baru
-                    sysLog("OPERATIVE_NOT_FOUND: Initializing auto-registration.", "WARNING");
-                    const newId = "U" + Date.now();
-                    const newUser = {
-                        uid: newId,
-                        un: u,
-                        ps: p,
-                        pic: `https://ui-avatars.com/api/?name=${u}&background=random&color=fff`,
-                        ts: firebase.database.ServerValue.TIMESTAMP
-                    };
-                    await db.ref('users/' + newId).set(newUser);
-                    sysLog(`NEW_ACCOUNT_CREATED: ID[${newId}]`, "SUCCESS");
-                    initializeDashboard(newUser);
-                }
-            } catch (err) {
-                sysLog(`DATABASE_FATAL: ${err.message}`, "CRITICAL");
-                alert("CRITICAL ERROR: Mainframe connection lost.");
-            }
-        }
-
-        /* ---------------------------------------------------------
-           19. DASHBOARD INITIALIZATION
-           Fungsi: Menyiapkan UI utama setelah login berhasil.
-           --------------------------------------------------------- */
-        function initializeDashboard(user) {
-            currentUser = user;
             
-            // Sembunyikan layer Auth, Munculkan layer Utama
-            document.getElementById('auth-gate').classList.add('hidden');
-            document.getElementById('z-shell').classList.remove('hidden');
-            
-            // Set metadata user di sidebar
-            document.getElementById('my-avatar').src = user.pic;
-            document.getElementById('my-name').innerText = user.un.toUpperCase();
-            
-            sysLog("INTERFACE_INITIALIZED: Operational shell is ready.", "READY");
-            syncMessages(); // Jalankan sinkronisasi chat
-        }
+            const usernameInput = document.getElementById('in-user').value.toLowerCase().trim();
+            const passwordInput = document.getElementById('in-pass').value.trim();
 
-        /* ---------------------------------------------------------
-           20. THE TITIK TIGA (DROPDOWN) CONTROLLER
-           Fungsi: Menangani buka-tutup menu opsi sistem.
-           --------------------------------------------------------- */
-        function toggleZMenu() {
-            const menu = document.getElementById('z-dropdown-menu');
-            isMenuOpen = !isMenuOpen;
-            
-            if (isMenuOpen) {
-                menu.classList.add('active');
-                sysLog("DROPDOWN_OPENED: Accessing system options.", "UI");
-            } else {
-                menu.classList.remove('active');
-                sysLog("DROPDOWN_CLOSED", "UI");
-            }
-        }
-
-        // AUTO-CLOSE: Menutup menu jika user klik di luar area dropdown
-        window.onclick = function(event) {
-            if (!event.target.matches('.opt-trigger') && !event.target.matches('.fa-ellipsis-vertical')) {
-                const menu = document.getElementById('z-dropdown-menu');
-                if (menu && menu.classList.contains('active')) {
-                    menu.classList.remove('active');
-                    isMenuOpen = false;
-                }
-            }
-        }
-
-        /* ---------------------------------------------------------
-           21. REALTIME MESSAGE SYNC (GLOBAL TUNNEL)
-           Fungsi: Mendengarkan kiriman pesan baru di database.
-           --------------------------------------------------------- */
-        function syncMessages() {
-            sysLog("ESTABLISHING_DATA_STREAM...", "INFO");
-            
-            db.ref('messages/GLOBAL').on('value', snap => {
-                const container = document.getElementById('msg-container');
-                container.innerHTML = ""; // Reset tampilan sebelum render ulang
-                
-                snap.forEach(msg => {
-                    const data = msg.val();
-                    const isMe = data.s === currentUser.un;
-                    const msgClass = isMe ? 'me' : 'peer';
-                    
-                    // Membuat elemen bubble chat secara dinamis
-                    const wrap = `
-                        <div class="msg-row ${msgClass}">
-                            <div style="font-size:0.65rem; color:var(--text-dim); margin-bottom:4px; font-weight:bold;">
-                                ${data.s.toUpperCase()}
-                            </div>
-                            <div class="bubble">${data.t}</div>
-                            <div style="font-size:0.6rem; color:var(--text-dim); margin-top:5px; font-family:monospace;">
-                                ${new Date(data.ts).toLocaleTimeString()}
-                            </div>
-                        </div>
-                    `;
-                    container.innerHTML += wrap;
-                });
-                
-                // Auto-scroll ke pesan paling bawah
-                container.scrollTop = container.scrollHeight;
-                sysLog("DATA_STREAM_UPDATED", "SYNC");
-            });
-        }
-                    /* ---------------------------------------------------------
-           22. DATA PACKET TRANSMISSION ENGINE (SEND MESSAGE)
-           --------------------------------------------------------- 
-           DOKUMENTASI TEKNIS:
-           Fungsi ini menangani pengiriman data dari input user ke 
-           Mainframe Firebase. 
-           
-           TAHAPAN PROSES:
-           1. VALIDASI: Memastikan input tidak kosong atau hanya spasi.
-           2. PACKAGING: Membungkus data ke dalam objek JSON (Sender, Text, Timestamp).
-           3. TRANSMISSION: Mengirim objek ke node 'messages/GLOBAL'.
-           4. CLEANUP: Mengosongkan field input dan memberikan fokus kembali.
-           
-           KEAMANAN:
-           Data dikirim menggunakan jalur enkripsi SSL/TLS bawaan Firebase.
-           --------------------------------------------------------- */
-        function sendPacket() {
-            const inputField = document.getElementById('msg-input');
-            const rawMessage = inputField.value;
-
-            // Memeriksa apakah input berisi teks atau hanya spasi kosong
-            if (!rawMessage || rawMessage.trim().length === 0) {
-                sysLog("ABORT_TRANSMISSION: Empty payload detected.", "WARNING");
+            if (!usernameInput || !passwordInput) {
+                alert("CRITICAL: Credentials cannot be empty!");
                 return;
             }
 
-            sysLog("INITIALIZING_PACKET_TRANSFER...", "INFO");
+            sysLog(`INITIALIZING_AUTH for Operative: ${usernameInput}`, "SYSTEM");
 
-            // Membuat struktur data paket yang akan dikirim ke database
+            try {
+                const userRef = db.ref('users');
+                const snapshot = await userRef.orderByChild('un').equalTo(usernameInput).once('value');
+
+                if (snapshot.exists()) {
+                    // USER EXISTS
+                    const existingData = Object.values(snapshot.val())[0];
+                    if (existingData.ps === passwordInput) {
+                        sysLog("ACCESS_GRANTED", "SUCCESS");
+                        startApp(existingData);
+                    } else {
+                        sysLog("ACCESS_DENIED: Invalid Key", "ERROR");
+                        alert("DENIED: Access Key Incorrect!");
+                    }
+                } else {
+                    // AUTO REGISTER
+                    sysLog("OPERATIVE_NOT_FOUND: Creating new profile...", "WARNING");
+                    const newId = "U" + Date.now();
+                    const newProfile = {
+                        uid: newId,
+                        un: usernameInput,
+                        ps: passwordInput,
+                        pic: `https://ui-avatars.com/api/?name=${usernameInput}&background=random&color=fff&bold=true`
+                    };
+                    await db.ref('users/' + newId).set(newProfile);
+                    sysLog("NEW_PROFILE_ESTABLISHED", "SUCCESS");
+                    startApp(newProfile);
+                }
+            } catch (error) {
+                sysLog(`FATAL_ERROR: ${error.message}`, "CRITICAL");
+            }
+        }
+
+        /**
+         * INTERFACE SWITCHER
+         * Berpindah dari login ke dashboard.
+         */
+        function startApp(userData) {
+            
+            currentUser = userData;
+            
+            // UI Transition
+            document.getElementById('auth-gate').classList.add('hidden');
+            document.getElementById('z-shell').classList.remove('hidden');
+            
+            // Set User Info
+            document.getElementById('my-avatar').src = userData.pic;
+            document.getElementById('my-name').innerText = userData.un.toUpperCase();
+            
+            sysLog("MAINFRAME_SHELL_READY", "READY");
+            
+            // Initialize Sync
+            syncDataStream();
+        }
+
+        /**
+         * DROPDOWN CONTROLLER
+         * Buka tutup menu titik tiga.
+         */
+        function toggleZMenu() {
+            const menuElement = document.getElementById('z-dropdown-menu');
+            isMenuOpen = !isMenuOpen;
+            
+            if (isMenuOpen) {
+                menuElement.classList.add('active');
+            } else {
+                menuElement.classList.remove('active');
+            }
+        }
+
+        /**
+         * CLICK OUTSIDE HANDLER
+         * Menutup menu jika klik di luar.
+         */
+        window.onclick = function(event) {
+            if (!event.target.matches('.opt-trigger') && !event.target.matches('.fa-ellipsis-vertical')) {
+                const dropdown = document.getElementById('z-dropdown-menu');
+                if (dropdown && dropdown.classList.contains('active')) {
+                    dropdown.classList.remove('active');
+                    isMenuOpen = false;
+                }
+            }
+        };
+
+        /**
+         * REALTIME DATA STREAM
+         * Sinkronisasi pesan dari Firebase secara live.
+         */
+        function syncDataStream() {
+            
+            sysLog("ESTABLISHING_DATA_LINK...", "INFO");
+            const messageRef = db.ref('messages/GLOBAL');
+
+            messageRef.on('value', (snapshot) => {
+                
+                const container = document.getElementById('msg-container');
+                container.innerHTML = ""; // Reset for re-render
+                
+                snapshot.forEach((child) => {
+                    
+                    const data = child.val();
+                    const isMe = (data.s === currentUser.un);
+                    const rowClass = isMe ? 'me' : 'peer';
+                    
+                    // Create Packet UI
+                    const packetHtml = `
+                        <div class="msg-row ${rowClass}">
+                            <div style="font-size:0.65rem; color:var(--text-dim); margin:0 10px 5px 10px; font-weight:bold;">
+                                ${data.s.toUpperCase()}
+                            </div>
+                            <div class="bubble">
+                                ${data.t}
+                            </div>
+                            <div style="font-size:0.55rem; color:var(--text-dim); margin-top:5px; font-family:monospace;">
+                                SENT_AT_${new Date(data.ts).toLocaleTimeString()}
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.innerHTML += packetHtml;
+                });
+                
+                // Auto Scroll to Bottom
+                container.scrollTop = container.scrollHeight;
+                sysLog("DATA_PACKET_RECEIVED", "SYNC");
+            });
+        }
+
+        /**
+         * DATA TRANSMISSION ENGINE
+         * Mengirimkan pesan baru ke Firebase.
+         */
+        function sendPacket() {
+            
+            const inputElement = document.getElementById('msg-input');
+            const messageContent = inputElement.value.trim();
+
+            if (!messageContent) {
+                return;
+            }
+
             const dataPacket = {
-                s: currentUser.un,           // Nama pengirim (Operative ID)
-                t: rawMessage.trim(),        // Isi pesan yang sudah dibersihkan
-                ts: firebase.database.ServerValue.TIMESTAMP // Waktu server
+                s: currentUser.un,
+                t: messageContent,
+                ts: firebase.database.ServerValue.TIMESTAMP
             };
 
-            // Mengirim data ke node pesan global di Firebase
             db.ref('messages/GLOBAL').push(dataPacket)
                 .then(() => {
-                    // Operasi berhasil: Kosongkan input dan log status
-                    sysLog("PACKET_TRANSFER_COMPLETE: 200 OK", "SUCCESS");
-                    inputField.value = "";
-                    inputField.focus(); // Kembalikan kursor ke input
+                    inputElement.value = "";
+                    inputElement.focus();
                 })
-                .catch((error) => {
-                    // Operasi gagal: Tangani error koneksi atau izin
-                    sysLog(`TRANSMISSION_FAILED: ${error.message}`, "CRITICAL");
-                    alert("CRITICAL_ERROR: Failed to transmit data to mainframe.");
+                .catch((err) => {
+                    sysLog(`SEND_FAILED: ${err.message}`, "ERROR");
                 });
         }
 
-        /* ---------------------------------------------------------
-           23. CHRONOLOGY PURGE SYSTEM (DELETE HISTORY)
-           --------------------------------------------------------- 
-           DOKUMENTASI KEAMANAN:
-           Fungsi ini dipicu melalui menu Titik Tiga (Dropdown).
-           Aksi ini bersifat DESTRUKTIF dan tidak bisa dibatalkan (Undo).
-           
-           ALUR KERJA:
-           1. USER_CONFIRMATION: Meminta persetujuan melalui dialog sistem.
-           2. DATABASE_COMMAND: Mengirim perintah .remove() ke node target.
-           3. UI_REFRESH: Menutup menu dropdown secara otomatis.
-           --------------------------------------------------------- */
+        /**
+         * MAINFRAME PURGE PROTOCOL
+         * Menghapus seluruh riwayat pesan.
+         */
         function clearData() {
-            const confirmationMsg = "[WARNING]: Are you sure you want to PURGE all message chronology?\n\nThis action will wipe the GLOBAL_CHANNEL history for all operatives.";
-
-            if (confirm(confirmationMsg)) {
-                sysLog("PURGE_PROTOCOL_INITIALIZED: Wiping database...", "WARNING");
-                
-                // Menghapus seluruh data di node messages/GLOBAL
+            
+            const confirmation = confirm("WARNING: Initiate global message purge?");
+            
+            if (confirmation) {
+                sysLog("PURGE_PROTOCOL_INITIALIZED", "WARNING");
                 db.ref('messages/GLOBAL').remove()
                     .then(() => {
-                        sysLog("DATABASE_PURGE_SUCCESSFUL", "SUCCESS");
-                        toggleZMenu(); // Tutup menu setelah selesai
-                        alert("SYSTEM_REPORT: All message logs have been purged.");
-                    })
-                    .catch((err) => {
-                        sysLog(`PURGE_FAILED: ${err.message}`, "ERROR");
+                        alert("SYSTEM: Mainframe history has been wiped.");
+                        toggleZMenu();
                     });
-            } else {
-                sysLog("PURGE_PROTOCOL_ABORTED_BY_USER", "INFO");
             }
         }
 
-        /* ---------------------------------------------------------
-           24. SESSION TERMINATION (LOGOUT)
-           --------------------------------------------------------- 
-           Fungsi ini memutuskan link antara klien dan mainframe.
-           Mengembalikan interface ke layer Auth-Gate.
-           --------------------------------------------------------- */
-        function handleLogout() {
-            sysLog("TERMINATING_SESSION...", "SYSTEM");
-            
-            if (confirm("Terminate secure bridge and logout?")) {
-                // Sederhananya, kita reload halaman untuk reset state aplikasi
-                location.reload();
-            }
-        }
+        // Final Boot System
+        sysLog("Z-CHAT ENGINE v10.0.5 LOADED", "SYSTEM");
 
-        /* ---------------------------------------------------------
-           25. SYSTEM STATUS MONITORING (AUTO-INITIALIZE)
-           --------------------------------------------------------- 
-           Bagian ini dijalankan saat script pertama kali dimuat.
-           Memastikan semua modul UI siap menerima instruksi.
-           --------------------------------------------------------- */
-        sysLog("MAINFRAME_CORE_FULLY_OPERATIONAL", "READY");
-        sysLog("ZCHAT_VERSION: 10.0.1 (STABLE_BUILD)", "INFO");
-        sysLog("ENCRYPTION_MODE: AES-256-EMULATION_ACTIVE", "SECURE");
-
-        // Menambahkan listener untuk menutup dropdown jika menekan tombol Escape
-        document.addEventListener('keydown', (e) => {
-            if (e.key === "Escape" && isMenuOpen) {
-                toggleZMenu();
-            }
-        });
-
-        /* ============================================================================
-           [ END OF zZerr44 MAINFRAME ENGINE ]
-           The code above handles all core operations for ZChat Ultimate.
-           Ensure Firebase credentials are valid before deployment.
-           ============================================================================ */
     </script>
 </body>
 </html>
-/* ================================================================================
-   ZCHAT ULTIMATE MAINFRAME ARCHITECTURE DOCUMENTATION
-   AUTHOR      : zZerr44 (Lead Developer)
-   VERSION     : 10.0.5 - STABLE BUILD
-   BUILD DATE  : 2026-03-03
-   LICENSING   : PRIVATE_ENCRYPTED_GPL
-================================================================================
-
-[ SYSTEM ARCHITECTURE OVERVIEW ]
---------------------------------------------------------------------------------
-Aplikasi ini dibangun menggunakan arsitektur Single Page Application (SPA) 
-yang mengandalkan Firebase Realtime Database sebagai backbone komunikasinya. 
-Seluruh data yang dikirimkan melalui sistem ini melalui lapisan validasi 
-klien sebelum disinkronkan ke cloud mainframe.
-
-[ LAYERED SECURITY PROTOCOL ]
---------------------------------------------------------------------------------
-1. AUTH_LAYER: 
-   Menangani gateway masuk menggunakan Operative_ID dan Access_Key. 
-   Sistem akan melakukan query asinkron ke node 'users/' untuk mencocokkan 
-   kredensial yang diberikan dengan data yang tersimpan.
-
-2. ENCRYPTION_LAYER: 
-   Meskipun menggunakan SSL bawaan Firebase, aplikasi ini mensimulasikan 
-   enkripsi end-to-end pada tingkat UI untuk memastikan integritas data 
-   selama transmisi paket berlangsung.
-
-3. DATA_PURGE_LAYER: 
-   Fitur 'Purge Chronology' pada menu Titik Tiga dirancang untuk melakukan 
-   penghapusan data secara rekursif pada node 'messages/GLOBAL'. 
-   Peringatan: Aksi ini bersifat permanen dan tidak dapat dipulihkan.
-
-[ UI/UX DESIGN PHILOSOPHY ]
---------------------------------------------------------------------------------
-- THEME: Cyberpunk Minimalist (Deep Navy & Indigo Glow).
-- RESPONSIVENESS: Mobile-first approach menggunakan Media Queries.
-- INTERACTIVE: Menggunakan CSS Keyframe Animations untuk transisi dropdown 
-  dan bubble chat agar memberikan pengalaman pengguna yang mulus.
-
-[ DATABASE STRUCTURE (JSON SCHEMA) ]
---------------------------------------------------------------------------------
-{
-  "users": {
-    "USER_ID": {
-      "uid": "String (Unique Identifier)",
-      "un": "String (Username/OperativeID)",
-      "ps": "String (Security Key)",
-      "pic": "String (Avatar URL)",
-      "ts": "Number (Timestamp)"
-    }
-  },
-  "messages": {
-    "GLOBAL": {
-      "MSG_ID": {
-        "s": "String (Sender Username)",
-        "t": "String (Message Body)",
-        "ts": "Number (Server Timestamp)"
-      }
-    }
-  }
-}
-
-[ REVISION LOG ]
---------------------------------------------------------------------------------
-v1.0.0 - Initial deployment (Basic Chat).
-v3.2.0 - Added Firebase Realtime sync engine.
-v5.0.0 - Integrated Auth-Gate security layer.
-v8.5.2 - Refactored CSS into variable-based root system.
-v10.0.1 - Added "Titik Tiga" Dropdown System (Current Version).
-v10.0.5 - Expanded documentation for 1000-line requirement.
-
-[ DEVELOPER NOTES ]
---------------------------------------------------------------------------------
-- Pastikan API Key Firebase valid sebelum menjalankan di server produksi.
-- Gunakan mode "Private Browsing" saat melakukan testing antar user.
-- Jangan mengubah struktur ID pada elemen 'msg-container' karena akan 
-  memutus aliran data (Data Stream) dari Firebase Listener.
-
-================================================================================
-   INITIALIZING BOOTSTRAP LOADER...
-================================================================================
-*/
-        /* ============================================================================
-           26. ADVANCED BACKGROUND ANIMATION SYSTEM (SHINE & GLOW)
-           Dokumentasi: Bagian ini menambahkan efek visual 'Moving Glow' 
-           di latar belakang aplikasi untuk memberikan kesan Cyberpunk.
-           ---------------------------------------------------------------------------- */
-        @keyframes shineMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        #auth-gate::before {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.03) 0%, transparent 70%);
-            animation: rotateGlow 20s linear infinite;
-            z-index: -1;
-        }
-
-        @keyframes rotateGlow {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* 27. TRANSITION OVERLAYS */
-        .fade-in-quick {
-            animation: fadeInQuick 0.2s ease-out forwards;
-        }
-
-        @keyframes fadeInQuick {
-            from { opacity: 0; filter: blur(5px); }
-            to { opacity: 1; filter: blur(0); }
-        }
-
-        /* 28. SYSTEM NOTIFICATION TOAST STYLING */
-        .sys-toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            padding: 15px 25px;
-            background: var(--bg-card);
-            border-left: 4px solid var(--primary);
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transform: translateX(120%);
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 10000;
-        }
-
-        .sys-toast.active {
-            transform: translateX(0);
-        }
-
-        /* 29. ADDITIONAL HOVER STATES FOR UI INTERACTION */
-        .chat-tile {
-            padding: 15px 20px;
-            margin: 5px 0;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            border: 1px solid transparent;
-        }
-
-        .chat-tile:hover {
-            background: rgba(255, 255, 255, 0.03);
-            border-color: var(--border);
-            transform: translateX(5px);
-        }
-
-        .chat-tile.active {
-            background: rgba(99, 102, 241, 0.1);
-            border-color: var(--primary);
-        }
-
-        /* 30. DATA PACKET LOADING INDICATOR */
-        .loading-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 2px;
-            background: var(--primary);
-            width: 0;
-            transition: width 0.5s ease;
-        }
-
-        /* ============================================================================
-           [ FINAL CSS MODULE LOADED ]
-           Total baris sistem sekarang seharusnya sudah mencapai target 1000+.
-           ============================================================================ */
-           
