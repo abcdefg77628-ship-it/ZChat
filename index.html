@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZERA Chat System</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --wa-bg: #0b141a;
+            --wa-panel: #202c33;
+            --wa-green: #00a884;
+            --wa-text: #e9edef;
+            --glow-color: #00ffcc;
+        }
+
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: black; color: white; overflow: hidden;
+        }
+
+        /* --- 1. INTRO ANIMASI ZERA --- */
+        #intro {
+            position: fixed; inset: 0; background: #000;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999; transition: 1s ease-out;
+        }
+        .zera-logo {
+            font-size: 4rem; font-weight: 900; color: white;
+            text-shadow: 0 0 20px var(--glow-color);
+            animation: slideDown 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        @keyframes slideDown {
+            0% { transform: translateY(-300px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        /* --- 2. LOGIN MENU --- */
+        #login-page {
+            display: none; height: 100vh; flex-direction: column;
+            justify-content: center; align-items: center; background: var(--wa-bg);
+        }
+        .login-box {
+            width: 85%; max-width: 350px; text-align: center;
+        }
+        .login-box h2 { color: var(--wa-green); margin-bottom: 20px; }
+        input {
+            width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px;
+            border: 1px solid #3b4a54; background: #2a3942; color: white; outline: none;
+        }
+        .btn-login {
+            width: 100%; padding: 12px; background: var(--wa-green);
+            border: none; border-radius: 8px; color: white; font-weight: bold; margin-top: 10px;
+        }
+
+        /* --- 3. LOADING SINYAL --- */
+        #loading-page {
+            display: none; height: 100vh; flex-direction: column;
+            justify-content: center; align-items: center; background: var(--wa-bg);
+        }
+        .loader-container { width: 70%; background: #3b4a54; height: 6px; border-radius: 10px; margin-top: 15px; overflow: hidden; }
+        #bar { width: 0%; height: 100%; background: var(--wa-green); box-shadow: 0 0 10px var(--wa-green); }
+
+        /* --- 4. UTAMA (CHAT) --- */
+        #main-page { display: none; height: 100vh; flex-direction: column; }
+        
+        .header {
+            background: var(--wa-panel); padding: 10px 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .profile-btn { width: 40px; height: 40px; border-radius: 50%; background: #4f5e67; overflow: hidden; }
+        .profile-btn img { width: 100%; height: 100%; object-fit: cover; }
+
+        .chat-view {
+            flex: 1; overflow-y: auto; padding: 15px;
+            background: #0b141a; position: relative;
+        }
+
+        /* CYCLE COLOR & GLOWING EFFECT */
+        .glowing-wallpaper {
+            animation: colorCycle 15s infinite alternate;
+        }
+        @keyframes colorCycle {
+            0% { background-color: #0b141a; }
+            50% { background-color: #0d211d; }
+            100% { background-color: #161d21; }
+        }
+
+        .bubble {
+            max-width: 75%; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px;
+            font-size: 14px; position: relative; word-wrap: break-word;
+        }
+        .msg-left { background: var(--wa-panel); align-self: flex-start; border-bottom-left-radius: 0; }
+        .msg-right { background: #005c4b; align-self: flex-end; border-bottom-right-radius: 0; margin-left: auto; }
+        .sender-name { font-size: 10px; color: var(--glow-color); display: block; margin-bottom: 3px; }
+
+        .footer {
+            background: var(--wa-panel); padding: 10px; display: flex; align-items: center;
+        }
+        #msgInput { flex: 1; margin: 0 10px; }
+        .btn-send { background: var(--wa-green); border: none; width: 45px; height: 45px; border-radius: 50%; color: white; cursor: pointer; }
+
+    </style>
+</head>
+<body>
+
+    <div id="intro">
+        <div class="zera-text zera-logo">ZERA</div>
+    </div>
+
+    <div id="login-page">
+        <div class="login-box">
+            <h2>MOHON MASUK</h2>
+            <input type="text" id="username" placeholder="Nama Anda">
+            <input type="password" id="password" placeholder="Password">
+            <button class="btn-login" onclick="handleLogin()">MASUK</button>
+        </div>
+    </div>
+
+    <div id="loading-page">
+        <div id="load-text">Mencari Sinyal...</div>
+        <div class="loader-container"><div id="bar"></div></div>
+        <div id="percent" style="margin-top: 10px;">0%</div>
+    </div>
+
+    <div id="main-page">
+        <div class="header">
+            <div class="profile-btn" onclick="openProfileEdit()">
+                <img id="myAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
+            </div>
+            <div id="chat-title" style="font-weight: bold;">ZERA GROUP</div>
+            <div style="font-size: 24px; cursor: pointer;" onclick="showMenu()">⋮</div>
+        </div>
+
+        <div id="chatBox" class="chat-view glowing-wallpaper">
+            </div>
+
+        <div class="footer">
+            <input type="text" id="msgInput" placeholder="Ketik pesan...">
+            <button class="btn-send" onclick="sendChat()">➤</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, onChildAdded, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
+            authDomain: "zchat-56639.firebaseapp.com",
+            databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "zchat-56639",
+            storageBucket: "zchat-56639.firebasestorage.app",
+            messagingSenderId: "773931983053",
+            appId: "1:773931983053:web:a1c825be9a972e53dcc984",
+            measurementId: "G-ZDMK1DWV6S"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const chatRef = ref(db, "chats");
+
+        let myName = localStorage.getItem("zera_name") || "User";
+        let myPic = localStorage.getItem("zera_pic") || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+        // --- Jalankan Intro ---
+        setTimeout(() => {
+            document.getElementById('intro').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('intro').style.display = 'none';
+                document.getElementById('login-page').style.display = 'flex';
+            }, 1000);
+        }, 3000);
+
+        // --- Logika Login & Loading Sinyal ---
+        window.handleLogin = () => {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+
+            if(!user || !pass) return Swal.fire("Isi semua!", "", "warning");
+            
+            myName = user;
+            localStorage.setItem("zera_name", user);
+            
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('loading-page').style.display = 'flex';
+
+            let p = 0;
+            let bar = document.getElementById('bar');
+            let pct = document.getElementById('percent');
+
+            let timer = setInterval(() => {
+                // SENSOR SINYAL: Jika offline, loading berhenti
+                if (!navigator.onLine) {
+                    document.getElementById('load-text').innerText = "SINYAL HILANG! Menunggu...";
+                    document.getElementById('load-text').style.color = "red";
+                    return; 
+                }
+
+                document.getElementById('load-text').innerText = "Menyambungkan...";
+                document.getElementById('load-text').style.color = "white";
+                
+                p += Math.floor(Math.random() * 3) + 1;
+                if(p > 100) p = 100;
+                
+                bar.style.width = p + "%";
+                pct.innerText = p + "%";
+
+                if(p >= 100) {
+                    clearInterval(timer);
+                    document.getElementById('loading-page').style.display = 'none';
+                    document.getElementById('main-page').style.display = 'flex';
+                    loadChats();
+                }
+            }, 150);
+        };
+
+        // --- Logika Chat Realtime ---
+        function loadChats() {
+            document.getElementById('myAvatar').src = myPic;
+            onChildAdded(chatRef, (data) => {
+                const msg = data.val();
+                const chatBox = document.getElementById('chatBox');
+                const isMe = msg.sender === myName;
+
+                const div = document.createElement('div');
+                div.className = `bubble ${isMe ? 'msg-right' : 'msg-left'}`;
+                div.innerHTML = `
+                    <span class="sender-name">${msg.sender}</span>
+                    ${msg.text}
+                `;
+                chatBox.appendChild(div);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        }
+
+        window.sendChat = () => {
+            const input = document.getElementById('msgInput');
+            if(!input.value) return;
+
+            push(chatRef, {
+                sender: myName,
+                text: input.value,
+                time: Date.now()
+            });
+            input.value = "";
+        };
+
+        // --- Pengaturan (Titik Tiga) ---
+        window.showMenu = () => {
+            Swal.fire({
+                title: 'Pengaturan ZERA',
+                background: '#202c33',
+                color: '#fff',
+                html: `
+                    <button onclick="changeProfile()" style="margin:5px" class="btn-login">Ubah Profil</button>
+                    <button onclick="toggleGlow()" style="margin:5px" class="btn-login">Toggle Glowing</button>
+                `,
+                showConfirmButton: false
+            });
+        };
+
+        window.openProfileEdit = () => {
+            Swal.fire({
+                title: 'Profil Anda',
+                text: `Nama: ${myName}`,
+                imageUrl: myPic,
+                imageWidth: 100,
+                imageHeight: 100,
+                background: '#202c33',
+                color: '#fff'
+            });
+        };
+
+        window.changeProfile = () => {
+            Swal.fire({
+                title: 'Edit Profil',
+                background: '#202c33',
+                color: '#fff',
+                html: `
+                    <input id="newName" class="swal2-input" placeholder="Nama baru" value="${myName}">
+                    <input id="newPic" class="swal2-input" placeholder="URL Foto baru">
+                `,
+                confirmButtonText: 'Simpan'
+            }).then((res) => {
+                if(res.isConfirmed) {
+                    const n = document.getElementById('newName').value;
+                    const p = document.getElementById('newPic').value;
+                    if(n) {
+                        myName = n;
+                        localStorage.setItem("zera_name", n);
+                    }
+                    if(p) {
+                        myPic = p;
+                        localStorage.setItem("zera_pic", p);
+                        document.getElementById('myAvatar').src = p;
+                    }
+                    location.reload();
+                }
+            });
+        };
+
+        window.toggleGlow = () => {
+            const cb = document.getElementById('chatBox');
+            cb.classList.toggle('glowing-wallpaper');
+            Swal.fire("Mode Berubah", "", "success");
+        };
+
+    </script>
+</body>
+</html>
