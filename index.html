@@ -3,150 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZERA Chat System</title>
+    <title>ZERA WA Clone</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root {
-            --wa-bg: #0b141a;
-            --wa-panel: #202c33;
-            --wa-green: #00a884;
-            --wa-text: #e9edef;
-            --glow-color: #00ffcc;
-        }
-
-        body, html {
-            margin: 0; padding: 0; height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: black; color: white; overflow: hidden;
-        }
-
-        /* --- 1. INTRO ANIMASI ZERA --- */
-        #intro {
-            position: fixed; inset: 0; background: #000;
-            display: flex; justify-content: center; align-items: center;
-            z-index: 9999; transition: 1s ease-out;
-        }
-        .zera-logo {
-            font-size: 4rem; font-weight: 900; color: white;
-            text-shadow: 0 0 20px var(--glow-color);
-            animation: slideDown 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        }
-        @keyframes slideDown {
-            0% { transform: translateY(-300px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-
-        /* --- 2. LOGIN MENU --- */
-        #login-page {
-            display: none; height: 100vh; flex-direction: column;
-            justify-content: center; align-items: center; background: var(--wa-bg);
-        }
-        .login-box {
-            width: 85%; max-width: 350px; text-align: center;
-        }
-        .login-box h2 { color: var(--wa-green); margin-bottom: 20px; }
-        input {
-            width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px;
-            border: 1px solid #3b4a54; background: #2a3942; color: white; outline: none;
-        }
-        .btn-login {
-            width: 100%; padding: 12px; background: var(--wa-green);
-            border: none; border-radius: 8px; color: white; font-weight: bold; margin-top: 10px;
-        }
-
-        /* --- 3. LOADING SINYAL --- */
-        #loading-page {
-            display: none; height: 100vh; flex-direction: column;
-            justify-content: center; align-items: center; background: var(--wa-bg);
-        }
-        .loader-container { width: 70%; background: #3b4a54; height: 6px; border-radius: 10px; margin-top: 15px; overflow: hidden; }
-        #bar { width: 0%; height: 100%; background: var(--wa-green); box-shadow: 0 0 10px var(--wa-green); }
-
-        /* --- 4. UTAMA (CHAT) --- */
-        #main-page { display: none; height: 100vh; flex-direction: column; }
+        :root { --wa-bg: #0b141a; --wa-panel: #202c33; --wa-green: #00a884; --glow: #00ffcc; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background: black; color: white; overflow: hidden; }
         
-        .header {
-            background: var(--wa-panel); padding: 10px 15px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-        .profile-btn { width: 40px; height: 40px; border-radius: 50%; background: #4f5e67; overflow: hidden; }
-        .profile-btn img { width: 100%; height: 100%; object-fit: cover; }
+        /* INTRO */
+        #intro { position: fixed; inset: 0; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .zera-logo { font-size: 4rem; font-weight: 900; animation: slideDown 1.2s forwards; text-shadow: 0 0 20px var(--glow); }
+        @keyframes slideDown { 0% { transform: translateY(-300px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
 
-        .chat-view {
-            flex: 1; overflow-y: auto; padding: 15px;
-            background: #0b141a; position: relative;
-        }
+        /* LOGIN & LOADING */
+        .page { display: none; height: 100vh; flex-direction: column; align-items: center; justify-content: center; background: var(--wa-bg); }
+        input { width: 80%; padding: 12px; margin: 8px; border-radius: 8px; border: 1px solid #3b4a54; background: #2a3942; color: white; }
+        .btn { width: 80%; padding: 12px; background: var(--wa-green); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
 
-        /* CYCLE COLOR & GLOWING EFFECT */
-        .glowing-wallpaper {
-            animation: colorCycle 15s infinite alternate;
-        }
-        @keyframes colorCycle {
-            0% { background-color: #0b141a; }
-            50% { background-color: #0d211d; }
-            100% { background-color: #161d21; }
-        }
+        /* LOADING BAR */
+        .loader-box { width: 70%; background: #3b4a54; height: 6px; border-radius: 10px; overflow: hidden; margin-top: 10px; }
+        #bar { width: 0%; height: 100%; background: var(--wa-green); transition: 0.1s; }
 
-        .bubble {
-            max-width: 75%; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px;
-            font-size: 14px; position: relative; word-wrap: break-word;
-        }
-        .msg-left { background: var(--wa-panel); align-self: flex-start; border-bottom-left-radius: 0; }
-        .msg-right { background: #005c4b; align-self: flex-end; border-bottom-right-radius: 0; margin-left: auto; }
-        .sender-name { font-size: 10px; color: var(--glow-color); display: block; margin-bottom: 3px; }
+        /* MAIN APP */
+        #main-app { display: none; height: 100vh; flex-direction: column; background: var(--wa-bg); }
+        .header { background: var(--wa-panel); padding: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        
+        /* CONTACT LIST */
+        #contact-list { flex: 1; overflow-y: auto; }
+        .contact-item { padding: 15px; border-bottom: 1px solid #222; display: flex; align-items: center; cursor: pointer; }
+        .contact-item:active { background: #2a3942; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; background: #4f5e67; margin-right: 15px; display: flex; align-items: center; justify-content: center; }
 
-        .footer {
-            background: var(--wa-panel); padding: 10px; display: flex; align-items: center;
-        }
-        #msgInput { flex: 1; margin: 0 10px; }
-        .btn-send { background: var(--wa-green); border: none; width: 45px; height: 45px; border-radius: 50%; color: white; cursor: pointer; }
+        /* CHAT ROOM */
+        #chat-room { display: none; position: fixed; inset: 0; background: var(--wa-bg); flex-direction: column; z-index: 100; }
+        .chat-view { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; }
+        .glowing { animation: colorCycle 10s infinite alternate; }
+        @keyframes colorCycle { 0% { background: #0b141a; } 100% { background: #0d211d; } }
+        
+        .bubble { max-width: 70%; padding: 8px 12px; border-radius: 8px; margin-bottom: 5px; font-size: 14px; }
+        .msg-in { background: var(--wa-panel); align-self: flex-start; }
+        .msg-out { background: #005c4b; align-self: flex-end; }
 
+        .footer { background: var(--wa-panel); padding: 10px; display: flex; }
+        .fab { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background: var(--wa-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
-    <div id="intro">
-        <div class="zera-text zera-logo">ZERA</div>
+    <div id="intro"><div class="zera-logo">ZERA</div></div>
+
+    <div id="login-page" class="page">
+        <h2>MOHON MASUK</h2>
+        <input type="text" id="myUser" placeholder="Username Kamu">
+        <input type="password" id="myPass" placeholder="Password">
+        <button class="btn" onclick="login()">MASUK</button>
     </div>
 
-    <div id="login-page">
-        <div class="login-box">
-            <h2>MOHON MASUK</h2>
-            <input type="text" id="username" placeholder="Nama Anda">
-            <input type="password" id="password" placeholder="Password">
-            <button class="btn-login" onclick="handleLogin()">MASUK</button>
-        </div>
+    <div id="loading-page" class="page">
+        <div id="load-status">Mengecek Sinyal...</div>
+        <div class="loader-box"><div id="bar"></div></div>
+        <div id="pct">0%</div>
     </div>
 
-    <div id="loading-page">
-        <div id="load-text">Mencari Sinyal...</div>
-        <div class="loader-container"><div id="bar"></div></div>
-        <div id="percent" style="margin-top: 10px;">0%</div>
-    </div>
-
-    <div id="main-page">
+    <div id="main-app">
         <div class="header">
-            <div class="profile-btn" onclick="openProfileEdit()">
-                <img id="myAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
-            </div>
-            <div id="chat-title" style="font-weight: bold;">ZERA GROUP</div>
-            <div style="font-size: 24px; cursor: pointer;" onclick="showMenu()">⋮</div>
+            <span>ZERA WA</span>
+            <div onclick="showSettings()">⋮</div>
         </div>
-
-        <div id="chatBox" class="chat-view glowing-wallpaper">
+        <div id="contact-list">
             </div>
+        <div class="fab" onclick="addContact()">+</div>
+    </div>
 
+    <div id="chat-room">
+        <div class="header">
+            <span onclick="closeChat()">← <span id="chatting-with">Nama Teman</span></span>
+        </div>
+        <div id="chatBox" class="chat-view glowing"></div>
         <div class="footer">
             <input type="text" id="msgInput" placeholder="Ketik pesan...">
-            <button class="btn-send" onclick="sendChat()">➤</button>
+            <button onclick="send()" style="background:none; border:none; color:var(--wa-green); font-size:20px;">➤</button>
         </div>
     </div>
 
     <script type="module">
-        // Import Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onChildAdded, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
@@ -155,160 +96,99 @@
             projectId: "zchat-56639",
             storageBucket: "zchat-56639.firebasestorage.app",
             messagingSenderId: "773931983053",
-            appId: "1:773931983053:web:a1c825be9a972e53dcc984",
-            measurementId: "G-ZDMK1DWV6S"
+            appId: "1:773931983053:web:a1c825be9a972e53dcc984"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const chatRef = ref(db, "chats");
+        let MY_NAME = "";
+        let CURRENT_CHAT_ID = "";
 
-        let myName = localStorage.getItem("zera_name") || "User";
-        let myPic = localStorage.getItem("zera_pic") || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+        // INTRO
+        setTimeout(() => { document.getElementById('intro').style.display='none'; document.getElementById('login-page').style.display='flex'; }, 3000);
 
-        // --- Jalankan Intro ---
-        setTimeout(() => {
-            document.getElementById('intro').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('intro').style.display = 'none';
-                document.getElementById('login-page').style.display = 'flex';
-            }, 1000);
-        }, 3000);
-
-        // --- Logika Login & Loading Sinyal ---
-        window.handleLogin = () => {
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-
-            if(!user || !pass) return Swal.fire("Isi semua!", "", "warning");
+        // LOGIN & SIGNAL LOADING
+        window.login = () => {
+            MY_NAME = document.getElementById('myUser').value;
+            if(!MY_NAME) return;
+            document.getElementById('login-page').style.display='none';
+            document.getElementById('loading-page').style.display='flex';
             
-            myName = user;
-            localStorage.setItem("zera_name", user);
-            
-            document.getElementById('login-page').style.display = 'none';
-            document.getElementById('loading-page').style.display = 'flex';
-
             let p = 0;
-            let bar = document.getElementById('bar');
-            let pct = document.getElementById('percent');
-
-            let timer = setInterval(() => {
-                // SENSOR SINYAL: Jika offline, loading berhenti
-                if (!navigator.onLine) {
-                    document.getElementById('load-text').innerText = "SINYAL HILANG! Menunggu...";
-                    document.getElementById('load-text').style.color = "red";
-                    return; 
-                }
-
-                document.getElementById('load-text').innerText = "Menyambungkan...";
-                document.getElementById('load-text').style.color = "white";
-                
-                p += Math.floor(Math.random() * 3) + 1;
-                if(p > 100) p = 100;
-                
-                bar.style.width = p + "%";
-                pct.innerText = p + "%";
-
-                if(p >= 100) {
-                    clearInterval(timer);
-                    document.getElementById('loading-page').style.display = 'none';
-                    document.getElementById('main-page').style.display = 'flex';
-                    loadChats();
-                }
-            }, 150);
+            let itv = setInterval(() => {
+                if(!navigator.onLine) { document.getElementById('load-status').innerText="SINYAL ILANG!"; return; }
+                document.getElementById('load-status').innerText="Menyambungkan...";
+                p += Math.floor(Math.random()*5)+1;
+                if(p>100) p=100;
+                document.getElementById('bar').style.width = p+"%";
+                document.getElementById('pct').innerText = p+"%";
+                if(p>=100) { clearInterval(itv); document.getElementById('loading-page').style.display='none'; document.getElementById('main-app').style.display='flex'; loadContacts(); }
+            }, 100);
         };
 
-        // --- Logika Chat Realtime ---
-        function loadChats() {
-            document.getElementById('myAvatar').src = myPic;
-            onChildAdded(chatRef, (data) => {
-                const msg = data.val();
-                const chatBox = document.getElementById('chatBox');
-                const isMe = msg.sender === myName;
+        // KONTAK SYSTEM
+        window.addContact = async () => {
+            const { value: friend } = await Swal.fire({ title: 'Tambah Nama Teman', input: 'text', background: '#202c33', color: '#fff' });
+            if(friend) {
+                const id = [MY_NAME, friend].sort().join("_"); // ID Unik berdua
+                const contactRef = ref(db, `users/${MY_NAME}/contacts/${friend}`);
+                set(contactRef, { room: id });
+                // Tambahkan sebaliknya biar teman juga punya kontak kita
+                set(ref(db, `users/${friend}/contacts/${MY_NAME}`), { room: id });
+            }
+        };
 
-                const div = document.createElement('div');
-                div.className = `bubble ${isMe ? 'msg-right' : 'msg-left'}`;
-                div.innerHTML = `
-                    <span class="sender-name">${msg.sender}</span>
-                    ${msg.text}
-                `;
-                chatBox.appendChild(div);
-                chatBox.scrollTop = chatBox.scrollHeight;
+        function loadContacts() {
+            const list = document.getElementById('contact-list');
+            onValue(ref(db, `users/${MY_NAME}/contacts`), (snapshot) => {
+                list.innerHTML = "";
+                snapshot.forEach(child => {
+                    const name = child.key;
+                    const room = child.val().room;
+                    const div = document.createElement('div');
+                    div.className = 'contact-item';
+                    div.innerHTML = `<div class="avatar">👤</div><div><b>${name}</b><br><small>Klik untuk chat</small></div>`;
+                    div.onclick = () => openChat(name, room);
+                    list.appendChild(div);
+                });
             });
         }
 
-        window.sendChat = () => {
-            const input = document.getElementById('msgInput');
-            if(!input.value) return;
-
-            push(chatRef, {
-                sender: myName,
-                text: input.value,
-                time: Date.now()
+        // CHAT SYSTEM
+        window.openChat = (name, room) => {
+            CURRENT_CHAT_ID = room;
+            document.getElementById('chatting-with').innerText = name;
+            document.getElementById('chat-room').style.display = 'flex';
+            document.getElementById('chatBox').innerHTML = "";
+            
+            // Listen pesan di room ini
+            onChildAdded(ref(db, `messages/${room}`), (snap) => {
+                const m = snap.val();
+                const d = document.createElement('div');
+                d.className = `bubble ${m.sender === MY_NAME ? 'msg-out' : 'msg-in'}`;
+                d.innerText = m.text;
+                document.getElementById('chatBox').appendChild(d);
+                document.getElementById('chatBox').scrollTop = 99999;
             });
-            input.value = "";
         };
 
-        // --- Pengaturan (Titik Tiga) ---
-        window.showMenu = () => {
+        window.send = () => {
+            const inp = document.getElementById('msgInput');
+            if(!inp.value) return;
+            push(ref(db, `messages/${CURRENT_CHAT_ID}`), { sender: MY_NAME, text: inp.value });
+            inp.value = "";
+        };
+
+        window.closeChat = () => document.getElementById('chat-room').style.display = 'none';
+
+        window.showSettings = () => {
             Swal.fire({
-                title: 'Pengaturan ZERA',
+                title: 'ZERA Settings',
                 background: '#202c33',
                 color: '#fff',
-                html: `
-                    <button onclick="changeProfile()" style="margin:5px" class="btn-login">Ubah Profil</button>
-                    <button onclick="toggleGlow()" style="margin:5px" class="btn-login">Toggle Glowing</button>
-                `,
-                showConfirmButton: false
+                html: '<button class="btn" onclick="localStorage.clear(); location.reload();">Logout</button>'
             });
-        };
-
-        window.openProfileEdit = () => {
-            Swal.fire({
-                title: 'Profil Anda',
-                text: `Nama: ${myName}`,
-                imageUrl: myPic,
-                imageWidth: 100,
-                imageHeight: 100,
-                background: '#202c33',
-                color: '#fff'
-            });
-        };
-
-        window.changeProfile = () => {
-            Swal.fire({
-                title: 'Edit Profil',
-                background: '#202c33',
-                color: '#fff',
-                html: `
-                    <input id="newName" class="swal2-input" placeholder="Nama baru" value="${myName}">
-                    <input id="newPic" class="swal2-input" placeholder="URL Foto baru">
-                `,
-                confirmButtonText: 'Simpan'
-            }).then((res) => {
-                if(res.isConfirmed) {
-                    const n = document.getElementById('newName').value;
-                    const p = document.getElementById('newPic').value;
-                    if(n) {
-                        myName = n;
-                        localStorage.setItem("zera_name", n);
-                    }
-                    if(p) {
-                        myPic = p;
-                        localStorage.setItem("zera_pic", p);
-                        document.getElementById('myAvatar').src = p;
-                    }
-                    location.reload();
-                }
-            });
-        };
-
-        window.toggleGlow = () => {
-            const cb = document.getElementById('chatBox');
-            cb.classList.toggle('glowing-wallpaper');
-            Swal.fire("Mode Berubah", "", "success");
-        };
-
+        }
     </script>
 </body>
 </html>
