@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -426,4 +427,120 @@
                 const list = document.getElementById('list-contacts');
                 list.innerHTML = "";
                 if(!snap.exists()) {
-                    list.innerHTML = `<p style="text-align:center; margin-top:20px; color:#999; font-size:13px;">Belum ad
+                    list.innerHTML = `<p style="text-align:center; margin-top:20px; color:#999; font-size:13px;">Belum ada kontak. Tambahkan teman dulu!</p>`;
+                    return;
+                }
+                snap.forEach(child => {
+                    const name = child.key;
+                    const item = document.createElement('div');
+                    item.className = 'contact-item';
+                    item.innerHTML = `
+                        <div class="avatar-circle" style="background:#075e54; width:45px; height:45px;"><i class="fas fa-user"></i></div>
+                        <div class="contact-info">
+                            <h4>${name}</h4>
+                            <p>Klik untuk memulai pesan...</p>
+                        </div>
+                    `;
+                    item.onclick = () => actOpenChat(name);
+                    list.appendChild(item);
+                });
+            });
+        }
+
+        function actOpenChat(target) {
+            activeTarget = target;
+            document.getElementById('display-target').innerText = target;
+            document.getElementById('display-status').innerText = 'online';
+            document.getElementById('chat-tools').style.display = 'block';
+            document.getElementById('chat-input-area').style.display = 'flex';
+            
+            if(window.innerWidth <= 768) {
+                document.getElementById('chat-window').classList.add('active');
+                document.getElementById('btn-back').style.display = 'block';
+            }
+
+            const roomId = [currentUser, target].sort().join("_v_");
+            db.ref('messages/' + roomId).on('value', (snap) => {
+                const box = document.getElementById('messages-box');
+                box.innerHTML = "";
+                snap.forEach(m => {
+                    const data = m.val();
+                    const row = document.createElement('div');
+                    row.className = `msg-row ${data.sender === currentUser ? 'my-row' : ''}`;
+                    row.innerHTML = `
+                        <div class="bubble ${data.sender === currentUser ? 'mine' : 'theirs'}">
+                            ${data.text}
+                            <div class="msg-time">${new Date(data.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                        </div>
+                    `;
+                    box.appendChild(row);
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        }
+
+        async function actSend() {
+            const txt = document.getElementById('inp-msg').value.trim();
+            if(!txt || !activeTarget) return;
+
+            // Keamanan: Cek Block
+            const blocked = await db.ref(`blocked/${activeTarget}/${currentUser}`).once('value');
+            if(blocked.exists()) return alert("Pesan Gagal: Anda telah diblokir oleh user ini.");
+
+            const roomId = [currentUser, activeTarget].sort().join("_v_");
+            db.ref('messages/' + roomId).push({
+                sender: currentUser,
+                text: txt,
+                time: Date.now()
+            });
+            document.getElementById('inp-msg').value = "";
+        }
+
+        // --- 4. ADDITIONAL TOOLS ---
+        window.actCloseChat = () => document.getElementById('chat-window').classList.remove('active');
+        window.actOpenSettings = () => {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('modal-settings').style.display = 'block';
+        };
+        window.actCloseSettings = () => {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('modal-settings').style.display = 'none';
+        };
+        window.actToggleDark = () => document.body.classList.toggle('dark-mode');
+        window.actChangeWall = (color) => {
+            const win = document.getElementById('chat-window');
+            win.style.backgroundImage = 'none';
+            win.style.backgroundColor = color;
+        };
+        window.actLogout = () => {
+            localStorage.clear();
+            location.reload();
+        };
+        window.actDeleteHistory = () => {
+            if(confirm("Hapus semua riwayat chat dengan user ini?")) {
+                const roomId = [currentUser, activeTarget].sort().join("_v_");
+                db.ref('messages/' + roomId).remove();
+            }
+        };
+        window.actBlock = async () => {
+            if(confirm(`Blokir ${activeTarget}? Dia tidak akan bisa mengirimkan pesan lagi ke Anda.`)) {
+                await db.ref(`blocked/${currentUser}/${activeTarget}`).set(true);
+                alert("User telah diblokir.");
+            }
+        };
+        window.actSearch = () => {
+            const q = document.getElementById('inp-search').value.toLowerCase();
+            const items = document.querySelectorAll('.contact-item');
+            items.forEach(it => {
+                const name = it.querySelector('h4').innerText.toLowerCase();
+                it.style.display = name.includes(q) ? 'flex' : 'none';
+            });
+        };
+
+        // Enter key to send
+        document.getElementById('inp-msg').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') actSend();
+        });
+    </script>
+</body>
+</html>
