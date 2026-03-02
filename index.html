@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZERA - Light Messenger</title>
+    <title>ZERA - Pro Messenger</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root { 
@@ -12,43 +12,41 @@
             --wa-bg: #ffffff; 
             --wa-panel: #f0f2f5; 
             --wa-text: #3b4a54;
-            --glow: #00ffcc; 
         }
         
         * { box-sizing: border-box; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: #e5ddd5; color: var(--wa-text); overflow: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: var(--wa-text); overflow: hidden; }
 
         /* INTRO */
         #intro { position: fixed; inset: 0; background: #fff; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .zera-logo { font-size: 4rem; font-weight: 900; color: var(--wa-light-green); animation: slideDown 1.2s forwards; text-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .zera-logo { font-size: 4.5rem; font-weight: 900; color: var(--wa-light-green); animation: slideDown 1.2s forwards; }
         @keyframes slideDown { 0% { transform: translateY(-300px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
 
         /* LOGIN CENTERED */
         .page-center { display: none; height: 100vh; width: 100%; flex-direction: column; align-items: center; justify-content: center; background: #f0f2f5; padding: 20px; }
-        .login-card { width: 100%; max-width: 350px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; }
-        .login-card h2 { margin-bottom: 10px; color: var(--wa-light-green); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; outline: none; }
-        .btn { width: 100%; padding: 12px; background: var(--wa-light-green); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
+        .login-card { width: 100%; max-width: 350px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 30px rgba(0,0,0,0.1); text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; outline: none; font-size: 16px; }
+        .btn { width: 100%; padding: 12px; background: var(--wa-light-green); border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; font-size: 16px; }
 
         /* MAIN APP */
         #main-app { display: none; height: 100vh; flex-direction: column; background: white; }
         .header { background: var(--wa-panel); padding: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; border-bottom: 1px solid #ddd; }
         
-        .contact-item { padding: 15px; border-bottom: 1px solid #f2f2f2; display: flex; align-items: center; cursor: pointer; background: white; }
-        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #00a884; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
+        .contact-item { padding: 15px; border-bottom: 1px solid #f2f2f2; display: flex; align-items: center; cursor: pointer; transition: 0.2s; }
+        .contact-item:active { background: #e9edef; }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #00a884; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: bold; }
 
         /* CHAT ROOM */
         #chat-room { display: none; position: fixed; inset: 0; background: #e5ddd5; flex-direction: column; z-index: 100; }
-        .chat-view { 
-            flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; 
-            background-size: cover; background-position: center;
-        }
-        .bubble { max-width: 80%; padding: 8px 12px; border-radius: 10px; margin-bottom: 4px; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .chat-view { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; background-size: cover; background-position: center; }
+        .bubble { max-width: 80%; padding: 10px 14px; border-radius: 12px; margin-bottom: 6px; font-size: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); line-height: 1.4; }
         .msg-in { background: white; align-self: flex-start; border-top-left-radius: 0; }
         .msg-out { background: var(--wa-soft-green); align-self: flex-end; border-top-right-radius: 0; }
 
-        .footer { background: var(--wa-panel); padding: 10px; display: flex; }
-        .fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--wa-light-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .footer { background: var(--wa-panel); padding: 10px; display: flex; align-items: center; }
+        #msgInput { flex: 1; margin: 0 10px; border-radius: 20px; padding: 10px 18px; border: none; }
+        
+        .fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--wa-light-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 99; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -57,28 +55,27 @@
 
     <div id="login-page" class="page-center">
         <div class="login-card">
-            <h2>MOHON MASUK</h2>
-            <p style="font-size: 12px; color: gray;">Gunakan username lama untuk masuk kembali</p>
-            <input type="text" id="myUser" placeholder="Username">
+            <h2 style="color:var(--wa-light-green)">MOHON MASUK</h2>
+            <input type="text" id="myUser" placeholder="Username (Contoh: zera)">
             <input type="password" id="myPass" placeholder="Password">
-            <button class="btn" onclick="login()">MASUK / RECOVER</button>
+            <button class="btn" onclick="login()">MASUK / DAFTAR</button>
         </div>
     </div>
 
     <div id="loading-page" class="page-center">
         <div class="login-card">
             <h3 id="load-status">Mengecek Sinyal...</h3>
-            <div style="width:100%; background:#eee; height:8px; border-radius:10px; overflow:hidden;">
-                <div id="bar" style="width:0%; height:100%; background:var(--wa-light-green);"></div>
+            <div style="width:100%; background:#eee; height:10px; border-radius:10px; overflow:hidden;">
+                <div id="bar" style="width:0%; height:100%; background:var(--wa-light-green); transition: 0.1s;"></div>
             </div>
-            <div id="pct" style="margin-top:10px">0%</div>
+            <div id="pct" style="margin-top:10px; font-weight:bold;">0%</div>
         </div>
     </div>
 
     <div id="main-app">
         <div class="header">
-            <span>ZERA MESSENGER</span>
-            <div onclick="showSettings()" style="cursor:pointer">⋮</div>
+            <span style="font-size: 20px;">ZERA PRO</span>
+            <div onclick="showSettings()" style="cursor:pointer; font-size: 24px;">⋮</div>
         </div>
         <div id="contact-list" style="flex:1; overflow-y:auto;"></div>
         <div class="fab" onclick="addContact()">+</div>
@@ -87,21 +84,21 @@
     <div id="chat-room">
         <div class="header">
             <div style="display:flex; align-items:center;">
-                <span onclick="closeChat()" style="margin-right:15px; cursor:pointer;">←</span>
+                <span onclick="closeChat()" style="margin-right:15px; cursor:pointer; font-size: 20px;">←</span>
                 <span id="chatting-with">Nama</span>
             </div>
-            <div id="chat-opts" onclick="showChatMenu()" style="cursor:pointer">⋮</div>
+            <div onclick="showChatMenu()" style="cursor:pointer; font-size: 24px;">⋮</div>
         </div>
         <div id="chatBox" class="chat-view"></div>
         <div class="footer">
             <input type="text" id="msgInput" placeholder="Ketik pesan...">
-            <button class="btn" onclick="send()" style="width:50px">➤</button>
+            <button class="btn" onclick="send()" style="width:50px; border-radius: 50%;">➤</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onChildAdded, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
@@ -117,9 +114,12 @@
         const db = getDatabase(app);
         let MY_NAME = localStorage.getItem("zera_user") || "";
         let CURRENT_ROOM = "";
-        let CURRENT_FRIEND = "";
+        let IS_CHAT_OPEN = false;
 
-        // INTRO & KEEP LOGIN
+        // PERMISSION NOTIFIKASI
+        if ("Notification" in window) { Notification.requestPermission(); }
+
+        // INTRO
         setTimeout(() => {
             document.getElementById('intro').style.display = 'none';
             if(MY_NAME) { login(true); } 
@@ -130,16 +130,15 @@
             if(!isAuto) {
                 const u = document.getElementById('myUser').value.trim().toLowerCase();
                 const p = document.getElementById('myPass').value;
-                if(!u || !p) return Swal.fire("Isi data!", "", "error");
+                if(!u || !p) return Swal.fire("Eitss!", "Isi dulu nama & passwordnya!", "warning");
                 
-                // Simpan data untuk recovery/login ulang
                 const userRef = ref(db, `accounts/${u}`);
                 const snap = await get(userRef);
                 
                 if(snap.exists() && snap.val().pass !== p) {
-                    return Swal.fire("Password Salah!", "Akun ini sudah ada.", "error");
+                    return Swal.fire({ icon: 'error', title: 'GAGAL MASUK', text: 'Password salah boss! Coba diingat lagi.' });
                 } else if(!snap.exists()) {
-                    await set(userRef, { pass: p });
+                    await set(userRef, { pass: p, name: u });
                 }
                 
                 MY_NAME = u;
@@ -151,51 +150,99 @@
             
             let prog = 0;
             let itv = setInterval(() => {
-                if(!navigator.onLine) return;
-                prog += 5;
-                document.getElementById('bar').style.width = prog + "%";
-                document.getElementById('pct').innerText = prog + "%";
+                if(!navigator.onLine) {
+                    document.getElementById('load-status').innerText = "SINYAL ILANG! GAK BISA MASUK";
+                    document.getElementById('bar').style.backgroundColor = "red";
+                    return;
+                }
+                prog += Math.floor(Math.random() * 10) + 1;
+                document.getElementById('bar').style.width = (prog > 100 ? 100 : prog) + "%";
+                document.getElementById('pct').innerText = (prog > 100 ? 100 : prog) + "%";
                 if(prog >= 100) {
                     clearInterval(itv);
                     document.getElementById('loading-page').style.display = 'none';
                     document.getElementById('main-app').style.display = 'flex';
-                    loadList();
+                    initApp();
                 }
-            }, 80);
+            }, 100);
         };
 
         window.addContact = async () => {
-            const { value: friend } = await Swal.fire({ title: 'Tambah User', input: 'text', background: '#fff', color: '#000' });
+            const { value: friend } = await Swal.fire({ 
+                title: 'Cari Username', 
+                input: 'text', 
+                inputPlaceholder: 'Ketik username teman...',
+                confirmButtonText: 'TAMBAH',
+                confirmButtonColor: '#25d366'
+            });
+
             if(friend) {
                 const f = friend.trim().toLowerCase();
+                if(f === MY_NAME) return Swal.fire("Waduh!", "Gak bisa chat sama diri sendiri.", "info");
+
+                // CEK DATABASE APAKAH USERNAME ADA
+                const checkRef = ref(db, `accounts/${f}`);
+                const snap = await get(checkRef);
+
+                if(!snap.exists()) {
+                    // NOTIF SEGEDE GABAN
+                    return Swal.fire({
+                        icon: 'error',
+                        title: '<span style="font-size:40px">USER TIDAK ADA!</span>',
+                        html: `<b style="font-size:20px">Username "${f}" tidak ditemukan di database ZERA. Pastikan temenmu udah daftar dulu!</b>`,
+                        confirmButtonText: 'OKE SIAP',
+                        confirmButtonColor: '#d33'
+                    });
+                }
+
                 const room = [MY_NAME, f].sort().join("_");
                 await set(ref(db, `users/${MY_NAME}/contacts/${f}`), { room: room });
                 await set(ref(db, `users/${f}/contacts/${MY_NAME}`), { room: room });
+                Swal.fire("Berhasil!", "Kontak sudah ditambahkan.", "success");
             }
         };
 
-        function loadList() {
+        function initApp() {
+            // Listen Kontak
             onValue(ref(db, `users/${MY_NAME}/contacts`), (snap) => {
                 const list = document.getElementById('contact-list');
                 list.innerHTML = "";
                 snap.forEach(c => {
-                    if(c.val().blocked) return; // Sembunyikan jika diblokir
                     const div = document.createElement('div');
                     div.className = 'contact-item';
-                    div.innerHTML = `<div class="avatar">${c.key[0].toUpperCase()}</div><div><b>${c.key}</b><br><small>${c.val().muted ? '🔇 Muted' : 'Online'}</small></div>`;
+                    div.innerHTML = `<div class="avatar">${c.key[0].toUpperCase()}</div><div><b>${c.key}</b><br><small>Online</small></div>`;
                     div.onclick = () => openChat(c.key, c.val().room);
                     list.appendChild(div);
                 });
             });
+
+            // GLOBAL LISTENER UNTUK NOTIF PESAN MASUK
+            onValue(ref(db, `users/${MY_NAME}/contacts`), (snap) => {
+                snap.forEach(c => {
+                    const room = c.val().room;
+                    const msgRef = ref(db, `messages/${room}`);
+                    // Hanya ambil pesan terakhir yang baru
+                    onChildAdded(msgRef, (mSnap) => {
+                        const m = mSnap.val();
+                        if(m.sender !== MY_NAME) {
+                            // Vibrasi & Notif jika chat room tidak sedang terbuka
+                            if(!IS_CHAT_OPEN || (IS_CHAT_OPEN && CURRENT_ROOM !== room)) {
+                                if ("vibrate" in navigator) navigator.vibrate(200);
+                                if (Notification.permission === "granted") {
+                                    new Notification(`Pesan dari ${m.sender}`, { body: m.text });
+                                }
+                            }
+                        }
+                    });
+                });
+            }, { onlyOnce: true });
         }
 
         window.openChat = (name, room) => {
-            CURRENT_ROOM = room; CURRENT_FRIEND = name;
+            CURRENT_ROOM = room; IS_CHAT_OPEN = true;
             document.getElementById('chatting-with').innerText = name;
             document.getElementById('chat-room').style.display = 'flex';
             const cb = document.getElementById('chatBox');
-            
-            // Set wallpaper tersimpan
             cb.style.backgroundImage = `url('${localStorage.getItem("wp_"+MY_NAME) || ""}')`;
 
             onValue(ref(db, `messages/${room}`), (snap) => {
@@ -212,18 +259,16 @@
 
         window.send = () => {
             const inp = document.getElementById('msgInput');
-            if(!inp.value) return;
-            push(ref(db, `messages/${CURRENT_ROOM}`), { sender: MY_NAME, text: inp.value });
+            if(!inp.value.trim()) return;
+            push(ref(db, `messages/${CURRENT_ROOM}`), { sender: MY_NAME, text: inp.value, time: Date.now() });
             inp.value = "";
         };
 
         window.showSettings = () => {
             Swal.fire({
                 title: 'Pengaturan',
-                html: `
-                    <button class="btn" onclick="changeWP()" style="margin-bottom:10px">Ganti Wallpaper</button>
-                    <button class="btn" onclick="logout()" style="background:red">Logout</button>
-                `,
+                html: `<button class="btn" onclick="changeWP()" style="margin-bottom:10px">Ganti Wallpaper</button>
+                       <button class="btn" onclick="logout()" style="background:#ff4757">Logout</button>`,
                 showConfirmButton: false
             });
         };
@@ -233,46 +278,21 @@
                 'https://i.pinimg.com/originals/79/5c/36/795c3614275030093672322580ef1488.jpg',
                 'https://i.pinimg.com/736x/ec/64/00/ec64005b57f0022207b99c090623d3a0.jpg',
                 'https://wallpaperaccess.com/full/1288076.jpg',
-                'https://e0.pxfuel.com/wallpapers/315/593/desktop-wallpaper-green-whatsapp-whatsapp-chat.jpg',
-                'https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA1L3B4MTM2OTgxMy1pbWFnZS1rd3Z4eHA5Mi5qcGc.jpg'
+                'https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA1L3B4MTM2OTgxMy1pbWFnZS1rd3Z4eHA5Mi5qcGc.jpg',
+                'https://e0.pxfuel.com/wallpapers/315/593/desktop-wallpaper-green-whatsapp-whatsapp-chat.jpg'
             ];
-            let html = wps.map((url, i) => `<img src="${url}" width="60" height="80" onclick="setWP('${url}')" style="margin:5px; cursor:pointer; border:2px solid #ddd">`).join("");
-            Swal.fire({ title: 'Pilih Wallpaper', html: html });
+            let html = wps.map(url => `<img src="${url}" width="60" height="90" onclick="setWP('${url}')" style="margin:5px; border-radius:5px; cursor:pointer">`).join("");
+            Swal.fire({ title: 'Pilih Background', html: html });
         };
 
         window.setWP = (url) => {
             localStorage.setItem("wp_"+MY_NAME, url);
             document.getElementById('chatBox').style.backgroundImage = `url('${url}')`;
-            Swal.fire("Berhasil!", "", "success");
-        };
-
-        window.showChatMenu = () => {
-            Swal.fire({
-                title: 'Opsi Chat',
-                html: `
-                    <button class="btn" onclick="muteUser()" style="margin-bottom:10px">Mute / Unmute</button>
-                    <button class="btn" onclick="blockUser()" style="background:orange">Blokir Kontak</button>
-                `,
-                showConfirmButton: false
-            });
-        };
-
-        window.muteUser = async () => {
-            const path = `users/${MY_NAME}/contacts/${CURRENT_FRIEND}/muted`;
-            const snap = await get(ref(db, path));
-            await set(ref(db, path), !snap.val());
-            Swal.fire("Status Mute Diubah", "", "success");
-        };
-
-        window.blockUser = async () => {
-            await set(ref(db, `users/${MY_NAME}/contacts/${CURRENT_FRIEND}/blocked`), true);
-            Swal.fire("Diblokir", "", "success");
-            closeChat();
+            Swal.fire("Sip!", "Wallpaper diganti.", "success");
         };
 
         window.logout = () => { localStorage.clear(); location.reload(); };
-        window.closeChat = () => document.getElementById('chat-room').style.display = 'none';
+        window.closeChat = () => { document.getElementById('chat-room').style.display = 'none'; IS_CHAT_OPEN = false; };
     </script>
 </body>
-    </html>
-    
+</html>
