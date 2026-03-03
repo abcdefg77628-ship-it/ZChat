@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ZChat - Cube Edition</title>
+    <title>ZChat - zZerr44 Edition</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
         :root {
             --bg-black: #050505;
             --bg-panel: #111214;
-            --bg-chat: #2b2d31;
+            --bg-chat: #313338;
             --cyan: #00b2ff;
             --red: #ff3b3b;
             --text: #dbdee1;
@@ -23,92 +23,95 @@
 
         body { background: var(--bg-black); color: var(--text); height: 100vh; overflow: hidden; position: fixed; width: 100%; }
 
-        /* --- LOGO KUBUS Z --- */
+        /* --- LOGO KUBUS ZZERR44 --- */
         .z-cube-box {
-            width: 80px; height: 80px; margin: 0 auto 20px;
+            width: 90px; height: 90px; margin: 0 auto 20px;
             position: relative;
-            border: 4px solid var(--cyan); /* Kubus Luar Biru */
+            border: 5px solid var(--cyan);
             display: flex; align-items: center; justify-content: center;
             border-radius: 4px;
+            box-shadow: 0 0 15px rgba(0, 178, 255, 0.3);
         }
         .z-inner-cube {
-            width: 30px; height: 30px;
-            border: 3px solid var(--red); /* Garis Merah Kubus */
+            width: 35px; height: 35px;
+            border: 4px solid var(--red);
             display: flex; align-items: center; justify-content: center;
-            font-weight: 900; color: var(--cyan); font-size: 24px;
+            font-weight: 900; color: var(--cyan); font-size: 26px;
         }
 
         /* --- AUTH SCREEN --- */
         #auth-layer {
             position: fixed; inset: 0; background: var(--bg-black);
-            z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;
+            z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 25px;
         }
-        .auth-container { width: 100%; max-width: 350px; text-align: center; }
+        .auth-container { width: 100%; max-width: 360px; text-align: center; }
         
-        .auth-choice { display: flex; flex-direction: column; gap: 15px; }
+        .auth-choice { display: flex; flex-direction: column; gap: 16px; }
         .auth-form { display: none; flex-direction: column; gap: 15px; text-align: left; }
 
         .z-btn {
-            width: 100%; padding: 15px; border-radius: 8px; border: none;
-            font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
-            transition: 0.2s;
+            width: 100%; padding: 16px; border-radius: 8px; border: none;
+            font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px;
+            transition: 0.2s; font-size: 14px;
         }
         .btn-cyan { background: var(--cyan); color: black; }
         .btn-outline { background: transparent; border: 2px solid var(--cyan); color: var(--cyan); }
-        .btn-back { background: none; color: var(--text-s); font-size: 12px; margin-top: 10px; }
+        .btn-back { background: none; color: var(--text-s); font-size: 12px; margin-top: 15px; border: none; cursor: pointer; text-decoration: underline; }
 
         .z-input {
             width: 100%; padding: 14px; background: #1a1a1a; border: 1px solid #333;
-            color: white; border-radius: 8px; outline: none;
+            color: white; border-radius: 8px; outline: none; font-size: 16px;
         }
         .z-input:focus { border-color: var(--cyan); }
 
-        /* --- APP INTERFACE --- */
+        /* --- APP HEADER --- */
         header {
             height: 60px; background: var(--bg-black); display: flex;
             align-items: center; justify-content: space-between; padding: 0 15px;
             border-bottom: 1px solid #222;
         }
 
+        .chat-title { font-weight: 800; color: white; letter-spacing: 1px; font-size: 18px; }
+
         .main-app { display: flex; height: calc(100vh - 60px); position: relative; }
 
         aside {
             position: absolute; left: -100%; top: 0; width: 280px; height: 100%;
-            background: var(--bg-panel); z-index: 999; transition: 0.3s;
-            border-right: 1px solid #222;
+            background: var(--bg-panel); z-index: 999; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        aside.open { left: 0; }
+        aside.open { left: 0; box-shadow: 5px 0 20px rgba(0,0,0,0.5); }
 
         main { flex: 1; background: var(--bg-chat); display: flex; flex-direction: column; position: relative; }
 
         #chat-flow {
             flex: 1; overflow-y: auto; padding: 20px; display: flex;
-            flex-direction: column; gap: 15px; padding-bottom: 100px;
+            flex-direction: column; gap: 15px; padding-bottom: 110px;
         }
 
+        /* --- INPUT AREA (ANTI KEPOTONG) --- */
         .input-bar {
             position: absolute; bottom: 0; left: 0; right: 0;
-            padding: 10px 15px 30px; background: linear-gradient(transparent, var(--bg-chat) 30%);
+            padding: 10px 15px 35px; background: linear-gradient(transparent, var(--bg-chat) 40%);
         }
         .input-inner {
             background: #383a40; padding: 12px 15px; border-radius: 8px;
             display: flex; align-items: center; gap: 10px;
         }
-        .input-inner input { flex: 1; background: none; border: none; color: white; outline: none; }
+        .input-inner input { flex: 1; background: none; border: none; color: white; outline: none; font-size: 15px; }
 
-        /* --- MENU RIGHT --- */
+        /* --- MENU OVERLAY --- */
         .menu-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
             z-index: 2000; display: none; justify-content: flex-end;
         }
-        .menu-side { width: 280px; background: var(--bg-panel); padding: 30px 20px; animation: slideIn 0.3s; }
-        @keyframes slideIn { from { transform: translateX(100%); } }
+        .menu-side { width: 280px; background: var(--bg-panel); padding: 30px 20px; animation: slideIn 0.3s forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
         #z-toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--cyan); color: black; padding: 10px 25px;
+            background: var(--cyan); color: black; padding: 12px 25px;
             border-radius: 50px; font-weight: 800; font-size: 12px; z-index: 100001;
-            display: none; text-transform: uppercase;
+            display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -121,38 +124,44 @@
         <div class="z-cube-box">
             <div class="z-inner-cube">Z</div>
         </div>
-        <h1 style="margin-bottom: 5px; letter-spacing: 2px;">ZCHAT</h1>
-        <p style="color: var(--text-s); font-size: 13px; margin-bottom: 30px;" id="auth-info">VERSI KUBUS 1.0</p>
+        <h1 style="margin-bottom: 5px; letter-spacing: 3px; font-weight: 800;">ZCHAT</h1>
+        <p style="color: var(--cyan); font-size: 11px; font-weight: 800; margin-bottom: 35px; letter-spacing: 2px;">BY ZZERR44</p>
 
         <div id="auth-main-choice" class="auth-choice">
-            <button class="z-btn btn-cyan" onclick="showAuthForm('REG')" id="txt-opt-reg">DAFTAR AKUN</button>
-            <button class="z-btn btn-outline" onclick="showAuthForm('LOGIN')" id="txt-opt-login">MASUK KEMBALI</button>
+            <button class="z-btn btn-cyan" onclick="showForm('REG')" id="txt-opt-reg">DAFTAR AKUN</button>
+            <button class="z-btn btn-outline" onclick="showForm('LOGIN')" id="txt-opt-login">MASUK KEMBALI</button>
         </div>
 
         <div id="auth-form-input" class="auth-form">
-            <label id="lbl-u" style="font-size: 11px; font-weight: 800; color: var(--text-s);">USERNAME</label>
-            <input type="text" id="u-name" class="z-input" placeholder="...">
-            <label id="lbl-p" style="font-size: 11px; font-weight: 800; color: var(--text-s);">PASSWORD</label>
-            <input type="password" id="u-pass" class="z-input" placeholder="...">
-            <button class="z-btn btn-cyan" id="auth-submit-btn" onclick="executeAuth()">LANJUT</button>
-            <button class="btn-back" onclick="resetAuth()">KEMBALI KE MENU</button>
+            <label id="lbl-u" style="font-size: 10px; font-weight: 800; color: var(--text-s); letter-spacing: 1px; margin-bottom: 5px;">USERNAME</label>
+            <input type="text" id="u-name" class="z-input" placeholder="Ketik username...">
+            
+            <label id="lbl-p" style="font-size: 10px; font-weight: 800; color: var(--text-s); letter-spacing: 1px; margin-top: 10px; margin-bottom: 5px;">PASSWORD</label>
+            <input type="password" id="u-pass" class="z-input" placeholder="Ketik password...">
+            
+            <button class="z-btn btn-cyan" id="auth-submit-btn" onclick="executeAuth()" style="margin-top: 10px;">LANJUTKAN</button>
+            <button class="btn-back" onclick="resetAuth()">KEMBALI</button>
         </div>
     </div>
 </div>
 
 <header>
-    <button class="btn-outline" style="padding: 5px 12px; font-size: 11px;" onclick="toggleSide()" id="nav-f">TEMAN</button>
-    <div style="font-weight: 800; color: white;" id="active-title">Z-KUBUS</div>
-    <button class="btn-cyan" style="padding: 5px 12px; font-size: 11px;" onclick="toggleMenu()" id="nav-m">MENU</button>
+    <button class="btn-outline" style="padding: 6px 15px; font-size: 11px; font-weight: 800;" onclick="toggleSide()" id="nav-f">TEMAN</button>
+    <div class="chat-title" id="active-title">ZCHAT</div>
+    <button class="btn-cyan" style="padding: 6px 15px; font-size: 11px; font-weight: 800;" onclick="toggleMenu()" id="nav-m">MENU</button>
 </header>
 
 <div class="main-app">
     <aside id="side-ui">
-        <div style="padding: 20px; font-size: 12px; font-weight: 800; color: var(--text-s); border-bottom: 1px solid #222;">LIST TEMAN</div>
+        <div style="padding: 20px; font-size: 11px; font-weight: 800; color: var(--text-s); border-bottom: 1px solid #222; letter-spacing: 1px;">DIRECT MESSAGES</div>
         <div id="friend-list-dom" style="flex:1; overflow-y:auto; padding: 10px;"></div>
-        <div style="padding: 15px; background: #0a0a0a; display: flex; align-items: center; gap: 10px;">
-            <div style="width: 30px; height: 30px; background: var(--cyan); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: black; font-weight: 900;" id="my-initial">?</div>
-            <div id="my-name-display" style="font-weight: 700; font-size: 13px;">USER</div>
+        
+        <div style="padding: 15px; background: #0a0a0a; display: flex; align-items: center; gap: 12px; border-top: 1px solid #222;">
+            <div style="width: 35px; height: 35px; background: var(--cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-weight: 900;" id="my-initial">Z</div>
+            <div>
+                <div id="my-name-display" style="font-weight: 800; font-size: 13px; color: white;">USER</div>
+                <div style="font-size: 10px; color: #23a55a; font-weight: 600;">Online</div>
+            </div>
         </div>
     </aside>
 
@@ -160,14 +169,15 @@
         <div id="chat-flow">
             <div style="margin: auto; text-align: center; opacity: 0.2;">
                 <div class="z-cube-box"><div class="z-inner-cube">Z</div></div>
-                <p id="txt-empty">Pilih teman dulu bos</p>
+                <p id="txt-empty">Pilih teman untuk memulai</p>
+                <p style="font-size: 10px; margin-top: 10px;">ZCHAT BY ZZERR44</p>
             </div>
         </div>
 
         <div class="input-bar">
             <div class="input-inner">
                 <input type="text" id="msg-in" placeholder="Ketik pesan..." onkeypress="if(event.key=='Enter') pushMsg()">
-                <button onclick="pushMsg()" style="background:none; border:none; color:var(--cyan); font-weight:900; cursor:pointer;" id="txt-send">KIRIM</button>
+                <button onclick="pushMsg()" style="background:none; border:none; color:var(--cyan); font-weight:900; cursor:pointer; letter-spacing: 1px;" id="txt-send">KIRIM</button>
             </div>
         </div>
     </main>
@@ -175,19 +185,20 @@
 
 <div class="menu-overlay" id="menu-ui" onclick="toggleMenu()">
     <div class="menu-side" onclick="event.stopPropagation()">
-        <h2 style="margin-bottom: 20px;" id="txt-sett">PENGATURAN</h2>
+        <h2 style="margin-bottom: 25px; font-weight: 800; letter-spacing: 1px;" id="txt-sett">SETTINGS</h2>
         
-        <label style="font-size: 11px; font-weight: 800; color: var(--text-s);">BAHASA / LANGUAGE</label>
-        <select id="lang-pick" onchange="setLang(this.value)" style="width:100%; padding:12px; background:#000; color:white; border:1px solid #333; margin: 10px 0 20px;">
+        <label style="font-size: 10px; font-weight: 800; color: var(--text-s); letter-spacing: 1px;">LANGUAGE</label>
+        <select id="lang-pick" onchange="setLang(this.value)" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; margin: 10px 0 25px; border-radius: 8px; outline: none;">
             <option value="id">Indonesia</option>
-            <option value="en">English</option>
+            <option value="en">English (US)</option>
         </select>
 
-        <button class="z-btn btn-outline" style="margin-bottom: 10px;" onclick="addFriend()" id="txt-add">Tambah Teman</button>
-        <button class="z-btn btn-outline" onclick="checkReq()" id="txt-req">Permintaan</button>
+        <button class="z-btn btn-outline" style="margin-bottom: 12px; text-align: left;" onclick="addFriend()" id="txt-add">➕ Add Friend</button>
+        <button class="z-btn btn-outline" style="text-align: left;" onclick="checkReq()" id="txt-req">📩 Requests</button>
         
-        <div style="margin-top: 50px;">
-            <button class="z-btn" style="background: var(--red); color: white;" onclick="logout()" id="txt-out">KELUAR</button>
+        <div style="margin-top: 60px; border-top: 1px solid #333; padding-top: 20px;">
+            <button class="z-btn" style="background: var(--red); color: white;" onclick="logout()" id="txt-out">LOGOUT</button>
+            <p style="text-align: center; font-size: 9px; color: var(--text-s); margin-top: 15px; letter-spacing: 1px;">DEVELOPED BY ZZERR44</p>
         </div>
     </div>
 </div>
@@ -214,16 +225,16 @@
     let lang = localStorage.getItem('z_lang') || 'id';
 
     const dict = {
-        id: { optReg: "DAFTAR AKUN", optLogin: "MASUK KEMBALI", u: "USERNAME", p: "PASSWORD", submit: "LANJUT", info: "VERSI KUBUS 1.0", navF: "TEMAN", navM: "MENU", empty: "Pilih teman dulu bos", place: "Ketik pesan...", send: "KIRIM", sett: "PENGATURAN", add: "Tambah Teman", req: "Permintaan", out: "KELUAR" },
-        en: { optReg: "REGISTER", optLogin: "LOGIN BACK", u: "USERNAME", p: "PASSWORD", submit: "CONTINUE", info: "CUBE VERSION 1.0", navF: "FRIENDS", navM: "MENU", empty: "Select a friend first", place: "Type a message...", send: "SEND", sett: "SETTINGS", add: "Add Friend", req: "Requests", out: "LOGOUT" }
+        id: { optReg: "DAFTAR AKUN", optLogin: "MASUK KEMBALI", u: "USERNAME", p: "PASSWORD", submit: "LANJUTKAN", navF: "TEMAN", navM: "MENU", empty: "Pilih teman untuk memulai", place: "Ketik pesan...", send: "KIRIM", sett: "SETTINGS", add: "➕ Add Friend", req: "📩 Requests", out: "LOGOUT" },
+        en: { optReg: "REGISTER ACCOUNT", optLogin: "LOGIN BACK", u: "USERNAME", p: "PASSWORD", submit: "CONTINUE", navF: "FRIENDS", navM: "MENU", empty: "Select a friend to start", place: "Type a message...", send: "SEND", sett: "SETTINGS", add: "➕ Add Friend", req: "📩 Requests", out: "LOGOUT" }
     };
 
-    window.showToast = (m) => { const t = document.getElementById('z-toast'); t.innerText = m; t.style.display='block'; setTimeout(()=>t.style.display='none', 2000); };
+    window.showToast = (m) => { const t = document.getElementById('z-toast'); t.innerText = m; t.style.display='block'; setTimeout(()=>t.style.display='none', 2500); };
     window.toggleSide = () => document.getElementById('side-ui').classList.toggle('open');
     window.toggleMenu = () => { const m = document.getElementById('menu-ui'); m.style.display = (m.style.display==='flex')?'none':'flex'; };
     window.closePanels = () => { document.getElementById('side-ui').classList.remove('open'); document.getElementById('menu-ui').style.display='none'; };
 
-    window.showAuthForm = (m) => {
+    window.showForm = (m) => {
         mode = m;
         document.getElementById('auth-main-choice').style.display = 'none';
         document.getElementById('auth-form-input').style.display = 'flex';
@@ -242,7 +253,6 @@
         document.getElementById('txt-opt-login').innerText = d.optLogin;
         document.getElementById('lbl-u').innerText = d.u;
         document.getElementById('lbl-p').innerText = d.p;
-        document.getElementById('auth-info').innerText = d.info;
         document.getElementById('nav-f').innerText = d.navF;
         document.getElementById('nav-m').innerText = d.navM;
         document.getElementById('txt-empty').innerText = d.empty;
@@ -257,19 +267,25 @@
     window.executeAuth = async () => {
         const u = document.getElementById('u-name').value.trim().toUpperCase();
         const p = document.getElementById('u-pass').value.trim();
-        if(u.length < 3) return showToast("Min 3 Karakter!");
+        if(u.length < 3 || p.length < 3) return showToast("Isi Username & Password!");
 
         const uRef = ref(db, `users/${u}`);
-        const snap = await get(uRef);
-
-        if(mode === 'REG') {
-            if(snap.exists()) return showToast("User sudah ada!");
-            await set(uRef, { p: p, created: Date.now() });
-            startApp(u);
-        } else {
-            if(snap.exists() && snap.val().p === p) startApp(u);
-            else showToast("User/Pass Salah!");
-        }
+        try {
+            const snap = await get(uRef);
+            if(mode === 'REG') {
+                if(snap.exists()) return showToast("Username sudah dipakai!");
+                await set(uRef, { p: p, created: Date.now() });
+                showToast("Daftar Berhasil!");
+                startApp(u);
+            } else {
+                if(snap.exists() && snap.val().p === p) {
+                    showToast("Login Berhasil!");
+                    startApp(u);
+                } else {
+                    showToast("User/Pass Salah!");
+                }
+            }
+        } catch(e) { showToast("Gagal Koneksi!"); }
     };
 
     function startApp(id) {
@@ -283,21 +299,21 @@
         
         loadFriends();
         setLang(lang);
-        document.getElementById('lang-pick').value = lang;
     }
 
     function loadFriends() {
         onValue(ref(db, `users/${myUID}/friends`), (snap) => {
             const dom = document.getElementById('friend-list-dom'); dom.innerHTML = '';
+            if(!snap.exists()) dom.innerHTML = '<p style="font-size:10px; color:#555; text-align:center; margin-top:20px;">Belum ada teman</p>';
             snap.forEach(f => {
                 onValue(ref(db, `status/${f.key}`), (st) => {
                     let old = document.getElementById(`f-${f.key}`); if(old) old.remove();
                     const card = document.createElement('div');
                     card.id = `f-${f.key}`;
-                    card.style = `padding: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 6px; margin-bottom: 5px; background: ${toUID===f.key?'#3f4147':'transparent'}`;
-                    card.innerHTML = `<div style="width:30px; height:30px; background:#444; border-radius:4px; display:flex; align-items:center; justify-content:center; position:relative">
-                                     ${f.key[0]}<div style="width:10px; height:10px; background:${st.val()?.online?'#23a55a':'#555'}; border-radius:50%; position:absolute; bottom:-2px; right:-2px; border:2px solid var(--bg-panel)"></div>
-                                     </div><div style="font-weight:600; font-size:14px">${f.key}</div>`;
+                    card.style = `padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-radius: 8px; margin-bottom: 4px; background: ${toUID===f.key?'#404249':'transparent'}`;
+                    card.innerHTML = `<div style="width:36px; height:36px; background:#444; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative; font-weight:800">
+                                     ${f.key[0]}<div style="width:12px; height:12px; background:${st.val()?.online?'#23a55a':'#555'}; border-radius:50%; position:absolute; bottom:0; right:0; border:2px solid var(--bg-panel)"></div>
+                                     </div><div style="font-weight:600; font-size:14px; color:white;">${f.key}</div>`;
                     card.onclick = () => openChat(f.key);
                     dom.appendChild(card);
                 });
@@ -314,10 +330,10 @@
             snap.forEach(m => {
                 const d = m.val();
                 const div = document.createElement('div');
-                div.style = "display: flex; gap: 10px; margin-bottom: 5px;";
-                div.innerHTML = `<div style="width:35px; height:35px; background:#5865f2; border-radius:4px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:800">${d.s[0]}</div>
-                                <div><div style="font-size:12px; font-weight:800; color:white">${d.s} <span style="font-size:9px; color:var(--text-s)">Today</span></div>
-                                <div style="font-size:14px; color:#dcddde">${d.c}</div></div>`;
+                div.style = "display: flex; gap: 12px; margin-bottom: 15px; animation: fadeIn 0.2s;";
+                div.innerHTML = `<div style="width:38px; height:38px; background:#5865f2; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:800; color:white;">${d.s[0]}</div>
+                                <div><div style="font-size:13px; font-weight:800; color:white">${d.s} <span style="font-size:10px; color:var(--text-s); font-weight:400; margin-left:5px;">Today</span></div>
+                                <div style="font-size:15px; color:#dcddde; margin-top:2px;">${d.c}</div></div>`;
                 box.appendChild(div);
             });
             box.scrollTop = box.scrollHeight;
@@ -325,16 +341,18 @@
     };
 
     window.pushMsg = () => {
-        const i = document.getElementById('msg-in'); if(!i.value || !toUID) return;
+        const i = document.getElementById('msg-in'); if(!i.value.trim() || !toUID) return;
         const room = [myUID, toUID].sort().join('_');
         push(ref(db, `chats/${room}`), { s: myUID, c: i.value, t: Date.now() });
         i.value = '';
     };
 
     window.addFriend = () => {
-        const f = prompt("Username Teman:"); if(f) {
-            set(ref(db, `req/${f.toUpperCase()}/${myUID}`), { from: myUID });
-            showToast("TERKIRIM!"); toggleMenu();
+        const f = prompt("Input Username:"); if(f) {
+            const tu = f.trim().toUpperCase();
+            if(tu === myUID) return showToast("Gak bisa tambah diri sendiri!");
+            set(ref(db, `req/${tu}/${myUID}`), { from: myUID });
+            showToast("REQ TERKIRIM!"); toggleMenu();
         }
     };
 
@@ -342,10 +360,11 @@
         onValue(ref(db, `req/${myUID}`), (snap) => {
             if(!snap.exists()) return showToast("Kosong.");
             snap.forEach(c => {
-                if(confirm(`Terima ${c.key}?`)) {
+                if(confirm(`Terima pertemanan dari ${c.key}?`)) {
                     set(ref(db, `users/${myUID}/friends/${c.key}`), true);
                     set(ref(db, `users/${c.key}/friends/${myUID}`), true);
                     remove(ref(db, `req/${myUID}/${c.key}`));
+                    showToast("Berhasil Berteman!");
                 }
             });
         }, {onlyOnce: true});
