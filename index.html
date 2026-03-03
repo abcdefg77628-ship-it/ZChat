@@ -3,128 +3,356 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZChat Pro - V11 Anti-Stuck</title>
+    <title>ZChat Ultimate V13 - 400+ Lines Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
+        /* --- CORE VARIABLES --- */
         :root {
-            --bg-dark: #070707;
-            --sidebar-color: #0f1012;
-            --friend-list-bg: #151619;
-            --chat-bg: radial-gradient(circle at center, #001a4d 0%, #000000 100%);
-            --accent-z: #00d4ff;
-            --msg-sent: #004d40;
-            --msg-rec: #262626;
-            --panel-bg: #121315;
-            --anim-speed: 0.25s;
+            --bg-deep: #050505;
+            --bg-sidebar: #111214;
+            --bg-channel: #2b2d31;
+            --bg-chat: #313338;
+            --accent-z: #5865f2; /* Discord Blurple */
+            --accent-cyan: #00d4ff;
+            --text-main: #dbdee1;
+            --text-muted: #949ba4;
+            --msg-sent: #3e45d1;
+            --msg-rec: #383a40;
+            --danger: #ed4245;
+            --success: #23a55a;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background-color: var(--bg-dark); color: white; height: 100vh; overflow: hidden; }
+        /* --- RESET & BASE --- */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Inter', sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+        }
 
-        /* --- ANIMATIONS --- */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes pop { from { transform: scale(0.9); } to { transform: scale(1); } }
+        body { 
+            background-color: var(--bg-deep); 
+            color: var(--text-main); 
+            height: 100vh; 
+            display: flex; 
+            overflow: hidden;
+        }
 
-        /* --- UI LAYOUT --- */
-        .app-container { display: none; height: 100vh; grid-template-columns: 70px 280px 1fr; animation: fadeIn var(--anim-speed); }
-        .nav-left { background: var(--sidebar-color); border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 20px; }
-        .nav-icon { width: 50px; height: 50px; border-radius: 15px; background: #1e1f22; cursor: pointer; display: flex; align-items: center; justify-content: center; border: 1px solid #222; overflow: hidden; transition: 0.2s; }
-        .nav-icon:hover { border-color: var(--accent-z); }
+        /* --- DISCORD SIDEBAR (GAK BAKAL KEPOTONG) --- */
+        .sidebar-guilds {
+            width: 72px;
+            background-color: #1e1f22;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 0;
+            gap: 8px;
+            flex-shrink: 0;
+        }
 
-        .friend-panel { background: var(--friend-list-bg); border-right: 1px solid #000; display: flex; flex-direction: column; }
-        .friend-card { padding: 15px; margin: 5px 10px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; border: 1px solid transparent; animation: slideIn 0.3s ease; }
-        .friend-card.active { background: #2b2d31; border-color: var(--accent-z); }
+        .guild-icon {
+            width: 48px;
+            height: 48px;
+            background-color: var(--bg-channel);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
 
-        .chat-area { display: flex; flex-direction: column; background: var(--chat-bg); position: relative; }
-        .chat-header { height: 65px; background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(10px); display: flex; align-items: center; padding: 0 25px; justify-content: space-between; z-index: 100; border-bottom: 1px solid #1a1a1a; }
+        .guild-icon:hover, .guild-icon.active {
+            border-radius: 16px;
+            background-color: var(--accent-z);
+            color: white;
+        }
+
+        .guild-icon img { width: 100%; height: 100%; object-fit: cover; }
+
+        .guild-separator {
+            width: 32px;
+            height: 2px;
+            background: #35363c;
+            border-radius: 1px;
+            margin: 4px 0;
+        }
+
+        /* --- CHANNEL / FRIEND LIST --- */
+        .sidebar-channels {
+            width: 240px;
+            background-color: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .channel-header {
+            height: 48px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+            font-size: 14px;
+        }
+
+        .channel-list {
+            flex: 1;
+            padding: 8px;
+            overflow-y: auto;
+        }
+
+        .friend-btn {
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+            transition: 0.1s;
+        }
+
+        .friend-btn:hover, .friend-btn.active {
+            background-color: #3f4147;
+            color: white;
+        }
+
+        .friend-btn .avatar-mini {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #444;
+            position: relative;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            border: 2px solid var(--bg-sidebar);
+        }
+
+        /* --- MAIN CHAT SECTION --- */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-chat);
+            position: relative;
+        }
+
+        .chat-top-bar {
+            height: 48px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message-group {
+            display: flex;
+            gap: 16px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .msg-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #555;
+            flex-shrink: 0;
+        }
+
+        .msg-content { flex: 1; }
+        .msg-author { font-weight: 600; font-size: 14px; color: white; display: flex; align-items: center; gap: 8px; }
+        .msg-time { font-size: 10px; color: var(--text-muted); font-weight: 400; }
+        .msg-text { font-size: 15px; color: #dbdee1; margin-top: 2px; line-height: 1.3; }
+
+        /* --- CHAT INPUT (ANTI-KEPOTONG VERSION) --- */
+        .chat-input-area {
+            padding: 0 16px 24px 16px; /* Padding bawah extra untuk mobile nav */
+            background: transparent;
+        }
+
+        .input-wrapper {
+            background-color: #383a40;
+            border-radius: 8px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 15px;
+            outline: none;
+        }
+
+        /* --- MODALS & DRAWER --- */
+        .z-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 5000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .z-modal-content {
+            background: var(--bg-chat);
+            width: 100%;
+            max-width: 440px;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        .z-btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .btn-primary { background: var(--accent-z); color: white; }
+        .btn-primary:hover { background: #4752c4; }
         
-        .messages-container { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
-        .msg { max-width: 75%; padding: 12px 16px; border-radius: 15px; font-size: 14px; line-height: 1.5; word-wrap: break-word; animation: pop 0.2s ease-out; }
-        .msg.sent { align-self: flex-end; background: var(--msg-sent); border-bottom-right-radius: 2px; }
-        .msg.received { align-self: flex-start; background: var(--msg-rec); border-bottom-left-radius: 2px; }
-
-        .input-bar { padding: 20px; background: #0f1012; display: flex; gap: 12px; border-top: 1px solid #1a1a1a; }
-        input { flex: 1; padding: 14px; background: #1e1f22; border: 1px solid #333; color: white; border-radius: 8px; outline: none; }
-        .btn-send { background: var(--accent-z); color: black; border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-
-        /* --- MOBILE --- */
+        /* --- MOBILE RESPONSIVE --- */
         @media (max-width: 768px) {
-            .app-container { grid-template-columns: 1fr; }
-            .nav-left { display: none; }
-            .friend-panel { position: fixed; left: -100%; top: 0; width: 85%; height: 100%; z-index: 1000; transition: 0.3s; }
-            .friend-panel.active { left: 0; box-shadow: 10px 0 50px black; }
+            .sidebar-channels {
+                position: fixed;
+                left: -240px;
+                top: 0;
+                bottom: 0;
+                z-index: 1000;
+            }
+            .sidebar-channels.active { transform: translateX(240px); }
+            .sidebar-guilds { width: 60px; }
         }
 
-        /* --- COMPONENTS --- */
-        .slide-menu { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: var(--panel-bg); z-index: 10000; transition: 0.3s; padding: 30px; }
-        .slide-menu.active { right: 0; }
-        .menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; backdrop-filter: blur(4px); }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 20000; display: none; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: #18191c; width: 100%; max-width: 400px; border-radius: 15px; padding: 30px; border: 1px solid #333; text-align: center; }
-        
-        .btn-z { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px; }
-        .btn-primary { background: var(--accent-z); color: black; }
-        .btn-secondary { background: #2b2d31; color: white; border: 1px solid #444; }
+        /* NOTIF BOX */
+        #z-notif {
+            position: fixed;
+            top: 20px;
+            right: -300px;
+            background: var(--accent-z);
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 9999;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
 
-    <div id="notif-box" style="position:fixed; top:-100px; left:50%; transform:translateX(-50%); background:#1e1f22; border:1px solid var(--accent-z); padding:12px 25px; z-index:50000; transition:0.4s; font-size:12px; border-radius:50px;"></div>
-    <div id="menu-overlay" class="menu-overlay" onclick="toggleMenu()"></div>
+    <div id="z-notif">Notifikasi</div>
 
-    <div id="auth-screen" style="position:fixed; inset:0; background:black; z-index:40000; display:flex; justify-content:center; align-items:center;">
-        <div style="background:#111; padding:45px; border-radius:20px; width:360px; text-align:center; border:1px solid #222;">
-            <h1 style="color:var(--accent-z); font-size:35px; letter-spacing:8px; margin-bottom:5px">ZCHAT</h1>
-            <p style="font-size:10px; color:#555; margin-bottom:30px; letter-spacing:3px">ELITE VERSION V11</p>
-            <input type="text" id="auth-user" placeholder="USERNAME" style="margin-bottom:10px; width:100%; padding:12px; background:#1e1f22; border:1px solid #333; color:white; border-radius:8px; outline:none;">
-            <input type="password" id="auth-pass" placeholder="PASSWORD" style="width:100%; padding:12px; background:#1e1f22; border:1px solid #333; color:white; border-radius:8px; outline:none;">
-            <button class="btn-z btn-primary" id="go-login" style="margin-top:20px">LOGIN</button>
-            <button class="btn-z btn-secondary" id="go-reg">DAFTAR AKUN BARU</button>
+    <div class="sidebar-guilds">
+        <div class="guild-icon active" onclick="location.reload()">
+            <span style="font-weight: bold;">Z</span>
+        </div>
+        <div class="guild-separator"></div>
+        <div class="guild-icon" onclick="toggleFriendBar()">
+            <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=friends" alt="Friends">
+        </div>
+        <div class="guild-icon" onclick="openMenu()">
+            <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=setup" alt="Settings">
+        </div>
+        <div style="flex: 1;"></div>
+        <div class="guild-icon" onclick="openProfile()">
+            <img id="my-avatar-img" src="https://api.dicebear.com/7.x/pixel-art/svg?seed=user" alt="Me">
         </div>
     </div>
 
-    <div class="app-container" id="main-app">
-        <div class="nav-left">
-            <div class="nav-icon" style="background:var(--accent-z); color:black; font-weight:bold; font-size:20px">Z</div>
-            <div class="nav-icon" onclick="openProfile()"><img id="my-avatar" src="" style="width:100%"></div>
-        </div>
-
-        <div class="friend-panel" id="friend-panel">
-            <div style="padding:25px; background:rgba(0,0,0,0.2); display:flex; justify-content:space-between; align-items:center">
-                <span style="font-size:11px; font-weight:bold; letter-spacing:2px; color:var(--accent-z)">KONTAK</span>
-                <button onclick="toggleFPanel()" style="background:none; border:none; color:#555; font-size:20px">&times;</button>
-            </div>
-            <div id="friend-list-area" style="flex:1; overflow-y:auto"></div>
-        </div>
-
-        <div class="chat-area">
-            <div class="chat-header">
-                <button onclick="toggleFPanel()" style="background:#1e1f22; border:1px solid #333; color:white; padding:8px 15px; border-radius:8px; font-size:11px; font-weight:bold" id="mobile-btn">TEMAN</button>
-                <div id="active-title" style="font-weight:bold; letter-spacing:1px">PILIH CHAT</div>
-                <div onclick="toggleMenu()" style="cursor:pointer; background:var(--accent-z); color:black; padding:6px 15px; border-radius:6px; font-size:11px; font-weight:bold">MENU</div>
-            </div>
-            <div class="messages-container" id="chat-box"></div>
-            <div class="input-bar">
-                <input type="text" id="chat-input" placeholder="Tulis pesan..." onkeypress="if(event.key=='Enter') pushChat()">
-                <button class="btn-send" onclick="pushChat()">KIRIM</button>
+    <div class="sidebar-channels" id="friend-sidebar">
+        <div class="channel-header">PESAN LANGSUNG</div>
+        <div class="channel-list" id="contact-list">
+            <div style="text-align: center; color: var(--text-muted); font-size: 11px; margin-top: 20px;">
+                KLIK ICON TEMAN DI KIRI<br>UNTUK BUKA DAFTAR
             </div>
         </div>
     </div>
 
-    <div id="slide-menu" class="slide-menu">
-        <h3 style="color:var(--accent-z); margin-bottom:30px; font-size:14px; border-bottom:1px solid #333; padding-bottom:10px">Z-MENU</h3>
-        <button class="btn-z btn-secondary" onclick="uiAddFriend()">TAMBAH TEMAN</button>
-        <button class="btn-z btn-secondary" onclick="uiRequests()">PERMINTAAN <span id="req-count" style="color:var(--accent-z)"></span></button>
-        <button class="btn-z btn-secondary" onclick="openProfile()">PROFIL SAYA</button>
-        <div style="height:50px"></div>
-        <button class="btn-z btn-secondary" onclick="logout()" style="border-color:#f44; color:#f44">LOGOUT</button>
+    <div class="chat-container">
+        <div id="auth-overlay" style="position: absolute; inset: 0; background: var(--bg-deep); z-index: 10000; display: flex; justify-content: center; align-items: center; padding: 30px;">
+            <div style="width: 100%; max-width: 380px; text-align: center;">
+                <h2 style="color: white; font-size: 24px; margin-bottom: 8px;">Selamat Datang Kembali!</h2>
+                <p style="color: var(--text-muted); margin-bottom: 24px;">ZChat Ultimate V13 - Professional AI Chat</p>
+                <div style="text-align: left; margin-bottom: 16px;">
+                    <label style="font-size: 12px; font-weight: 700; color: var(--text-muted);">USERNAME</label>
+                    <input type="text" id="login-user" style="width: 100%; padding: 10px; background: #1e1f22; border: none; color: white; border-radius: 4px; margin-top: 8px;">
+                </div>
+                <div style="text-align: left; margin-bottom: 24px;">
+                    <label style="font-size: 12px; font-weight: 700; color: var(--text-muted);">PASSWORD</label>
+                    <input type="password" id="login-pass" style="width: 100%; padding: 10px; background: #1e1f22; border: none; color: white; border-radius: 4px; margin-top: 8px;">
+                </div>
+                <button class="z-btn btn-primary" onclick="handleAuth('LOGIN')">Masuk</button>
+                <button class="z-btn" style="background: transparent; color: var(--accent-cyan); font-size: 13px;" onclick="handleAuth('REG')">Butuh akun? Daftar sekarang</button>
+            </div>
+        </div>
+
+        <div class="chat-top-bar">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="color: var(--text-muted); font-size: 20px;">@</span>
+                <span id="active-chat-name" style="font-weight: 600;">Pilih Teman</span>
+            </div>
+            <div style="color: var(--text-muted); font-size: 12px; font-weight: 600;">ULTIMATE V13</div>
+        </div>
+
+        <div class="chat-messages" id="message-flow">
+            <div style="margin: auto; text-align: center; color: var(--text-muted);">
+                <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=ZChat" style="width: 80px; opacity: 0.2;">
+                <p style="margin-top: 10px;">Mulai percakapan di ZChat</p>
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <div class="input-wrapper">
+                <input type="text" id="main-input" placeholder="Ketik pesan..." onkeypress="if(event.key=='Enter') processSend()">
+                <button onclick="processSend()" style="background: none; border: none; color: var(--accent-cyan); font-weight: 700; cursor: pointer;">KIRIM</button>
+            </div>
+        </div>
     </div>
 
-    <div id="modal-wrap" class="modal-overlay">
-        <div class="modal-content">
-            <h3 id="modal-head" style="margin-bottom:20px; color:var(--accent-z)"></h3>
-            <div id="modal-body"></div>
-            <button class="btn-z btn-secondary" onclick="closeModal()" style="margin-top:15px">TUTUP</button>
+    <div class="z-modal" id="z-modal-wrapper">
+        <div class="z-modal-content">
+            <h3 id="modal-title" style="margin-bottom: 16px;">Title</h3>
+            <div id="modal-body-content"></div>
+            <button class="z-btn" onclick="closeZModal()" style="background: #4e5058; color: white; margin-top: 16px;">Tutup</button>
         </div>
     </div>
 
@@ -132,160 +360,169 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, push, onValue, remove, update, onDisconnect, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+        // --- CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
             authDomain: "zchat-56639.firebaseapp.com",
             databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "zchat-56639",
             storageBucket: "zchat-56639.firebasestorage.app",
-            messagingSenderId: "773931983053",
             appId: "1:773931983053:web:a1c825be9a972e53dcc984"
         };
 
+        // --- INITIALIZATION ---
+        console.log("[ZChat System] Initializing components...");
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        let myID = null;
-        let chatTarget = null;
+        
+        let currentUser = localStorage.getItem('z_user_id');
+        let activeTarget = null;
+        let myData = null;
 
-        window.showNotif = (m) => { const b = document.getElementById('notif-box'); b.innerText = m; b.style.top = '25px'; setTimeout(() => b.style.top = '-100px', 2500); };
-        window.toggleMenu = () => { document.getElementById('slide-menu').classList.toggle('active'); document.getElementById('menu-overlay').style.display = document.getElementById('slide-menu').classList.contains('active') ? 'block' : 'none'; };
-        window.toggleFPanel = () => document.getElementById('friend-panel').classList.toggle('active');
-        window.closeModal = () => document.getElementById('modal-wrap').style.display = 'none';
-        window.logout = () => { localStorage.clear(); location.reload(); };
-
-        // --- PERSISTENT LOGIN ENGINE ---
-        async function checkSession() {
-            const saved = localStorage.getItem('zchat_user');
-            if(saved) {
-                const s = await get(ref(db, 'users/'+saved));
-                if(s.exists()) startApp(saved); else showAuth();
-            } else { showAuth(); }
-        }
-
-        function showAuth() { document.getElementById('auth-screen').style.display = 'flex'; }
-
-        document.getElementById('go-login').onclick = async () => {
-            const u = document.getElementById('auth-user').value.trim().toUpperCase();
-            const p = document.getElementById('auth-pass').value.trim();
-            if(!u || !p) return showNotif("ISI DATA");
-            const s = await get(ref(db, 'users/'+u));
-            if(s.exists() && s.val().password === p) startApp(u); else showNotif("LOGIN GAGAL");
+        // --- CORE UTILS ---
+        window.alertZ = (msg) => {
+            const n = document.getElementById('z-notif');
+            n.innerText = msg; n.style.right = '20px';
+            setTimeout(() => n.style.right = '-300px', 3000);
         };
 
-        document.getElementById('go-reg').onclick = async () => {
-            const u = document.getElementById('auth-user').value.trim().toUpperCase();
-            const p = document.getElementById('auth-pass').value.trim();
-            if(u.length < 3) return showNotif("MIN 3 HURUF");
-            const s = await get(ref(db, 'users/'+u));
-            if(s.exists()) return showNotif("USER ADA");
-            await set(ref(db, 'users/'+u), {password:p, nickname:u, avatar: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${u}`, bio: "ZChat User"});
-            startApp(u);
+        window.toggleFriendBar = () => {
+            document.getElementById('friend-sidebar').classList.toggle('active');
         };
 
-        async function startApp(u) {
-            myID = u; localStorage.setItem('zchat_user', u);
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('main-app').style.display = 'grid';
-            const s = await get(ref(db, 'users/'+u));
-            document.getElementById('my-avatar').src = s.val().avatar;
-            update(ref(db, 'status/'+u), {online:true, avatar:s.val().avatar});
-            onDisconnect(ref(db, 'status/'+u)).update({online:false});
-            loadContacts(); trackRequests();
+        window.closeZModal = () => document.getElementById('z-modal-wrapper').style.display = 'none';
+
+        // --- AUTH LOGIC ---
+        window.handleAuth = async (type) => {
+            const u = document.getElementById('login-user').value.trim().toUpperCase();
+            const p = document.getElementById('login-pass').value.trim();
+            
+            if(u.length < 3) return alertZ("Username minimal 3 karakter!");
+            
+            if(type === 'REG') {
+                const check = await get(ref(db, `users/${u}`));
+                if(check.exists()) return alertZ("User sudah terdaftar!");
+                
+                const avatarUrl = `https://api.dicebear.com/7.x/pixel-art/svg?seed=${u}_${Math.floor(Math.random()*1000)}`;
+                await set(ref(db, `users/${u}`), {
+                    password: p,
+                    avatar: avatarUrl,
+                    bio: "Bussy using ZChat Ultimate",
+                    created: Date.now()
+                });
+                alertZ("Berhasil Daftar!");
+                initApp(u);
+            } else {
+                const snap = await get(ref(db, `users/${u}`));
+                if(snap.exists() && snap.val().password === p) {
+                    initApp(u);
+                } else {
+                    alertZ("Username atau Password salah!");
+                }
+            }
+        };
+
+        async function initApp(id) {
+            currentUser = id;
+            localStorage.setItem('z_user_id', id);
+            document.getElementById('auth-overlay').style.display = 'none';
+            
+            const snap = await get(ref(db, `users/${id}`));
+            myData = snap.val();
+            document.getElementById('my-avatar-img').src = myData.avatar;
+            
+            // Online Sync
+            const statusRef = ref(db, `status/${id}`);
+            update(statusRef, { online: true, last_seen: Date.now(), avatar: myData.avatar });
+            onDisconnect(statusRef).update({ online: false, last_seen: Date.now() });
+            
+            console.log(`[ZChat] Logged in as ${id}`);
+            syncContacts();
+            listenRequests();
         }
 
-        function loadContacts() {
-            onValue(ref(db, `users/${myID}/friends`), (snap) => {
-                const area = document.getElementById('friend-list-area'); area.innerHTML = '';
-                snap.forEach(c => {
-                    onValue(ref(db, 'status/'+c.key), (st) => {
-                        const d = st.val();
-                        let old = document.getElementById('c-'+c.key); if(old) old.remove();
-                        const card = document.createElement('div');
-                        card.id = 'c-'+c.key; card.className = `friend-card ${chatTarget===c.key?'active':''}`;
-                        card.innerHTML = `<img src="${d.avatar}" style="width:38px; border-radius:10px">
-                                          <div><b>${c.key}</b><br><small style="color:${d.online?'var(--accent-z)':'#555'}">${d.online?'ONLINE':'OFFLINE'}</small></div>`;
-                        card.onclick = () => openChat(c.key);
-                        area.appendChild(card);
+        // --- CONTACT SYSTEM ---
+        function syncContacts() {
+            onValue(ref(db, `users/${currentUser}/friends`), (snap) => {
+                const list = document.getElementById('contact-list');
+                list.innerHTML = '';
+                
+                if(!snap.exists()) {
+                    list.innerHTML = `<div style="padding:20px; text-align:center; color:#555; font-size:12px;">Gak ada teman. Tambah yuk!</div>`;
+                }
+
+                snap.forEach(child => {
+                    const friendID = child.key;
+                    onValue(ref(db, `status/${friendID}`), (sSnap) => {
+                        const s = sSnap.val();
+                        let existing = document.getElementById(`f-card-${friendID}`);
+                        if(existing) existing.remove();
+                        
+                        const div = document.createElement('div');
+                        div.id = `f-card-${friendID}`;
+                        div.className = `friend-btn ${activeTarget === friendID ? 'active' : ''}`;
+                        div.innerHTML = `
+                            <div class="avatar-mini">
+                                <img src="${s.avatar}" style="width:100%; border-radius:50%">
+                                <div class="status-dot" style="background: ${s.online ? 'var(--success)' : '#555'}"></div>
+                            </div>
+                            <div style="flex:1; overflow:hidden">
+                                <div style="font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${friendID}</div>
+                                <div style="font-size:11px; color:var(--text-muted)">${s.online ? 'Online' : 'Offline'}</div>
+                            </div>
+                        `;
+                        div.onclick = () => openChat(friendID);
+                        list.appendChild(div);
                     });
                 });
             });
         }
 
-        window.openChat = (id) => {
-            chatTarget = id; document.getElementById('active-title').innerText = id;
-            if(window.innerWidth <= 768) toggleFPanel();
-            document.querySelectorAll('.friend-card').forEach(c => c.classList.remove('active'));
-            document.getElementById('c-'+id).classList.add('active');
-            const cID = [myID, id].sort().join('_');
-            onValue(ref(db, 'chats/'+cID), (snap) => {
-                const box = document.getElementById('chat-box'); box.innerHTML = '';
+        // --- CHAT ENGINE ---
+        window.openChat = (target) => {
+            activeTarget = target;
+            document.getElementById('active-chat-name').innerText = target;
+            document.querySelectorAll('.friend-btn').forEach(b => b.classList.remove('active'));
+            const card = document.getElementById(`f-card-${target}`);
+            if(card) card.classList.add('active');
+            
+            if(window.innerWidth <= 768) toggleFriendBar();
+            
+            const chatID = [currentUser, target].sort().join('___');
+            onValue(ref(db, `chats/${chatID}`), (snap) => {
+                const box = document.getElementById('message-flow');
+                box.innerHTML = '';
+                
                 snap.forEach(m => {
-                    const d = m.val(); const div = document.createElement('div');
-                    div.className = `msg ${d.s===myID?'sent':'received'}`;
-                    div.innerText = d.c; box.appendChild(div);
+                    const d = m.val();
+                    const isMe = d.s === currentUser;
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = 'message-group';
+                    msgDiv.innerHTML = `
+                        <img src="${isMe ? myData.avatar : 'https://api.dicebear.com/7.x/pixel-art/svg?seed='+target}" class="msg-avatar">
+                        <div class="msg-content">
+                            <div class="msg-author">${d.s} <span class="msg-time">${new Date(d.t).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span></div>
+                            <div class="msg-text">${d.c}</div>
+                        </div>
+                    `;
+                    box.appendChild(msgDiv);
                 });
                 box.scrollTop = box.scrollHeight;
             });
         };
 
-        window.pushChat = () => {
-            const i = document.getElementById('chat-input'); if(!i.value || !chatTarget) return;
-            const cID = [myID, chatTarget].sort().join('_');
-            push(ref(db, 'chats/'+cID), {s:myID, c:i.value}); i.value = '';
-        };
-
-        window.uiAddFriend = () => {
-            toggleMenu();
-            document.getElementById('modal-head').innerText = "TAMBAH TEMAN";
-            document.getElementById('modal-body').innerHTML = `<input type="text" id="target-id" placeholder="USERNAME" style="width:100%; padding:10px; background:#111; border:1px solid #333; color:white; border-radius:8px"><button class="btn-z btn-primary" id="btn-do-add">KIRIM</button>`;
-            document.getElementById('modal-wrap').style.display = 'flex';
-            document.getElementById('btn-do-add').onclick = async () => {
-                const t = document.getElementById('target-id').value.toUpperCase();
-                if(!t || t===myID) return showNotif("ERROR");
-                await set(ref(db, `req/${t}/${myID}`), {from:myID});
-                showNotif("TERKIRIM"); closeModal();
-            };
-        };
-
-        function trackRequests() {
-            onValue(ref(db, `req/${myID}`), (s) => {
-                let count = 0; s.forEach(() => count++);
-                document.getElementById('req-count').innerText = count > 0 ? `(${count})` : '';
+        window.processSend = () => {
+            const input = document.getElementById('main-input');
+            if(!input.value || !activeTarget) return;
+            
+            const chatID = [currentUser, activeTarget].sort().join('___');
+            push(ref(db, `chats/${chatID}`), {
+                s: currentUser,
+                c: input.value,
+                t: Date.now()
             });
-        }
-
-        window.uiRequests = () => {
-            toggleMenu();
-            onValue(ref(db, `req/${myID}`), (snap) => {
-                let h = ''; snap.forEach(c => {
-                    h += `<div style="display:flex; justify-content:space-between; align-items:center; background:#111; padding:10px; margin-bottom:5px; border-radius:8px">
-                            <span>${c.key}</span><button class="btn-z btn-primary" style="width:auto; padding:5px 15px" onclick="actAcc('${c.key}')">ACC</button>
-                          </div>`;
-                });
-                document.getElementById('modal-head').innerText = "PERMINTAAN";
-                document.getElementById('modal-body').innerHTML = h || "KOSONG";
-                document.getElementById('modal-wrap').style.display = 'flex';
-            }, {onlyOnce:true});
+            input.value = '';
         };
 
-        window.actAcc = async (u) => {
-            await set(ref(db, `users/${myID}/friends/${u}`), true);
-            await set(ref(db, `users/${u}/friends/${myID}`), true);
-            await remove(ref(db, `req/${myID}/${u}`));
-            showNotif("BERTEMAN"); closeModal();
-        };
-
-        window.openProfile = async () => {
-            if(document.getElementById('slide-menu').classList.contains('active')) toggleMenu();
-            const s = await get(ref(db, 'users/'+myID));
-            const d = s.val();
-            document.getElementById('modal-head').innerText = "PROFIL";
-            document.getElementById('modal-body').innerHTML = `<img src="${d.avatar}" style="width:70px; border-radius:15px; border:2px solid var(--accent-z)"><br><br><b>${myID}</b><p style="font-size:12px; color:#555">${d.bio}</p>`;
-            document.getElementById('modal-wrap').style.display = 'flex';
-        };
-
-        checkSession();
-    </script>
-</body>
-    </html>
-    
+        // --- MODAL FEATURES ---
+        window.openMenu
