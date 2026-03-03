@@ -317,6 +317,71 @@
         async function kick(n) { if(confirm("Ban "+n+"?")) { await db.ref('u/'+n).remove(); openAdm(); } }
         function clearDB() { if(confirm("Purge history?")) db.ref('m').remove(); }
         function logout() { location.reload(); }
+        /* --- PENYEMPURNAAN LOGIKA PERTEMANAN --- */
+
+        // Fungsi kirim permintaan pertemanan (Bukan langsung jadi teman)
+        function promptAddFriend() {
+            showModal("Connect New User", "Type username to invite...", (val) => {
+                if (val && val.toLowerCase() !== me.u) {
+                    const target = val.toLowerCase();
+                    // Cek dulu apakah user yang di-add ada di database
+                    db.ref('u/' + target).once('value', s => {
+                        if (s.exists()) {
+                            db.ref('req/' + target + '/' + me.u).set(true);
+                            tst("Invitation sent to " + target);
+                        } else {
+                            tst("User not found!");
+                        }
+                    });
+                }
+            });
+        }
+
+        // Fungsi buka daftar permintaan (Request List)
+        function toggleReqList() {
+            const listArea = document.getElementById('req-list');
+            if (listArea.style.display === 'block') {
+                listArea.style.display = 'none';
+            } else {
+                listArea.style.display = 'block';
+                tst("Checking pending requests...");
+            }
+        }
+
+        // Listener otomatis untuk Badge Notifikasi di Sidebar
+        db.ref('req/' + me.u).on('value', snap => {
+            const nb = document.getElementById('nb');
+            const count = snap.numChildren();
+            if (count > 0) {
+                nb.innerText = count;
+                nb.classList.remove('hidden');
+                // Efek glow sedikit pada menu request kalau ada pesan masuk
+                document.querySelector('.side-item:nth-child(3)').style.borderColor = 'var(--accent)';
+            } else {
+                nb.classList.add('hidden');
+                document.querySelector('.side-item:nth-child(3)').style.borderColor = 'var(--border)';
+            }
+        });
+
+        /* --- PENYEMPURNAAN UI SIDEBAR --- */
+        // Tambahkan CSS ini di bagian <style> lo untuk mempercantik teks Hak Cipta
+        /*
+        .legal-footer {
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid #222;
+            background: rgba(255,255,255,0.02);
+            border-radius: 0 0 12px 12px;
+        }
+        .legal-text {
+            font-size: 9px;
+            color: #555;
+            text-align: justify;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            line-height: 1.6;
+        }
+        */
     </script>
 </body>
 </html>
