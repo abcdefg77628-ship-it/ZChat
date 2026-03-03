@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZChat</title>
+    <title>ZChat Ultimate</title>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -22,16 +22,14 @@
             --green: #4cd964;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         .hidden { display: none !important; }
 
-        /* --- ANIMATIONS --- */
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-
-        /* --- UI COMPONENTS --- */
+        /* ANIMATIONS */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* UI ELEMENTS */
         input {
             width: 100%; padding: 16px; margin-bottom: 15px; background: var(--surface);
             border: 1px solid var(--border); border-radius: 12px; color: #fff; font-size: 16px; outline: none;
@@ -41,12 +39,7 @@
         .btn-p { width: 100%; padding: 16px; background: var(--blue); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.2s; }
         .btn-p:active { transform: scale(0.96); }
 
-        /* --- AUTH SCREEN --- */
-        #page-auth { flex: 1; display: flex; align-items: center; justify-content: center; padding: 25px; }
-        .auth-card { background: var(--card); width: 100%; max-width: 380px; padding: 40px; border-radius: 25px; border: 1px solid var(--border); text-align: center; animation: slideUp 0.5s ease; }
-        .z-logo { width: 70px; height: 70px; background: var(--blue); margin: 0 auto 25px; border-radius: 18px; line-height: 70px; font-size: 40px; font-weight: 900; box-shadow: 0 0 20px var(--blue-glow); }
-
-        /* --- MAIN HEADER --- */
+        /* HEADER */
         header { background: var(--card); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--blue); z-index: 100; }
         .nav-icon { position: relative; cursor: pointer; width: 25px; height: 18px; display: flex; flex-direction: column; justify-content: space-between; }
         .nav-icon span { height: 3px; background: var(--blue); border-radius: 10px; width: 100%; }
@@ -55,82 +48,50 @@
             position: absolute; top: -8px; right: -8px; background: var(--red); color: white;
             font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: flex;
             align-items: center; justify-content: center; font-weight: bold; border: 2px solid var(--card);
-            animation: pop 0.5s infinite;
         }
 
-        /* --- SIDEBAR & INBOX --- */
+        /* SIDEBAR */
         #sidebar-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 500; display: none; }
         #sidebar {
             position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
             background: var(--card); z-index: 501; transition: 0.4s; padding: 30px; border-left: 1px solid var(--blue);
         }
         #sidebar.active { right: 0; }
-        .side-title { color: var(--blue); font-size: 12px; letter-spacing: 2px; font-weight: 900; margin-bottom: 20px; }
+        .side-title { color: var(--blue); font-size: 11px; letter-spacing: 2px; font-weight: 900; margin-bottom: 20px; text-transform: uppercase; }
         
-        .req-card {
-            background: var(--surface); padding: 12px; border-radius: 10px; border: 1px solid var(--border);
-            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
-            animation: fadeIn 0.3s ease;
-        }
-        .btn-acc { background: var(--green); border: none; padding: 5px 10px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 11px; }
+        /* CARDS */
+        .card-item { background: var(--surface); padding: 12px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; animation: fadeIn 0.3s ease; }
+        .indicator { width: 10px; height: 10px; border-radius: 50%; background: var(--text-dim); }
 
-        /* --- FRIEND LIST --- */
-        .friend-card {
-            background: var(--card); padding: 18px; border-radius: 15px; margin-bottom: 12px;
-            border: 1px solid var(--border); display: flex; align-items: center; cursor: pointer;
-            transition: 0.3s;
-        }
-        .friend-card:hover { border-color: var(--blue); }
-        .avatar { width: 45px; height: 45px; background: var(--surface); border: 2px solid var(--blue); border-radius: 12px; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-
-        /* --- CHAT SCREEN --- */
+        /* CHAT WINDOW */
         #chat-window { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; animation: fadeIn 0.3s ease; }
-        #chat-logs { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        
-        .msg { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.4; animation: fadeIn 0.3s ease; }
+        #chat-logs { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 20px 20px; }
+        .msg { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 14px; position: relative; line-height: 1.4; }
         .msg-me { align-self: flex-end; background: var(--blue); border-bottom-right-radius: 2px; }
         .msg-them { align-self: flex-start; background: var(--card); border: 1px solid var(--border); border-bottom-left-radius: 2px; }
-        .msg-time { font-size: 9px; opacity: 0.5; margin-top: 5px; display: block; text-align: right; }
 
-        /* --- TOAST --- */
-        #toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: var(--blue); padding: 10px 20px; border-radius: 50px; font-weight: bold;
-            z-index: 2000; display: none; box-shadow: 0 5px 15px var(--blue-glow);
-        }
+        /* TOAST */
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--blue); padding: 10px 25px; border-radius: 50px; font-weight: bold; z-index: 5000; display: none; box-shadow: 0 5px 15px var(--blue-glow); }
     </style>
 </head>
 <body>
 
-    <div id="toast">Notifikasi</div>
+    <div id="toast">Notif</div>
 
-    <div id="page-auth">
-        <div id="form-login" class="auth-card">
-            <div class="z-logo">Z</div>
-            <h2 style="margin-bottom:20px">ZChat Login</h2>
-            <input type="text" id="l-user" placeholder="Username">
-            <input type="password" id="l-pass" placeholder="Password">
-            <button class="btn-p" onclick="doLogin()">MASUK</button>
-            <p style="margin-top:20px; color:var(--text-dim); font-size:14px" onclick="toggleAuth('reg')">
-                Belum punya akun? <b style="color:var(--blue)">Daftar</b>
-            </p>
-        </div>
-
-        <div id="form-reg" class="auth-card hidden">
-            <div class="z-logo">Z</div>
-            <h2 style="margin-bottom:20px">ZChat Register</h2>
-            <input type="text" id="r-user" placeholder="Buat Username">
-            <input type="password" id="r-pass" placeholder="Buat Password">
-            <button class="btn-p" onclick="doReg()">DAFTAR</button>
-            <p style="margin-top:20px; color:var(--text-dim); font-size:14px" onclick="toggleAuth('log')">
-                Sudah punya akun? <b style="color:var(--blue)">Login</b>
-            </p>
+    <div id="page-auth" style="flex:1; display:flex; align-items:center; justify-content:center; padding:25px;">
+        <div id="auth-box" class="card-item" style="flex-direction:column; width:100%; max-width:380px; padding:40px; background:var(--card);">
+            <div style="font-size:40px; font-weight:900; color:var(--blue); margin-bottom:10px;">Z</div>
+            <h2 id="auth-title">Login</h2><br>
+            <input type="text" id="u-in" placeholder="Username">
+            <input type="password" id="p-in" placeholder="Password">
+            <button class="btn-p" id="auth-btn" onclick="handleAuth()">MASUK</button>
+            <p id="auth-toggle" onclick="toggleAuthMode()" style="margin-top:20px; color:var(--text-dim); font-size:14px; cursor:pointer;">Belum punya akun? <b style="color:var(--blue)">Daftar</b></p>
         </div>
     </div>
 
     <div id="page-main" class="hidden" style="flex:1; display:flex; flex-direction:column;">
         <header>
-            <div id="my-name" style="font-weight:900; font-size:12px; color:var(--blue)">@USER</div>
+            <div id="display-u" style="font-weight:900; font-size:11px; color:var(--blue)">@USER</div>
             <div style="font-weight:900; letter-spacing:3px">ZCHAT</div>
             <div class="nav-icon" onclick="toggleSidebar(true)">
                 <span></span><span></span><span></span>
@@ -140,156 +101,166 @@
 
         <div id="sidebar-mask" onclick="toggleSidebar(false)"></div>
         <nav id="sidebar">
-            <div class="side-title">KOTAK MASUK</div>
-            <div id="inbox-area"></div>
+            <div class="side-title">Kotak Masuk</div>
+            <div id="req-list"></div>
+            
+            <div id="admin-btn" class="hidden" onclick="openAdmin()" style="margin-top:30px; padding:15px; background:var(--surface); border:1px solid var(--blue); border-radius:10px; color:var(--blue); font-weight:bold; text-align:center; cursor:pointer;">ADMIN PANEL</div>
             
             <div style="position:absolute; bottom:30px; left:30px; right:30px">
                 <button class="btn-p" style="background:#1a1a1a; color:var(--red); border:1px solid var(--red)" onclick="logout()">LOGOUT</button>
             </div>
         </nav>
 
-        <div style="padding:25px; flex:1; overflow-y:auto">
-            <button class="btn-p" onclick="addFriendPrompt()" style="margin-bottom:25px">+ CARI TEMAN</button>
-            <p style="font-size:11px; color:var(--text-dim); margin-bottom:15px; letter-spacing:1px">TEMAN AKTIF</p>
+        <main style="padding:20px; flex:1; overflow-y:auto">
+            <button class="btn-p" onclick="addFriend()">+ CARI TEMAN</button><br><br>
+            <div class="side-title">Teman Saya</div>
             <div id="friend-list"></div>
-        </div>
+        </main>
     </div>
 
     <div id="chat-window" class="hidden">
         <header>
             <div onclick="closeChat()" style="cursor:pointer; font-weight:bold; color:var(--blue)">KEMBALI</div>
-            <div id="chat-target" style="font-weight:bold">NAME</div>
+            <div id="peer-name" style="font-weight:bold">NAME</div>
             <div style="width:50px"></div>
         </header>
         <div id="chat-logs"></div>
-        <div style="padding:15px; background:var(--card); display:flex; gap:10px; border-top:1px solid var(--border)">
-            <input id="chat-in" placeholder="Ketik pesan..." style="margin:0; flex:1">
+        <div style="padding:15px; background:var(--card); display:flex; gap:10px;">
+            <input id="msg-in" placeholder="Pesan..." style="margin:0; flex:1">
             <button class="btn-p" style="width:80px; margin:0" onclick="sendMsg()">KIRIM</button>
         </div>
     </div>
 
+    <div id="admin-panel" class="hidden" style="position:fixed; inset:0; background:var(--bg); z-index:5000; padding:25px; overflow-y:auto;">
+        <div onclick="document.getElementById('admin-panel').classList.add('hidden')" style="color:var(--blue); font-weight:bold; cursor:pointer; margin-bottom:20px;">← KEMBALI</div>
+        <h2>Data User Master</h2><br>
+        <div id="admin-list"></div>
+    </div>
+
     <script>
-        // --- FIREBASE CONFIG ---
-        const fbCfg = { databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app" };
-        firebase.initializeApp(fbCfg);
+        // CONFIG
+        const config = { databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app" };
+        firebase.initializeApp(config);
         const db = firebase.database();
+        const ADMIN_NAME = 'zZerr44'; // Nama akun kamu
 
         let me = null;
-        let activePeer = null;
+        let peer = null;
+        let isReg = false;
 
-        // --- UTILS ---
+        // UI HELPERS
         function toast(m){ const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); }
-        function toggleAuth(v){
-            document.getElementById('form-login').classList.toggle('hidden', v==='reg');
-            document.getElementById('form-reg').classList.toggle('hidden', v==='log');
-        }
-        function toggleSidebar(s){
-            document.getElementById('sidebar').classList.toggle('active', s);
-            document.getElementById('sidebar-mask').style.display = s ? 'block' : 'none';
+        function toggleAuthMode(){ isReg = !isReg; document.getElementById('auth-title').innerText = isReg ? 'Daftar' : 'Login'; document.getElementById('auth-btn').innerText = isReg ? 'BUAT AKUN' : 'MASUK'; }
+        function toggleSidebar(s){ document.getElementById('sidebar').classList.toggle('active', s); document.getElementById('sidebar-mask').style.display = s ? 'block' : 'none'; }
+
+        // AUTH
+        async function handleAuth(){
+            const u = document.getElementById('u-in').value.trim().toLowerCase();
+            const p = document.getElementById('p-in').value;
+            if(u.length < 3) return toast("Min. 3 karakter");
+
+            if(isReg){
+                const s = await db.ref('u/'+u).once('value');
+                if(s.exists()) return toast("Username sudah ada");
+                await db.ref('u/'+u).set({ u, p });
+                toast("Daftar sukses! Silakan login.");
+                toggleAuthMode();
+            } else {
+                const s = await db.ref('u/'+u).once('value');
+                if(s.exists() && s.val().p === p){
+                    me = s.val();
+                    localStorage.setItem('z_sess', JSON.stringify(me));
+                    startApp();
+                } else toast("Salah username/password");
+            }
         }
 
-        // --- AUTH SYSTEM ---
-        async function doReg(){
-            const u = document.getElementById('r-user').value.trim().toLowerCase();
-            const p = document.getElementById('r-pass').value;
-            if(u.length < 3) return toast("Username minimal 3 huruf!");
-            const s = await db.ref('u/'+u).once('value');
-            if(s.exists()) return toast("Username sudah ada!");
-            await db.ref('u/'+u).set({ u, p });
-            toast("Daftar Berhasil! Silakan Login.");
-            toggleAuth('log');
-        }
-
-        async function doLogin(){
-            const u = document.getElementById('l-user').value.trim().toLowerCase();
-            const p = document.getElementById('l-pass').value;
-            const s = await db.ref('u/'+u).once('value');
-            if(s.exists() && s.val().p === p){
-                me = s.val();
-                localStorage.setItem('z_sess', JSON.stringify(me));
-                startApp();
-            } else toast("Username/Password salah!");
-        }
-
+        // START APP
         function startApp(){
             document.getElementById('page-auth').classList.add('hidden');
             document.getElementById('page-main').classList.remove('hidden');
-            document.getElementById('my-name').innerText = "@" + me.u.toUpperCase();
+            document.getElementById('display-u').innerText = "@"+me.u.toUpperCase();
+            
+            if(me.u === ADMIN_NAME) document.getElementById('admin-btn').classList.remove('hidden'); // Cek admin
+
+            // Status & Clean
+            db.ref('status/'+me.u).onDisconnect().set({ s:'off' });
+            db.ref('status/'+me.u).set({ s:'on' }); // Set online
+            cleanOld(); // Hapus pesan lama
+
             listenInbox();
             listenFriends();
         }
 
-        // --- SOCIAL ENGINE ---
-        async function addFriendPrompt(){
-            const t = prompt("Masukkan Username Teman:");
+        async function cleanOld(){
+            const limit = Date.now() - (3 * 24 * 60 * 60 * 1000);
+            const s = await db.ref('m').once('value');
+            s.forEach(room => room.forEach(msg => { if(msg.val().ts < limit) msg.ref.remove(); })); // Auto-clean
+        }
+
+        // SOCIAL
+        async function addFriend(){
+            const t = prompt("Cari Username:");
             if(!t || t.toLowerCase() === me.u) return;
             const s = await db.ref('u/'+t.toLowerCase()).once('value');
-            if(!s.exists()) return toast("User tidak ditemukan!");
-            
-            await db.ref('req/'+t.toLowerCase()+'/'+me.u).set({ from: me.u });
-            toast("Permintaan terkirim!");
+            if(!s.exists()) return toast("User tidak ditemukan");
+            await db.ref('req/'+t.toLowerCase()+'/'+me.u).set({ f: me.u });
+            toast("Terkirim!");
         }
 
         function listenInbox(){
             db.ref('req/'+me.u).on('value', snap => {
-                const area = document.getElementById('inbox-area');
+                const list = document.getElementById('req-list');
                 const badge = document.getElementById('notif-badge');
-                area.innerHTML = "";
-                let count = 0;
-                snap.forEach(c => {
-                    count++;
+                list.innerHTML = ""; let c = 0;
+                snap.forEach(i => {
+                    c++;
                     const div = document.createElement('div');
-                    div.className = "req-card";
-                    div.innerHTML = `<b>${c.key.toUpperCase()}</b><button class="btn-acc" onclick="accFriend('${c.key}')">TERIMA</button>`;
-                    area.appendChild(div);
+                    div.className = "card-item";
+                    div.innerHTML = `<b>${i.key}</b><button onclick="acc('${i.key}')" style="background:var(--green); border:none; padding:5px 10px; border-radius:5px; font-weight:bold">TERIMA</button>`;
+                    list.appendChild(div);
                 });
-                badge.innerText = count;
-                badge.classList.toggle('hidden', count === 0);
+                badge.innerText = c; badge.classList.toggle('hidden', c === 0);
             });
         }
 
-        async function accFriend(f){
+        async function acc(f){
             await db.ref('f/'+me.u+'/'+f).set(true);
             await db.ref('f/'+f+'/'+me.u).set(true);
             await db.ref('req/'+me.u+'/'+f).remove();
-            toast("Sekarang berteman!");
+            toast("Berteman!");
         }
 
         function listenFriends(){
             db.ref('f/'+me.u).on('value', snap => {
                 const list = document.getElementById('friend-list');
                 list.innerHTML = "";
-                snap.forEach(c => {
-                    const name = c.key;
+                snap.forEach(i => {
+                    const n = i.key;
                     const div = document.createElement('div');
-                    div.className = "friend-card";
-                    div.innerHTML = `
-                        <div class="avatar">${name[0].toUpperCase()}</div>
-                        <div style="flex:1"><b>${name.toUpperCase()}</b><br><small style="color:var(--text-dim)">Online</small></div>
-                        <div style="color:var(--blue)">Chat →</div>
-                    `;
-                    div.onclick = () => openChat(name);
+                    div.className = "card-item";
+                    div.innerHTML = `<div style="display:flex; align-items:center; gap:10px;"><div id="st-${n}" class="indicator"></div><b>${n.toUpperCase()}</b></div><span>Chat →</span>`;
+                    div.onclick = () => openChat(n);
                     list.appendChild(div);
+                    db.ref('status/'+n).on('value', s => { 
+                        const ind = document.getElementById('st-'+n);
+                        if(ind) ind.style.background = s.val()?.s === 'on' ? 'var(--green)' : 'var(--text-dim)'; // Lampu status
+                    });
                 });
             });
         }
 
-        // --- CHAT ENGINE ---
+        // CHAT
         function openChat(n){
-            activePeer = n;
-            document.getElementById('chat-target').innerText = n.toUpperCase();
+            peer = n; document.getElementById('peer-name').innerText = n.toUpperCase();
             document.getElementById('chat-window').classList.remove('hidden');
             const id = [me.u, n].sort().join('_');
-            
             db.ref('m/'+id).on('value', snap => {
-                const logs = document.getElementById('chat-logs');
-                logs.innerHTML = "";
+                const logs = document.getElementById('chat-logs'); logs.innerHTML = "";
                 snap.forEach(m => {
-                    const d = m.val();
-                    const isMe = d.s === me.u;
-                    const div = document.createElement('div');
-                    div.className = `msg ${isMe ? 'msg-me' : 'msg-them'}`;
-                    div.innerHTML = `${d.t}<span class="msg-time">${new Date(d.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>`;
+                    const d = m.val(); const isMe = d.s === me.u;
+                    const div = document.createElement('div'); div.className = `msg ${isMe ? 'msg-me' : 'msg-them'}`;
+                    div.innerHTML = `${d.t}<br><small style="font-size:8px; opacity:0.5">${new Date(d.ts).toLocaleTimeString()}</small>`;
                     logs.appendChild(div);
                 });
                 logs.scrollTop = logs.scrollHeight;
@@ -297,23 +268,36 @@
         }
 
         function sendMsg(){
-            const inp = document.getElementById('chat-in');
-            if(!inp.value.trim()) return;
-            const id = [me.u, activePeer].sort().join('_');
-            db.ref('m/'+id).push({ s: me.u, t: inp.value, ts: Date.now() });
-            inp.value = "";
+            const i = document.getElementById('msg-in'); if(!i.value.trim()) return;
+            const id = [me.u, peer].sort().join('_');
+            db.ref('m/'+id).push({ s: me.u, t: i.value, ts: Date.now() });
+            i.value = "";
         }
 
-        function closeChat(){
-            document.getElementById('chat-window').classList.add('hidden');
-            activePeer = null;
+        function closeChat(){ document.getElementById('chat-window').classList.add('hidden'); db.ref('m').off(); }
+
+        // ADMIN PANEL
+        async function openAdmin(){
+            toggleSidebar(false);
+            document.getElementById('admin-panel').classList.remove('hidden');
+            const list = document.getElementById('admin-list'); list.innerHTML = "Loading...";
+            const s = await db.ref('u').once('value');
+            list.innerHTML = "";
+            s.forEach(u => {
+                const d = u.val();
+                const div = document.createElement('div'); div.className = "card-item";
+                div.innerHTML = `<div><b>${d.u}</b><br><small>Pass: ${d.p}</small></div>
+                ${d.u !== ADMIN_NAME ? `<button onclick="kick('${d.u}')" style="background:var(--red); border:none; padding:5px 10px; border-radius:5px; color:white">HAPUS</button>` : 'OWNER'}`;
+                list.appendChild(div);
+            });
         }
+
+        async function kick(n){ if(confirm("Hapus akun "+n+"?")) { await db.ref('u/'+n).remove(); await db.ref('f/'+n).remove(); openAdmin(); } } // Hapus user
 
         function logout(){ localStorage.clear(); location.reload(); }
 
-        // --- AUTO BOOT ---
-        const saved = localStorage.getItem('z_sess');
-        if(saved){ me = JSON.parse(saved); startApp(); }
+        const s = localStorage.getItem('z_sess');
+        if(s){ me = JSON.parse(s); startApp(); }
     </script>
 </body>
 </html>
