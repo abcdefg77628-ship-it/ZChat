@@ -31,11 +31,11 @@
         
         .menu-item {
             padding: 14px 15px; border-radius: 8px; cursor: pointer; transition: 0.2s;
-            display: flex; align-items: center; font-size: 14px; text-transform: uppercase;
+            display: flex; align-items: center; font-size: 13px; text-transform: uppercase;
             letter-spacing: 1px; font-weight: 600; color: #aaa;
         }
         .menu-item:hover { background: #2b2d31; color: var(--accent-z); }
-        .req-count { background: #ff4d4d; color: white; font-size: 10px; padding: 2px 8px; border-radius: 4px; margin-left: 10px; }
+        .req-count { background: #ff4d4d; color: white; font-size: 10px; padding: 2px 8px; border-radius: 4px; margin-left: auto; }
 
         /* --- LAYOUT --- */
         .app-container { display: none; height: 100vh; grid-template-columns: 65px 260px 1fr; }
@@ -43,7 +43,7 @@
         .nav-icon { width: 45px; height: 45px; border-radius: 12px; background: #313338; cursor: pointer; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         
         .friend-panel { background: var(--friend-list-bg); border-right: 1px solid #111; display: flex; flex-direction: column; }
-        .friend-card { padding: 12px; margin: 4px 8px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .friend-card { padding: 12px; margin: 4px 8px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
         .friend-card:hover { background: #35373c; }
         .friend-card.active { background: #404249; border-left: 3px solid var(--accent-z); }
 
@@ -51,38 +51,39 @@
         .chat-area { display: flex; flex-direction: column; background: var(--chat-bg); position: relative; }
         .chat-header { height: 60px; background: rgba(24, 25, 28, 0.95); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; z-index: 100; border-bottom: 1px solid #000; }
         .messages-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .msg { max-width: 75%; padding: 10px 14px; border-radius: 10px; font-size: 14px; }
+        .msg { max-width: 75%; padding: 10px 14px; border-radius: 10px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
         .msg.sent { align-self: flex-end; background: var(--msg-sent); }
         .msg.received { align-self: flex-start; background: var(--msg-rec); }
 
-        /* --- INPUTS & BUTTONS --- */
+        /* --- INPUTS --- */
         .input-bar { padding: 15px 20px; background: #1e1f22; display: flex; gap: 10px; border-top: 1px solid #000; }
-        input[type="text"], input[type="password"] { width: 100%; padding: 12px; background: #2b2d31; border: 1px solid #333; color: white; border-radius: 5px; margin: 5px 0; }
-        .btn-z { background: var(--accent-z); color: black; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; text-transform: uppercase; }
+        input { width: 100%; padding: 12px; background: #2b2d31; border: 1px solid #333; color: white; border-radius: 5px; margin: 5px 0; }
+        .btn-z { background: var(--accent-z); color: black; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; text-transform: uppercase; font-size: 12px; }
+        .btn-outline { background: transparent; border: 1px solid var(--accent-z); color: var(--accent-z); margin-top: 10px; }
 
-        /* --- BURGER ICON (MINIMAL) --- */
+        /* --- BURGER --- */
         .burger { width: 22px; height: 14px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; }
         .burger span { height: 2px; background: #fff; border-radius: 2px; }
 
         /* --- MODAL --- */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 20000; display: none; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: #18191c; width: 100%; max-width: 400px; border-radius: 10px; padding: 25px; border: 1px solid #333; }
+        .modal-content { background: #18191c; width: 100%; max-width: 400px; border-radius: 10px; padding: 25px; border: 1px solid #333; text-align: center; }
 
-        .avatar-opt { width: 60px; height: 60px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; margin: 5px; filter: grayscale(1); transition: 0.3s; }
-        .avatar-opt.selected, .avatar-opt:hover { border-color: var(--accent-z); filter: grayscale(0); }
+        .avatar-opt { width: 55px; height: 55px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; margin: 4px; filter: grayscale(1); }
+        .avatar-opt.selected { border-color: var(--accent-z); filter: grayscale(0); }
 
         @media (max-width: 768px) { .app-container { grid-template-columns: 55px 1fr; } .friend-panel { display: none; } }
     </style>
 </head>
 <body>
 
-    <div id="custom-notification" style="position:fixed; top:-100px; left:50%; transform:translateX(-50%); background:#2b2d31; border:1px solid var(--accent-z); padding:12px 25px; z-index:50000; transition:0.5s; font-size:12px; text-transform:uppercase;">NOTIFIKASI</div>
+    <div id="custom-notification" style="position:fixed; top:-100px; left:50%; transform:translateX(-50%); background:#2b2d31; border:1px solid var(--accent-z); padding:12px 25px; z-index:50000; transition:0.5s; font-size:11px;">NOTIFIKASI</div>
     <div id="menu-overlay" class="menu-overlay" onclick="toggleMenu()"></div>
 
     <div id="slide-menu" class="slide-menu">
         <h4 style="color:var(--accent-z); margin-bottom:20px; letter-spacing:2px; border-bottom:1px solid #333; padding-bottom:10px">ZCHAT MENU</h4>
         <div class="menu-item" onclick="openAddFriend()">TAMBAH TEMAN</div>
-        <div class="menu-item" onclick="openRequests()">PERMINTAAN TEMAN <span id="req-count-badge" class="req-count" style="display:none">0</span></div>
+        <div class="menu-item" onclick="openRequests()">PERMINTAAN <span id="req-count-badge" class="req-count" style="display:none">0</span></div>
         <div class="menu-item" onclick="openProfileSettings()">PENGATURAN PROFIL</div>
         <div class="menu-item" onclick="openSecurity()">KEAMANAN</div>
         <div class="menu-item" onclick="showCopyright()">HAK CIPTA</div>
@@ -92,40 +93,43 @@
 
     <div id="modal-box" class="modal-overlay">
         <div class="modal-content">
-            <h3 id="modal-title" style="margin-bottom:20px; color:var(--accent-z); letter-spacing:1px; text-transform:uppercase"></h3>
+            <h3 id="modal-title" style="margin-bottom:20px; color:var(--accent-z); text-transform:uppercase"></h3>
             <div id="modal-body"></div>
-            <button class="btn-z" onclick="closeModal()">TUTUP</button>
+            <button class="btn-z" onclick="closeModal()" style="margin-top:20px">TUTUP</button>
         </div>
     </div>
 
     <div id="auth-screen" style="position:fixed; inset:0; background:black; z-index:40000; display:flex; justify-content:center; align-items:center;">
-        <div style="background:#18191c; padding:40px; border-radius:10px; width:340px; text-align:center; border:1px solid #222;">
+        <div id="auth-box" style="background:#18191c; padding:40px; border-radius:10px; width:340px; text-align:center; border:1px solid #222;">
             <div style="font-size:30px; color:var(--accent-z); font-weight:bold; margin-bottom:25px; letter-spacing:5px">ZCHAT</div>
-            <input type="text" id="user-input" placeholder="USERNAME">
+            <input type="text" id="user-input" placeholder="USERNAME (HURUF BESAR)">
             <input type="password" id="pass-input" placeholder="PASSWORD">
-            <button class="btn-z" onclick="processAuth()">MASUK / DAFTAR</button>
+            <div id="auth-opsi" style="margin-top:10px">
+                <button class="btn-z" onclick="doLogin()">MASUK</button>
+                <button class="btn-z btn-outline" onclick="doRegister()">DAFTAR AKUN BARU</button>
+            </div>
         </div>
     </div>
 
     <div class="app-container" id="main-app">
         <div class="nav-left">
-            <div class="nav-icon" style="background:var(--accent-z); color:black; font-weight:bold; font-size:18px">Z</div>
+            <div class="nav-icon" style="background:var(--accent-z); color:black; font-weight:bold;">Z</div>
             <div class="nav-icon" onclick="openProfileSettings()"><img id="my-nav-avatar" src="" style="width:100%"></div>
         </div>
 
         <div class="friend-panel">
-            <div style="padding:20px; font-weight:bold; font-size:12px; letter-spacing:2px; color:#555">DAFTAR PESAN</div>
+            <div style="padding:20px; font-weight:bold; font-size:11px; letter-spacing:2px; color:#555">KONTAK TEMAN</div>
             <div id="friend-list-container" style="flex:1; overflow-y:auto"></div>
         </div>
 
         <div class="chat-area">
             <div id="blank-state" style="position:absolute; inset:0; background:var(--chat-bg); z-index:50; display:flex; flex-direction:column; justify-content:center; align-items:center;">
                 <div style="font-size:100px; color:var(--accent-z); opacity:0.05; font-weight:bold;">Z</div>
-                <p style="color:#333; font-size:11px; letter-spacing:2px">PILIH PERCAKAPAN</p>
+                <p style="color:#333; font-size:10px; letter-spacing:2px">PILIH TEMAN UNTUK CHAT</p>
             </div>
 
             <div class="chat-header">
-                <div id="active-user-title" style="font-weight:bold; letter-spacing:1px; font-size:14px; text-transform:uppercase">ZCHAT PRO</div>
+                <div id="active-user-title" style="font-weight:bold; font-size:14px; text-transform:uppercase">ZCHAT PRO</div>
                 <div class="burger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
             </div>
 
@@ -133,7 +137,7 @@
 
             <div class="input-bar">
                 <input type="text" id="msg-input" placeholder="TULIS PESAN..." onkeypress="if(event.key=='Enter') sendChat()">
-                <button onclick="sendChat()" style="background:none; border:none; color:var(--accent-z); font-weight:bold; cursor:pointer; letter-spacing:1px">KIRIM</button>
+                <button onclick="sendChat()" style="background:none; border:none; color:var(--accent-z); font-weight:bold; cursor:pointer;">KIRIM</button>
             </div>
         </div>
     </div>
@@ -157,51 +161,82 @@
 
         let currentUser = localStorage.getItem('zchat_user');
         let activeFriend = null;
-        const avatars = Array.from({length: 12}, (_, i) => `https://api.dicebear.com/7.x/avataaars/svg?seed=Z${i+100}`);
+        const avatars = Array.from({length: 12}, (_, i) => `https://api.dicebear.com/7.x/avataaars/svg?seed=Z${i+200}`);
 
         window.showNotif = (t) => { const n = document.getElementById('custom-notification'); n.innerText = t; n.style.top = '20px'; setTimeout(() => n.style.top = '-100px', 3000); };
         window.toggleMenu = () => { const m = document.getElementById('slide-menu'); const o = document.getElementById('menu-overlay'); m.classList.toggle('active'); o.style.display = m.classList.contains('active') ? 'block' : 'none'; };
         window.openModal = (t, b) => { document.getElementById('modal-title').innerText = t; document.getElementById('modal-body').innerHTML = b; document.getElementById('modal-box').style.display = 'flex'; };
         window.closeModal = () => document.getElementById('modal-box').style.display = 'none';
 
-        window.processAuth = async () => {
+        // --- FIX LOGIN & REGISTER ---
+        window.doLogin = async () => {
             const u = document.getElementById('user-input').value.trim().toUpperCase();
             const p = document.getElementById('pass-input').value.trim();
-            if(u.length < 8 || p.length < 8) return showNotif("MINIMAL 8 KARAKTER");
-            const userRef = ref(db, 'users/' + u);
-            const snap = await get(userRef);
-            if(!snap.exists()) {
-                await set(userRef, { password: p, nickname: u, bio: "ZCHAT USER", avatar: avatars[0] });
-                showNotif("AKUN TERDAFTAR");
-            } else if(snap.val().password !== p) return showNotif("SANDI SALAH");
-            login(u);
+            if(!u || !p) return showNotif("ISI SEMUA DATA");
+            
+            const snap = await get(ref(db, 'users/' + u));
+            if(!snap.exists()) return showNotif("USER TIDAK DITEMUKAN");
+            if(snap.val().password !== p) return showNotif("SANDI SALAH");
+            
+            successLogin(u);
         };
 
-        async function login(u) {
+        window.doRegister = async () => {
+            const u = document.getElementById('user-input').value.trim().toUpperCase();
+            const p = document.getElementById('pass-input').value.trim();
+            if(u.length < 5 || p.length < 5) return showNotif("MINIMAL 5 KARAKTER");
+            
+            const snap = await get(ref(db, 'users/' + u));
+            if(snap.exists()) return showNotif("USER SUDAH ADA");
+            
+            await set(ref(db, 'users/' + u), { password: p, nickname: u, bio: "ZCHAT USER", avatar: avatars[0] });
+            showNotif("BERHASIL DAFTAR!");
+            successLogin(u);
+        };
+
+        async function successLogin(u) {
             currentUser = u; localStorage.setItem('zchat_user', u);
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('main-app').style.display = 'grid';
+            
             const userSnap = await get(ref(db, 'users/' + u));
             document.getElementById('my-nav-avatar').src = userSnap.val().avatar;
+            
             update(ref(db, 'status/' + u), { online: true, avatar: userSnap.val().avatar, nickname: userSnap.val().nickname });
             onDisconnect(ref(db, 'status/' + u)).update({ online: false });
-            loadFriends(); listenToRequests();
+            
+            loadFriendsList();
+            listenToRequests();
         }
 
-        function loadFriends() {
+        // --- FIX FRIEND LIST (LANGSUNG MUNCUL) ---
+        function loadFriendsList() {
+            // Kita pantau node 'friends' milik user ini secara real-time
             onValue(ref(db, `users/${currentUser}/friends`), (snap) => {
                 const container = document.getElementById('friend-list-container');
                 container.innerHTML = '';
+                
+                if(!snap.exists()) {
+                    container.innerHTML = '<p style="text-align:center; font-size:10px; color:#444; margin-top:20px">BELUM ADA TEMAN</p>';
+                    return;
+                }
+
                 snap.forEach(child => {
                     const fName = child.key;
+                    // Ambil detail status online & avatar teman
                     onValue(ref(db, 'status/' + fName), (s) => {
                         if(!s.exists()) return;
                         const d = s.val();
+                        
+                        // Hapus elemen lama kalau ada (agar tidak duplikat saat status berubah)
                         let old = document.getElementById('f-'+fName); if(old) old.remove();
+                        
                         const div = document.createElement('div');
-                        div.id = 'f-'+fName; div.className = `friend-card ${activeFriend === fName ? 'active' : ''}`;
-                        div.innerHTML = `<img src="${d.avatar}" style="width:35px; border-radius:5px; filter:grayscale(0.5)">
-                            <div><div style="font-weight:bold; font-size:13px">${d.nickname}</div><div style="font-size:9px; color:${d.online?'#23a55a':'#555'}">${d.online?'ONLINE':'OFFLINE'}</div></div>`;
+                        div.id = 'f-'+fName;
+                        div.className = `friend-card ${activeFriend === fName ? 'active' : ''}`;
+                        div.innerHTML = `<img src="${d.avatar}" style="width:35px; border-radius:5px">
+                            <div style="flex:1"><div style="font-weight:bold; font-size:13px">${d.nickname}</div><div style="font-size:9px; color:${d.online?'#23a55a':'#555'}">${d.online?'ONLINE':'OFFLINE'}</div></div>`;
+                        
                         div.onclick = () => startChat(fName, d.nickname);
                         container.appendChild(div);
                     });
@@ -210,13 +245,14 @@
         }
 
         window.openAddFriend = () => { toggleMenu(); openModal("TAMBAH TEMAN", `<input type="text" id="target-u" placeholder="USERNAME TUJUAN"><button class="btn-z" onclick="sendRequest()">KIRIM PERMINTAAN</button>`); };
+        
         window.sendRequest = async () => {
             const target = document.getElementById('target-u').value.trim().toUpperCase();
-            if(target === currentUser) return showNotif("KESALAHAN INPUT");
+            if(target === currentUser) return showNotif("TIDAK BISA DIRI SENDIRI");
             const snap = await get(ref(db, 'users/' + target));
-            if(!snap.exists()) return showNotif("USER TIDAK DITEMUKAN");
-            await set(ref(db, `requests/${target}/${currentUser}`), { from: currentUser, status: 'pending' });
-            showNotif("PERMINTAAN TERKIRIM"); closeModal();
+            if(!snap.exists()) return showNotif("USER TIDAK ADA");
+            await set(ref(db, `requests/${target}/${currentUser}`), { from: currentUser });
+            showNotif("TERKIRIM!"); closeModal();
         };
 
         function listenToRequests() {
@@ -231,13 +267,13 @@
             toggleMenu();
             onValue(ref(db, `requests/${currentUser}`), (snap) => {
                 let html = '<div style="max-height:300px; overflow-y:auto">';
-                if(!snap.exists()) html += '<p style="font-size:12px; color:#555">KOSONG</p>';
+                if(!snap.exists()) html += '<p style="font-size:11px; color:#555">TIDAK ADA PERMINTAAN</p>';
                 snap.forEach(child => {
                     html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:#111; margin-bottom:5px; border:1px solid #333">
                         <span style="font-size:12px">${child.key}</span>
                         <div>
-                            <button onclick="acceptF('${child.key}')" style="background:#23a55a; border:none; color:white; padding:5px 10px; border-radius:3px; font-size:10px; cursor:pointer">TERIMA</button>
-                            <button onclick="rejectF('${child.key}')" style="background:#f04747; border:none; color:white; padding:5px 10px; border-radius:3px; font-size:10px; cursor:pointer">TOLAK</button>
+                            <button onclick="acceptF('${child.key}')" style="background:#23a55a; color:white; border:none; padding:5px 10px; border-radius:3px; font-size:10px">ACC</button>
+                            <button onclick="rejectF('${child.key}')" style="background:#f04747; color:white; border:none; padding:5px 10px; border-radius:3px; font-size:10px; margin-left:5px">X</button>
                         </div>
                     </div>`;
                 });
@@ -247,10 +283,12 @@
         };
 
         window.acceptF = async (u) => {
+            // Update daftar teman di kedua belah pihak
             await set(ref(db, `users/${currentUser}/friends/${u}`), true);
             await set(ref(db, `users/${u}/friends/${currentUser}`), true);
+            // Hapus request
             await remove(ref(db, `requests/${currentUser}/${u}`));
-            showNotif("TEMAN DITAMBAHKAN"); closeModal();
+            showNotif("TEMAN DITAMBAHKAN!"); closeModal();
         };
 
         window.rejectF = async (u) => { await remove(ref(db, `requests/${currentUser}/${u}`)); closeModal(); };
@@ -258,6 +296,11 @@
         window.startChat = (name, nick) => {
             activeFriend = name; document.getElementById('blank-state').style.display = 'none';
             document.getElementById('active-user-title').innerText = nick;
+            
+            // Highlight teman yang aktif
+            document.querySelectorAll('.friend-card').forEach(c => c.classList.remove('active'));
+            const activeCard = document.getElementById('f-'+name); if(activeCard) activeCard.classList.add('active');
+
             const chatID = [currentUser, activeFriend].sort().join('_');
             onValue(ref(db, 'chats/' + chatID), (snap) => {
                 const box = document.getElementById('chat-box'); box.innerHTML = '';
@@ -277,6 +320,7 @@
             inp.value = '';
         };
 
+        // --- PROFILE SETTINGS ---
         window.openProfileSettings = async () => {
             if(document.getElementById('slide-menu').classList.contains('active')) toggleMenu();
             const snap = await get(ref(db, 'users/' + currentUser));
@@ -285,41 +329,7 @@
             avatars.forEach(a => avHtml += `<img src="${a}" class="avatar-opt ${d.avatar===a?'selected':''}" onclick="selectAv(this, '${a}')">`);
             avHtml += '</div>';
 
-            openModal("PENGATURAN PROFIL", `
-                <div style="text-align:left">
-                    <label style="font-size:10px; color:var(--accent-z); letter-spacing:1px">NAMA TAMPILAN</label>
-                    <input type="text" id="edit-nick" value="${d.nickname}">
-                    <label style="font-size:10px; color:var(--accent-z); letter-spacing:1px">BIO</label>
-                    <input type="text" id="edit-bio" value="${d.bio}">
-                    <p style="font-size:10px; color:var(--accent-z); margin-top:15px; letter-spacing:1px">FOTO PROFIL</p>
-                    ${avHtml}
-                    <button class="btn-z" onclick="saveAllProfile()">SIMPAN DATA</button>
-                </div>
-            `);
-        };
-
-        let tempAvatar = "";
-        window.selectAv = (el, url) => {
-            document.querySelectorAll('.avatar-opt').forEach(img => img.classList.remove('selected'));
-            el.classList.add('selected'); tempAvatar = url;
-        };
-
-        window.saveAllProfile = async () => {
-            const nickname = document.getElementById('edit-nick').value.toUpperCase();
-            const bio = document.getElementById('edit-bio').value;
-            const updates = { nickname, bio };
-            if(tempAvatar) { updates.avatar = tempAvatar; document.getElementById('my-nav-avatar').src = tempAvatar; }
-            await update(ref(db, 'users/' + currentUser), updates);
-            await update(ref(db, 'status/' + currentUser), { nickname, avatar: updates.avatar || tempAvatar });
-            showNotif("PROFIL DIPERBARUI"); closeModal();
-        };
-
-        window.openSecurity = () => { toggleMenu(); openModal("KEAMANAN", `<input type="password" id="new-p" placeholder="SANDI BARU"><button class="btn-z" onclick="updateP()">GANTI SANDI</button>`); };
-        window.updateP = () => { const p = document.getElementById('new-p').value; if(p.length<8) return; update(ref(db, 'users/'+currentUser), {password:p}); showNotif("SANDI DIGANTI"); closeModal(); };
-        window.showCopyright = () => { toggleMenu(); openModal("HAK CIPTA", "ZCHAT PRO 2026 BY ZZERR44"); };
-        window.logout = () => { localStorage.clear(); location.reload(); };
-
-        if(currentUser) login(currentUser);
-    </script>
-</body>
-</html>
+            openModal("PENGATURAN PROFIL", `<div style="text-align:left">
+                <label style="font-size:10px; color:var(--accent-z)">NAMA TAMPILAN</label>
+                <input type="text" id="edit-nick" value="${d.nickname}">
+                <label style="font-size:10px;
