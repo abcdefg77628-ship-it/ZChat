@@ -1,344 +1,207 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZChat Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <title>ZChat - Realtime Messaging</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-dark: #0f111a;
-            --bg-side: #161925;
-            --accent: #3d5afe;
-            --text-main: #ffffff;
+            --primary: #6366f1;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
             --text-dim: #94a3b8;
-            --bubble-me: #3d5afe;
-            --bubble-them: #232736;
-            --danger: #ff5252;
-            --success: #00e676;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --sent-bubble: #4f46e5;
+            --rcv-bubble: #334155;
+            --danger: #ef4444;
+            --success: #22c55e;
         }
 
-        [data-theme="light"] {
-            --bg-dark: #f8fafc;
-            --bg-side: #ffffff;
-            --text-main: #1e293b;
-            --text-dim: #64748b;
-            --bubble-me: #3d5afe;
-            --bubble-them: #e2e8f0;
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-dark); color: var(--text-main); overflow: hidden; height: 100vh; }
+
+        /* --- INTRO SCREEN --- */
+        #intro-screen {
+            position: fixed; inset: 0; background: var(--bg-dark);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 9999; transition: opacity 0.5s ease;
         }
+        .logo-anim { font-size: 3rem; font-weight: 800; color: var(--primary); animation: pulse 1.5s infinite; }
+        .creator-tag { margin-top: 10px; color: var(--text-dim); font-size: 0.9rem; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        body, html {
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-        }
-
-        /* Loading Screen */
-        #loading-screen {
-            position: fixed;
-            inset: 0;
-            background: var(--bg-dark);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        .loader {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--accent);
-            border-bottom-color: transparent;
-            border-radius: 50%;
-            animation: rotation 1s linear infinite;
-        }
-
-        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Auth Layout */
+        /* --- AUTH SYSTEM --- */
         .auth-container {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
         }
-
         .auth-card {
-            background: var(--bg-side);
-            padding: 40px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            background: var(--bg-card); padding: 30px; border-radius: 20px; width: 100%; max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
-
-        .auth-card h2 { margin-bottom: 24px; text-align: center; font-weight: 700; }
-
         input {
-            width: 100%;
-            padding: 12px 16px;
-            margin-bottom: 16px;
-            background: var(--bg-dark);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            color: white;
-            outline: none;
+            width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155;
+            background: #0f172a; color: white; outline: none;
         }
-
-        [data-theme="light"] input { color: #000; border: 1px solid #ddd; }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
+        .btn {
+            width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 600;
+            cursor: pointer; transition: 0.3s; margin-top: 10px;
         }
+        .btn-primary { background: var(--primary); color: white; }
+        .toggle-container { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; margin: 10px 0; }
 
-        button:active { transform: scale(0.98); }
-
-        .auth-toggle {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 14px;
-            color: var(--text-dim);
-            cursor: pointer;
+        /* --- MAIN LAYOUT --- */
+        #main-app { display: grid; grid-template-columns: 350px 1fr; height: 100vh; display: none; }
+        
+        /* Sidebar */
+        .sidebar { background: var(--bg-card); border-right: 1px solid #334155; display: flex; flex-direction: column; }
+        .sb-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        .contact-list { flex: 1; overflow-y: auto; }
+        .contact-item { 
+            padding: 15px 20px; display: flex; align-items: center; gap: 15px; cursor: pointer;
+            border-bottom: 1px solid #1e293b; transition: 0.2s;
         }
-
-        /* Main App Layout */
-        #app-interface {
-            display: none;
-            height: 100vh;
-            grid-template-columns: 280px 1fr;
-        }
-
-        .sidebar {
-            background: var(--bg-side);
-            border-right: 1px solid rgba(255,255,255,0.05);
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
-
-        .profile-section {
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            margin-bottom: 20px;
-        }
-
-        .user-info { display: flex; align-items: center; gap: 12px; }
-        .avatar { 
-            width: 45px; height: 45px; 
-            background: var(--accent); 
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold;
-        }
-
-        .online-badge { font-size: 12px; color: var(--success); }
-
-        .menu-list { flex: 1; list-style: none; }
-        .menu-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px; border-radius: 8px; cursor: pointer;
-            transition: var(--transition); color: var(--text-dim);
-        }
-        .menu-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .contact-item:hover { background: #334155; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #64748b; }
+        .status-online { background: var(--success); }
 
         /* Chat Area */
-        .chat-main {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            position: relative;
-        }
-
-        .chat-header {
-            padding: 16px 24px;
-            background: var(--bg-side);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        #message-container {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .msg {
-            max-width: 70%;
-            padding: 12px 16px;
-            border-radius: 14px;
-            position: relative;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .msg.me {
-            align-self: flex-end;
-            background: var(--bubble-me);
-            color: white;
-            border-bottom-right-radius: 2px;
-        }
-
-        .msg.them {
-            align-self: flex-start;
-            background: var(--bubble-them);
-            border-bottom-left-radius: 2px;
-        }
-
-        .msg-info { font-size: 11px; margin-bottom: 4px; opacity: 0.7; }
-        .msg-time { font-size: 10px; margin-top: 4px; text-align: right; opacity: 0.6; }
-
-        .msg-actions {
-            position: absolute; top: 0; right: -30px;
-            display: none; cursor: pointer; color: var(--danger);
-        }
-        .msg.me:hover .msg-actions { display: block; }
+        .chat-area { display: flex; flex-direction: column; background-size: cover; background-position: center; }
+        .chat-header { padding: 15px 25px; background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: space-between; }
+        .messages-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        
+        /* Bubbles */
+        .msg { max-width: 70%; padding: 10px 15px; border-radius: 15px; font-size: 0.95rem; position: relative; }
+        .msg-sent { align-self: flex-end; background: var(--sent-bubble); border-bottom-right-radius: 2px; }
+        .msg-rcv { align-self: flex-start; background: var(--rcv-bubble); border-bottom-left-radius: 2px; }
+        .msg-time { font-size: 0.7rem; opacity: 0.7; margin-top: 5px; display: block; text-align: right; }
+        .read-status { font-size: 0.7rem; margin-left: 5px; }
 
         /* Input Area */
-        .input-area {
-            padding: 20px 24px;
-            background: var(--bg-side);
-            display: flex;
-            gap: 12px;
-        }
+        .input-bar { padding: 15px 25px; background: var(--bg-card); display: flex; gap: 15px; align-items: center; }
+        #msg-input { flex: 1; margin: 0; }
 
-        .input-area input { margin-bottom: 0; flex: 1; }
-
-        /* Modals */
-        .modal {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.8);
-            display: none; justify-content: center; align-items: center;
-            z-index: 1000;
+        /* Modal */
+        .modal { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; 
+            align-items: center; justify-content: center; z-index: 1000; 
         }
-
-        .modal-content {
-            background: var(--bg-side);
-            padding: 30px; border-radius: 16px;
-            width: 90%; max-width: 400px;
-        }
+        .modal-content { background: var(--bg-card); padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; }
 
         /* Responsive */
         @media (max-width: 768px) {
-            #app-interface { grid-template-columns: 1fr; }
-            .sidebar { 
-                position: fixed; left: -100%; top: 0; height: 100%; width: 80%; 
-                z-index: 100; transition: 0.3s; 
-            }
-            .sidebar.active { left: 0; }
+            #main-app { grid-template-columns: 1fr; }
+            .sidebar { position: absolute; width: 100%; z-index: 10; transition: 0.3s; }
+            .sidebar.hidden { transform: translateX(-100%); }
+            .chat-area { width: 100%; }
         }
+        
+        .hidden { display: none !important; }
     </style>
 </head>
-<body data-theme="dark">
+<body>
 
-    <div id="loading-screen"><div class="loader"></div></div>
+    <div id="intro-screen">
+        <div class="logo-anim">ZChat</div>
+        <div style="color: var(--primary); font-weight: 600;">Realtime Messaging</div>
+        <div class="creator-tag">Created by zZerr44</div>
+    </div>
 
-    <div id="auth-interface" class="auth-container">
-        <div class="auth-card" id="login-form">
-            <h2>ZChat Pro</h2>
-            <input type="email" id="login-email" placeholder="Email">
-            <input type="password" id="login-pass" placeholder="Password">
-            <button onclick="handleLogin()">Login</button>
-            <div class="auth-toggle" onclick="toggleAuth(true)">Don't have an account? Register</div>
-        </div>
-
-        <div class="auth-card" id="register-form" style="display: none;">
-            <h2>Create Account</h2>
-            <input type="text" id="reg-user" placeholder="Username">
-            <input type="email" id="reg-email" placeholder="Email">
-            <input type="password" id="reg-pass" placeholder="Password">
-            <input type="password" id="reg-confirm" placeholder="Confirm Password">
-            <button onclick="handleRegister()">Register</button>
-            <div class="auth-toggle" onclick="toggleAuth(false)">Already have an account? Login</div>
+    <div id="auth-section" class="auth-container hidden">
+        <div class="auth-card">
+            <h2 id="auth-title" style="margin-bottom: 20px;">Masuk ke ZChat</h2>
+            <input type="text" id="auth-user" placeholder="Username">
+            <input type="password" id="auth-pass" placeholder="Password">
+            <div class="toggle-container">
+                <input type="checkbox" id="keep-login" style="width: auto;">
+                <label for="keep-login">Keep Login (Tetap Masuk)</label>
+            </div>
+            <button class="btn btn-primary" onclick="handleAuth()">Lanjut</button>
+            <p style="text-align: center; margin-top: 15px; font-size: 0.9rem; cursor: pointer; color: var(--primary);" 
+               onclick="toggleAuthMode()" id="auth-toggle-text">Belum punya akun? Daftar</p>
         </div>
     </div>
 
-    <div id="app-interface">
-        <aside class="sidebar" id="sidebar">
-            <div class="profile-section">
-                <div class="user-info">
-                    <div class="avatar" id="my-initial">Z</div>
-                    <div>
-                        <div id="my-username" style="font-weight: 600;">Username</div>
-                        <div class="online-badge">Online</div>
-                    </div>
+    <div id="main-app">
+        <div class="sidebar" id="sidebar">
+            <div class="sb-header">
+                <h3>ZChat</h3>
+                <div style="display: flex; gap: 15px;">
+                    <i class="fas fa-user-plus" onclick="showModal('add-user-modal')"></i>
+                    <i class="fas fa-cog" onclick="showModal('settings-modal')"></i>
                 </div>
             </div>
-            <ul class="menu-list">
-                <li class="menu-item" onclick="openSettings()">
-                    <span class="material-icons-round">settings</span> Settings
-                </li>
-                <li class="menu-item" onclick="toggleTheme()">
-                    <span class="material-icons-round">dark_mode</span> Change Theme
-                </li>
-                <li class="menu-item" style="color: var(--danger)" onclick="handleLogout()">
-                    <span class="material-icons-round">logout</span> Logout
-                </li>
-            </ul>
-            <div style="font-size: 12px; color: var(--text-dim);">
-                Online Members: <span id="online-count">0</span>
+            <div class="contact-list" id="contact-list">
+                </div>
+        </div>
+
+        <div class="chat-area" id="chat-area">
+            <div id="no-chat-selected" style="flex:1; display:flex; align-items:center; justify-content:center; flex-direction:column; color: var(--text-dim);">
+                <i class="fas fa-comments" style="font-size: 4rem; margin-bottom: 10px;"></i>
+                <p>Pilih teman untuk mulai chat</p>
             </div>
-        </aside>
 
-        <main class="chat-main">
-            <header class="chat-header">
-                <span class="material-icons-round" id="menu-toggle" style="cursor: pointer;">menu</span>
-                <div style="font-weight: 600;">Global Group Chat</div>
-                <div id="typing-status" style="font-size: 12px; color: var(--text-dim);"></div>
-            </header>
+            <div id="active-chat" class="hidden" style="display:flex; flex-direction:column; height: 100%;">
+                <div class="chat-header">
+                    <div style="display:flex; align-items:center; gap: 10px;">
+                        <i class="fas fa-arrow-left mobile-only" onclick="closeChat()"></i>
+                        <div>
+                            <strong id="target-name">Username</strong>
+                            <div id="target-status" style="font-size: 0.7rem; color: var(--success);">Online</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 15px;">
+                        <i class="fas fa-search" onclick="searchChat()"></i>
+                        <i class="fas fa-ellipsis-v" onclick="toggleChatMenu()"></i>
+                    </div>
+                </div>
+                
+                <div class="messages-container" id="messages-container">
+                    </div>
 
-            <div id="message-container"></div>
+                <div id="typing-indicator" style="padding: 5px 25px; font-size: 0.75rem; font-style: italic; color: var(--text-dim); display:none;">Sedang mengetik...</div>
 
-            <div class="input-area">
-                <input type="text" id="msg-input" placeholder="Type a message..." onkeypress="checkEnter(event)">
-                <button style="width: 60px;" onclick="sendMessage()">
-                    <span class="material-icons-round">send</span>
-                </button>
+                <div class="input-bar">
+                    <input type="text" id="msg-input" placeholder="Ketik pesan..." onkeyup="handleTyping(event)">
+                    <button class="btn btn-primary" style="width: auto; margin:0;" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
             </div>
-        </main>
-    </div>
-
-    <div class="modal" id="settings-modal" onclick="closeModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="margin-bottom: 20px;">Settings</h3>
-            <p style="color: var(--text-dim); margin-bottom: 20px;">Manage your account and privacy.</p>
-            <button onclick="closeModal(null)">Close</button>
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <div id="add-user-modal" class="modal">
+        <div class="modal-content">
+            <h3>Tambah Teman</h3>
+            <input type="text" id="new-friend-user" placeholder="Masukkan username">
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="addFriend()">Tambah</button>
+                <button class="btn" style="background:#475569" onclick="closeModals()">Batal</button>
+            </div>
+        </div>
+    </div>
 
-    <script>
-        // FIREBASE CONFIGURATION
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <h3>Pengaturan</h3>
+            <button class="btn" onclick="toggleDarkMode()">Ganti Tema (Dark/Light)</button>
+            <button class="btn" onclick="changeWallpaper()">Ganti Wallpaper</button>
+            <button class="btn" onclick="showAppInfo()" style="background: #6366f1;">Info Aplikasi</button>
+            <button class="btn" style="background: var(--danger);" onclick="logout()">Keluar</button>
+            <button class="btn" onclick="closeModals()">Tutup</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, get, child, onValue, push, update, onDisconnect, serverTimestamp } 
+        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // Konfigurasi Firebase sesuai permintaan
         const firebaseConfig = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
             authDomain: "zchat-56639.firebaseapp.com",
@@ -350,161 +213,211 @@
             measurementId: "G-ZDMK1DWV6S"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.database();
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
+        // Global State
         let currentUser = null;
-        let lastMessageTime = 0;
-        let blockedUsers = [];
-        let mutedUsers = [];
+        let isRegisterMode = false;
+        let activeChatUser = null;
 
-        // Auth Logic
-        auth.onAuthStateChanged(user => {
-            document.getElementById('loading-screen').style.display = 'none';
-            if (user) {
-                currentUser = user;
-                showApp();
-                setupPresence();
-                listenMessages();
-                updateOnlineCount();
+        // --- AUTH LOGIC ---
+        window.toggleAuthMode = () => {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('auth-title').innerText = isRegisterMode ? "Daftar ZChat" : "Masuk ke ZChat";
+            document.getElementById('auth-toggle-text').innerText = isRegisterMode ? "Sudah punya akun? Login" : "Belum punya akun? Daftar";
+        };
+
+        window.handleAuth = async () => {
+            const user = document.getElementById('auth-user').value.trim().toLowerCase();
+            const pass = document.getElementById('auth-pass').value;
+            const keepLogin = document.getElementById('keep-login').checked;
+
+            if(!user || !pass) return alert("Isi semua bidang!");
+
+            const userRef = ref(db, 'users/' + user);
+            const snapshot = await get(userRef);
+
+            if(isRegisterMode) {
+                if(snapshot.exists()) return alert("Username sudah digunakan!");
+                await set(userRef, { password: pass, username: user, status: 'offline' });
+                alert("Registrasi Berhasil! Silakan Login.");
+                toggleAuthMode();
             } else {
-                showAuth();
+                if(!snapshot.exists() || snapshot.val().password !== pass) {
+                    return alert("Username atau Password salah!");
+                }
+                loginSuccess(snapshot.val(), keepLogin);
             }
-        });
+        };
 
-        function toggleAuth(isReg) {
-            document.getElementById('login-form').style.display = isReg ? 'none' : 'block';
-            document.getElementById('register-form').style.display = isReg ? 'block' : 'none';
-        }
-
-        async function handleRegister() {
-            const user = document.getElementById('reg-user').value;
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;
-            const confirm = document.getElementById('reg-confirm').value;
-
-            if (!user || !email || pass.length < 6) return alert("Valid data required (Pass min 6 chars)");
-            if (pass !== confirm) return alert("Passwords do not match");
-
-            try {
-                const res = await auth.createUserWithEmailAndPassword(email, pass);
-                await res.user.updateProfile({ displayName: user });
-                await db.ref('users/' + res.user.uid).set({ username: user, status: 'online' });
-                location.reload();
-            } catch (e) { alert(e.message); }
-        }
-
-        async function handleLogin() {
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-pass').value;
-            try { await auth.signInWithEmailAndPassword(email, pass); } catch (e) { alert(e.message); }
-        }
-
-        function handleLogout() { auth.signOut().then(() => location.reload()); }
-
-        // Core App Logic
-        function showApp() {
-            document.getElementById('auth-interface').style.display = 'none';
-            document.getElementById('app-interface').style.display = 'grid';
-            document.getElementById('my-username').innerText = currentUser.displayName;
-            document.getElementById('my-initial').innerText = currentUser.displayName.charAt(0).toUpperCase();
-        }
-
-        function showAuth() {
-            document.getElementById('auth-interface').style.display = 'flex';
-            document.getElementById('app-interface').style.display = 'none';
-        }
-
-        // Messaging Logic
-        function sendMessage() {
-            const now = Date.now();
-            if (now - lastMessageTime < 1500) return alert("Anti-spam: Wait a moment");
+        function loginSuccess(userData, keep) {
+            currentUser = userData;
+            if(keep) localStorage.setItem('zchat_session', JSON.stringify(userData));
             
-            const input = document.getElementById('msg-input');
-            const val = input.value.trim();
-            if (!val) return;
+            // Set Online Status
+            const statusRef = ref(db, `users/${currentUser.username}/status`);
+            set(statusRef, 'online');
+            onDisconnect(statusRef).set('offline');
 
-            db.ref('messages').push({
-                uid: currentUser.uid,
-                username: currentUser.displayName,
-                text: val,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            });
-
-            input.value = '';
-            lastMessageTime = now;
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('main-app').style.display = 'grid';
+            loadContacts();
         }
 
-        function listenMessages() {
-            db.ref('messages').limitToLast(50).on('value', snapshot => {
-                const container = document.getElementById('message-container');
-                container.innerHTML = '';
-                snapshot.forEach(child => {
-                    const data = child.val();
-                    if (blockedUsers.includes(data.uid)) return;
+        // --- CONTACT LOGIC ---
+        window.addFriend = async () => {
+            const target = document.getElementById('new-friend-user').value.trim().toLowerCase();
+            if(target === currentUser.username) return alert("Tidak bisa menambah diri sendiri!");
+            
+            const targetSnap = await get(ref(db, 'users/' + target));
+            if(!targetSnap.exists()) return alert("User tidak ditemukan!");
+
+            await set(ref(db, `contacts/${currentUser.username}/${target}`), { username: target });
+            closeModals();
+            alert("Kontak ditambahkan!");
+        };
+
+        function loadContacts() {
+            const contactsRef = ref(db, `contacts/${currentUser.username}`);
+            onValue(contactsRef, (snapshot) => {
+                const list = document.getElementById('contact-list');
+                list.innerHTML = "";
+                snapshot.forEach((child) => {
+                    const contact = child.val();
+                    const item = document.createElement('div');
+                    item.className = "contact-item";
+                    item.innerHTML = `
+                        <div class="status-dot" id="dot-${contact.username}"></div>
+                        <div style="flex:1"><strong>${contact.username}</strong></div>
+                    `;
+                    item.onclick = () => openChat(contact.username);
+                    list.appendChild(item);
                     
-                    const isMe = data.uid === currentUser.uid;
-                    const time = new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    // Listen to contact status
+                    onValue(ref(db, `users/${contact.username}/status`), (stat) => {
+                        const dot = document.getElementById(`dot-${contact.username}`);
+                        if(dot) dot.className = `status-dot ${stat.val() === 'online' ? 'status-online' : ''}`;
+                    });
+                });
+            });
+        }
+
+        // --- CHAT LOGIC ---
+        window.openChat = (target) => {
+            activeChatUser = target;
+            document.getElementById('no-chat-selected').classList.add('hidden');
+            document.getElementById('active-chat').classList.remove('hidden');
+            document.getElementById('target-name').innerText = target;
+            
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.add('hidden');
+            }
+
+            loadMessages();
+            
+            // Typing indicator listener
+            onValue(ref(db, `typing/${activeChatUser}/${currentUser.username}`), (snap) => {
+                document.getElementById('typing-indicator').style.display = snap.val() ? 'block' : 'none';
+            });
+        };
+
+        window.sendMessage = async () => {
+            const input = document.getElementById('msg-input');
+            const text = input.value.trim();
+            if(!text || !activeChatUser) return;
+
+            // Cek blokir
+            const blocked = await get(ref(db, `blocked/${activeChatUser}/${currentUser.username}`));
+            if(blocked.exists()) return alert("Anda diblokir oleh user ini.");
+
+            const chatId = [currentUser.username, activeChatUser].sort().join("_");
+            const msgData = {
+                sender: currentUser.username,
+                text: text,
+                timestamp: serverTimestamp(),
+                read: false
+            };
+
+            await push(ref(db, `messages/${chatId}`), msgData);
+            input.value = "";
+            set(ref(db, `typing/${currentUser.username}/${activeChatUser}`), false);
+        };
+
+        function loadMessages() {
+            const chatId = [currentUser.username, activeChatUser].sort().join("_");
+            const msgRef = ref(db, `messages/${chatId}`);
+            
+            onValue(msgRef, (snapshot) => {
+                const container = document.getElementById('messages-container');
+                container.innerHTML = "";
+                snapshot.forEach((child) => {
+                    const m = child.val();
+                    const isMe = m.sender === currentUser.username;
+                    const time = m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '...';
                     
                     const div = document.createElement('div');
-                    div.className = `msg ${isMe ? 'me' : 'them'}`;
+                    div.className = `msg ${isMe ? 'msg-sent' : 'msg-rcv'}`;
                     div.innerHTML = `
-                        <div class="msg-info">${isMe ? 'You' : data.username}</div>
-                        <div class="msg-text">${data.text}</div>
-                        <div class="msg-time">${time}</div>
-                        ${isMe ? `<span class="material-icons-round msg-actions" onclick="deleteMsg('${child.key}')">delete</span>` : ''}
+                        ${m.text}
+                        <span class="msg-time">${time} ${isMe ? (m.read ? ' <i class="fas fa-check-double" style="color:#34d399"></i>' : ' <i class="fas fa-check"></i>') : ''}</span>
                     `;
                     container.appendChild(div);
+                    
+                    // Set Read Receipt
+                    if(!isMe && !m.read) {
+                        update(ref(db, `messages/${chatId}/${child.key}`), { read: true });
+                    }
                 });
                 container.scrollTop = container.scrollHeight;
-                if (!document.hasFocus() && snapshot.numChildren() > 0) {
-                    new Notification("ZChat Pro: New Message");
+            });
+        }
+
+        window.handleTyping = (e) => {
+            const isTyping = e.target.value.length > 0;
+            set(ref(db, `typing/${currentUser.username}/${activeChatUser}`), isTyping);
+            if(e.key === 'Enter') sendMessage();
+        };
+
+        // --- UI HELPERS ---
+        window.showModal = (id) => document.getElementById(id).style.display = 'flex';
+        window.closeModals = () => {
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        };
+        window.closeChat = () => {
+            document.getElementById('sidebar').classList.remove('hidden');
+            document.getElementById('active-chat').classList.add('hidden');
+        };
+
+        window.logout = () => {
+            set(ref(db, `users/${currentUser.username}/status`), 'offline');
+            localStorage.removeItem('zchat_session');
+            location.reload();
+        };
+
+        window.showAppInfo = () => {
+            alert("ZChat v1.0\nCreator: zZerr44\nModern Realtime Messaging Experience");
+        };
+
+        window.changeWallpaper = () => {
+            const url = prompt("Masukkan URL Gambar Wallpaper:");
+            if(url) document.getElementById('chat-area').style.backgroundImage = `url('${url}')`;
+        };
+
+        // --- INITIALIZATION ---
+        setTimeout(() => {
+            document.getElementById('intro-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('intro-screen').style.display = 'none';
+                const session = localStorage.getItem('zchat_session');
+                if(session) {
+                    loginSuccess(JSON.parse(session), true);
+                } else {
+                    document.getElementById('auth-section').classList.remove('hidden');
                 }
-            });
-        }
-
-        function deleteMsg(id) {
-            if (confirm("Delete this message?")) db.ref('messages/' + id).remove();
-        }
-
-        // Presence & Theme
-        function setupPresence() {
-            const statusRef = db.ref('users/' + currentUser.uid + '/status');
-            db.ref('.info/connected').on('value', snap => {
-                if (snap.val() === false) return;
-                statusRef.onDisconnect().set('offline');
-                statusRef.set('online');
-            });
-        }
-
-        function updateOnlineCount() {
-            db.ref('users').on('value', snap => {
-                let count = 0;
-                snap.forEach(u => { if (u.val().status === 'online') count++; });
-                document.getElementById('online-count').innerText = count;
-            });
-        }
-
-        function toggleTheme() {
-            const body = document.body;
-            const newTheme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            body.setAttribute('data-theme', newTheme);
-        }
-
-        // UI Helpers
-        function checkEnter(e) { if (e.key === 'Enter') sendMessage(); }
-        function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
-        function closeModal(e) { document.getElementById('settings-modal').style.display = 'none'; }
-
-        // Sidebar Toggle Mobile
-        document.getElementById('menu-toggle').onclick = () => {
-            document.getElementById('sidebar').classList.toggle('active');
-        }
-
-        // Request Notification
-        if (Notification.permission !== "granted") Notification.requestPermission();
+            }, 500);
+        }, 2500);
 
     </script>
 </body>
-</html>
+                </html>
