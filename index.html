@@ -697,6 +697,365 @@
             // Listener untuk pesan baru (untuk bunyi notifikasi)
             // ... (logika pertemanan lanjut)
         }
-    </script>
+    <script>
+    // 1. INITIALIZE FIREBASE
+    const firebaseConfig = {
+        apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
+        authDomain: "zchat-56639.firebaseapp.com",
+        databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "zchat-56639",
+        storageBucket: "zchat-56639.firebasestorage.app",
+        messagingSenderId: "773931983053",
+        appId: "1:773931983053:web:a1c825be9a972e53dcc984",
+        measurementId: "G-ZDMK1DWV6S"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // 2. STATE & GLOBAL VARIABLES
+    let currentUser = null;
+    let activeChat = null;
+    let chatListener = null;
+    let typingTimeout = null;
+    let selectedAvatar = "https://api.dicebear.com/7.x/avataaars/svg?seed=zpro1";
+    let selectedWallpaper = "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)";
+
+    const avatars = Array.from({length: 20}, (_, i) => `https://api.dicebear.com/7.x/avataaars/svg?seed=zpro${i}`);
+    const wallpapers = [
+        "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)", "linear-gradient(135deg, #1e293b 0%, #334155 100%)",
+        "linear-gradient(135deg, #4c1d95 0%, #1e1b4b 100%)", "linear-gradient(135deg, #064e3b 0%, #022c22 100%)",
+        "linear-gradient(135deg, #701c1c 0%, #450a0a 100%)", "linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%)",
+        "linear-gradient(135deg, #164e63 0%, #083344 100%)", "linear-gradient(135deg, #3f2b96 0%, #a8c0ff 100%)",
+        "linear-gradient(45deg, #2193b0, #6dd5ed)", "linear-gradient(45deg, #ee9ca7, #ffdde1)",
+        "linear-gradient(45deg, #bdc3c7, #2c3e50)", "linear-gradient(45deg, #de6262, #ffb88c)",
+        "linear-gradient(45deg, #06beb1, #48b1bf)", "linear-gradient(45deg, #eb3349, #f45c43)",
+        "linear-gradient(45deg, #dd5e89, #f7bb97)", "linear-gradient(45deg, #56ab2f, #a8e063)",
+        "linear-gradient(45deg, #614385, #516395)", "linear-gradient(45deg, #eecda3, #ef629f)",
+        "linear-gradient(45deg, #02aab0, #00cdac)", "linear-gradient(45deg, #da22ff, #9733ee)"
+    ];
+
+    // 3. CORE INITIALIZATION
+    window.onload = () => {
+        renderGrids();
+        setupMobileViewport();
+        const savedUser = localStorage.getItem('zchat_user');
+        if(savedUser) {
+            currentUser = JSON.parse(savedUser);
+            initApp();
+        }
+    };
+
+    function setupMobileViewport() {
+        if ('visualViewport' in window) {
+            window.visualViewport.addEventListener('resize', () => {
+                document.body.style.height = window.visualViewport.height + 'px';
+            });
+        }
+    }
+
+    function renderGrids() {
+        const agReg = document.getElementById('avatar-grid-reg');
+        const agSet = document.getElementById('avatar-grid-settings');
+        const wg = document.getElementById('wallpaper-grid');
+        
+        avatars.forEach((url) => {
+            const imgHtml = `<img src="${url}" class="grid-item" onclick="selectAvatar('${url}', this)">`;
+            agReg.innerHTML += imgHtml;
+            agSet.innerHTML += imgHtml;
+        });
+
+        wallpapers.forEach((wp) => {
+            wg.innerHTML += `<div class="grid-item" style="background:${wp}" onclick="selectWallpaper('${wp}', this)"></div>`;
+        });
+    }
+
+    // 4. AUTHENTICATION LOGIC
+    function toggleAuth(showLogin) {
+        document.getElementById('login-form').classList.toggle('hidden', !showLogin);
+        document.getElementById('register-form').classList.toggle('hidden', showLogin);
+    }
+
+    function selectAvatar(url, el) {
+        document.querySelectorAll('.grid-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        selectedAvatar = url;
+        document.getElementById('reg-avatar-preview').src = url;
+        document.getElementById('setting-avatar-preview').src = url;
+    }
+
+    function selectWallpaper(wp, el) {
+        selectedWallpaper = wp;
+        document.getElementById('chat-view').style.background = wp;
+    }
+
+    async function handleRegister() {
+        const user = document.getElementById('reg-user').value.trim().toLowerCase();
+        const pass = document.getElementById('reg-pass').value;
+        if(!user || !pass) return alert("Harap isi username dan password!");
+
+        const snapshot = await db.ref('users/' + user).once('value');
+        if(snapshot.exists()) return alert("Username sudah terdaftar!");
+
+        const userData = {
+            username: user,
+            password: pass,
+            avatar: selectedAvatar,
+            wallpaper: selectedWallpaper,
+            status: 'online',
+            lastSeen: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        await db.ref('users/' + user).set(userData);
+        alert("Registrasi Berhasil! Silakan Login.");
+        toggleAuth(true);
+    }
+
+    async function handleLogin() {
+        const user = document.getElementById('login-user').value.trim().toLowerCase();
+        const pass = document.getElementById('login-pass').value;
+
+        const snapshot = await db.ref('users/' + user).once('value');
+        if(snapshot.exists() && snapshot.val().password === pass) {
+            currentUser = snapshot.val();
+            localStorage.setItem('zchat_user', JSON.stringify(currentUser));
+            initApp();
+        } else {
+            alert("Username atau Password salah!");
+        }
+    }
+
+    // 5. MAIN APP CONTROLLER
+    function initApp() {
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+        document.getElementById('my-username').innerText = currentUser.username;
+        document.getElementById('my-avatar').src = currentUser.avatar;
+        document.getElementById('chat-view').style.background = currentUser.wallpaper || selectedWallpaper;
+        
+        // Presence System
+        const statusRef = db.ref('users/' + currentUser.username + '/status');
+        statusRef.set('online');
+        statusRef.onDisconnect().set('offline');
+        db.ref('users/' + currentUser.username + '/lastSeen').onDisconnect().set(firebase.database.ServerValue.TIMESTAMP);
+
+        loadFriends();
+        listenToRequests();
+    }
+
+    // 6. FRIENDSHIP SYSTEM
+    async function searchUsers(val) {
+        const resDiv = document.getElementById('search-results');
+        if(val.length < 3) return resDiv.innerHTML = "";
+        
+        const snapshot = await db.ref('users').orderByKey().startAt(val).endAt(val + "\uf8ff").once('value');
+        resDiv.innerHTML = "";
+        snapshot.forEach(child => {
+            if(child.key !== currentUser.username) {
+                resDiv.innerHTML += `
+                    <div class="chat-item" onclick="sendFriendRequest('${child.key}')">
+                        <img src="${child.val().avatar}" class="avatar-img" style="width:30px;height:30px;">
+                        <span>${child.key}</span>
+                        <small style="margin-left:auto; color:var(--primary)">Tambah</small>
+                    </div>`;
+            }
+        });
+    }
+
+    async function sendFriendRequest(target) {
+        await db.ref(`requests/${target}/${currentUser.username}`).set({
+            from: currentUser.username,
+            avatar: currentUser.avatar,
+            status: 'pending'
+        });
+        alert("Permintaan pertemanan terkirim ke " + target);
+        document.getElementById('search-results').innerHTML = "";
+        document.getElementById('search-friend').value = "";
+    }
+
+    function listenToRequests() {
+        db.ref(`requests/${currentUser.username}`).on('child_added', snapshot => {
+            const req = snapshot.val();
+            if(req.status === 'pending') {
+                if(confirm(`Terima permintaan pertemanan dari ${req.from}?`)) {
+                    acceptFriend(req.from, req.avatar);
+                } else {
+                    db.ref(`requests/${currentUser.username}/${req.from}`).remove();
+                }
+            }
+        });
+    }
+
+    async function acceptFriend(name, avatar) {
+        await db.ref(`friends/${currentUser.username}/${name}`).set({ username: name, avatar: avatar });
+        await db.ref(`friends/${name}/${currentUser.username}`).set({ username: currentUser.username, avatar: currentUser.avatar });
+        db.ref(`requests/${currentUser.username}/${name}`).remove();
+    }
+
+    function loadFriends() {
+        db.ref(`friends/${currentUser.username}`).on('value', snapshot => {
+            const list = document.getElementById('friend-list');
+            list.innerHTML = "";
+            snapshot.forEach(child => {
+                const f = child.val();
+                list.innerHTML += `
+                    <div class="chat-item" id="item-${f.username}" onclick="openChat('${f.username}', '${f.avatar}')">
+                        <img src="${f.avatar}" class="avatar-img">
+                        <div style="flex:1">
+                            <h4>${f.username}</h4>
+                            <p id="last-msg-${f.username}" style="font-size:0.8rem; color:var(--text-dim)">Klik untuk chat</p>
+                        </div>
+                    </div>`;
+            });
+        });
+    }
+
+    // 7. REAL-TIME CHAT LOGIC
+    function openChat(name, avatar) {
+        // Clean old listeners
+        if(chatListener) chatListener.off();
+        const oldChatID = activeChat ? [currentUser.username, activeChat].sort().join("_") : null;
+        if(oldChatID) db.ref(`typing/${oldChatID}/${currentUser.username}`).set(false);
+
+        activeChat = name;
+        document.getElementById('no-chat-selected').classList.add('hidden');
+        document.getElementById('chat-active').classList.remove('hidden');
+        document.getElementById('chat-target-name').innerText = name;
+        document.getElementById('chat-avatar').src = avatar;
+        document.getElementById('messages-box').innerHTML = "";
+
+        // UI Responsive
+        if(window.innerWidth <= 768) {
+            document.getElementById('sidebar').style.display = 'none';
+            document.getElementById('chat-view').style.display = 'flex';
+        }
+
+        const chatID = [currentUser.username, name].sort().join("_");
+        
+        // Listen Messages
+        chatListener = db.ref('chats/' + chatID);
+        chatListener.limitToLast(50).on('child_added', snap => {
+            renderMessage(snap.val());
+        });
+
+        // Online Status & Last Seen
+        db.ref('users/' + name).on('value', snap => {
+            const data = snap.val();
+            const statusEl = document.getElementById('chat-status');
+            if(data.status === 'online') {
+                statusEl.innerText = "● Online";
+                statusEl.style.color = "var(--success)";
+            } else {
+                const date = new Date(data.lastSeen);
+                statusEl.innerText = "Last seen " + date.getHours() + ":" + (date.getMinutes()<10?'0':'') + date.getMinutes();
+                statusEl.style.color = "var(--text-dim)";
+            }
+        });
+
+        // Typing Indicator Listener
+        db.ref(`typing/${chatID}/${name}`).on('value', snap => {
+            document.getElementById('typing-indicator').innerText = snap.val() ? `${name} sedang mengetik...` : "";
+        });
+
+        // Input Setup
+        const msgInput = document.getElementById('msg-input');
+        msgInput.oninput = () => {
+            db.ref(`typing/${chatID}/${currentUser.username}`).set(true);
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                db.ref(`typing/${chatID}/${currentUser.username}`).set(false);
+            }, 2000);
+        };
+    }
+
+    function renderMessage(msg) {
+        const box = document.getElementById('messages-box');
+        const isMe = msg.sender === currentUser.username;
+        const time = new Date(msg.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        const bubble = document.createElement('div');
+        bubble.className = `bubble ${isMe ? 'sent' : 'received'}`;
+        bubble.innerHTML = `
+            ${msg.text}
+            <div class="msg-info">
+                ${time} ${isMe ? '<span style="color:#fff; margin-left:4px;">✓✓</span>' : ''}
+            </div>
+        `;
+        box.appendChild(bubble);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('msg-input');
+        const text = input.value.trim();
+        if(!text || !activeChat) return;
+
+        const chatID = [currentUser.username, activeChat].sort().join("_");
+        const msgData = {
+            sender: currentUser.username,
+            text: text,
+            time: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        await db.ref('chats/' + chatID).push(msgData);
+        input.value = "";
+        db.ref(`typing/${chatID}/${currentUser.username}`).set(false);
+    }
+
+    document.getElementById('send-btn').onclick = sendMessage;
+    document.getElementById('msg-input').onkeypress = (e) => { if(e.key === 'Enter') sendMessage(); };
+
+    // 8. SETTINGS & UI CONTROLS
+    function openSettings() {
+        document.getElementById('settings-modal').classList.remove('hidden');
+        document.getElementById('set-username').value = currentUser.username;
+        document.getElementById('setting-avatar-preview').src = currentUser.avatar;
+    }
+
+    function closeSettings() {
+        document.getElementById('settings-modal').classList.add('hidden');
+    }
+
+    async function saveSettings() {
+        const updates = {
+            avatar: selectedAvatar,
+            wallpaper: selectedWallpaper
+        };
+
+        await db.ref('users/' + currentUser.username).update(updates);
+        currentUser.avatar = selectedAvatar;
+        currentUser.wallpaper = selectedWallpaper;
+        localStorage.setItem('zchat_user', JSON.stringify(currentUser));
+        alert("Pengaturan Berhasil Disimpan!");
+        location.reload();
+    }
+
+    function handleLogout() {
+        if(currentUser) {
+            db.ref('users/' + currentUser.username + '/status').set('offline');
+            localStorage.removeItem('zchat_user');
+        }
+        location.reload();
+    }
+
+    function backToSidebar() {
+        document.getElementById('sidebar').style.display = 'flex';
+        document.getElementById('chat-view').style.display = 'none';
+    }
+
+    // Custom CSS for Final Polishing
+    const style = document.createElement('style');
+    style.textContent = `
+        @media (max-width: 768px) {
+            .mobile-only { display: block !important; }
+            #main-app { display: block; position: relative; }
+            .sidebar { width: 100vw; height: 100vh; }
+            .chat-view { width: 100vw; height: 100vh; display: none; }
+        }
+        .mobile-only { display: none; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    `;
+    document.head.appendChild(style);
+</script>
 </body>
 </html>
