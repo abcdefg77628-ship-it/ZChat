@@ -2,160 +2,329 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Z-CHAT PRO | SECURE NODE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Z-CHAT ULTIMATE NODE v4.0</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+
     <style>
+        /* VARIABLE ENGINE */
         :root {
-            --bg: #000000;
-            --surface: #0a0a0b;
-            --input: #151518;
+            --bg-pure: #000000;
+            --bg-soft: #0a0a0c;
+            --bg-card: #111114;
+            --bg-input: #16161a;
+            --bg-bubble-me: #0084ff;
+            --bg-bubble-you: #1c1c1e;
+            
             --accent: #0084ff;
-            --text: #ffffff;
-            --dim: #82828a;
-            --border: #1f1f22;
+            --accent-gradient: linear-gradient(135deg, #0084ff 0%, #00c6ff 100%);
+            --accent-glow: rgba(0, 132, 255, 0.5);
+            
+            --text-main: #ffffff;
+            --text-secondary: #8e8e93;
+            --text-ghost: #48484a;
+            
+            --border-thin: 1px solid #242426;
+            --border-thick: 2px solid #2c2c2e;
+            
+            --status-online: #30d158;
+            --status-offline: #ff453a;
+            --status-away: #ffd60a;
+            
+            --radius-xl: 32px;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+            
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.5);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.8);
+            
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { 
-            background: var(--bg); color: var(--text); 
-            height: 100%; width: 100%; overflow: hidden; 
+        /* RESET & BASE */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
             font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body, html {
+            background-color: var(--bg-pure);
+            color: var(--text-main);
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
             position: fixed;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.5;
         }
 
-        /* Toast Notif */
-        #toast {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            background: var(--surface); border: 1px solid var(--border);
-            padding: 12px 25px; border-radius: 50px; font-size: 13px; font-weight: 800;
-            z-index: 999999; transition: 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        #toast.active { top: 30px; }
+        /* SCROLLBAR ENGINE */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        .scrollable { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
 
-        .layer {
-            position: absolute; inset: 0; background: var(--bg);
-            display: none; flex-direction: column; z-index: 10;
-        }
+        /* ANIMATION LIBRARY */
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideDown { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(0, 132, 255, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(0, 132, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 132, 255, 0); } }
 
-        /* Input Styles */
-        .z-input {
-            width: 100%; background: var(--input); border: 2px solid var(--border);
-            padding: 18px; border-radius: 15px; color: white;
-            font-size: 16px; outline: none; transition: 0.3s;
-        }
-        .z-input:focus { border-color: var(--accent); }
+        .anim-fade { animation: fadeIn 0.4s ease-out; }
+        .anim-slide-up { animation: slideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .anim-scale { animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
 
-        .z-btn {
-            width: 100%; padding: 18px; border-radius: 15px; border: none;
-            font-weight: 800; font-size: 15px; cursor: pointer;
-            background: var(--accent); color: white;
+        /* TOAST SYSTEM STYLING */
+        #z-toast-container {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            pointer-events: none;
         }
 
-        /* Splash */
-        #splash {
-            position: fixed; inset: 0; background: var(--bg);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 1000;
+        .z-toast {
+            background: rgba(20, 20, 22, 0.95);
+            backdrop-filter: blur(20px);
+            border: var(--border-thin);
+            padding: 14px 24px;
+            border-radius: 50px;
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-100px);
+            transition: 0.6s cubic-bezier(0.18, 0.89, 0.32, 1.28);
         }
-        .logo { font-family: 'JetBrains Mono'; font-size: 30px; letter-spacing: -1px; }
-        .logo span { color: var(--accent); }
+
+        .z-toast.show { transform: translateY(0); }
+        .z-toast-icon { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); }
+
+        /* LAYER ENGINE */
+        .app-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            background-color: var(--bg-pure);
+            z-index: 10;
+        }
+
+        .layer-active { display: flex; }
+
+        /* TYPOGRAPHY */
+        .z-logo { font-family: 'JetBrains Mono', monospace; font-weight: 800; letter-spacing: -1.5px; }
+        .z-logo span { color: var(--accent); }
+
+        /* SHARED COMPONENTS */
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: var(--radius-md);
+            font-weight: 800;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary:active { transform: scale(0.96); opacity: 0.9; }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-ghost);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+            margin-left: 4px;
+        }
+
+        .z-input-field {
+            width: 100%;
+            background: var(--bg-input);
+            border: var(--border-thick);
+            border-radius: var(--radius-md);
+            padding: 18px 20px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .z-input-field:focus {
+            border-color: var(--accent);
+            background: var(--bg-pure);
+            box-shadow: 0 0 20px rgba(0, 132, 255, 0.15);
+        }
     </style>
 </head>
 <body>
-    <div id="toast">SYSTEM READY</div>
-
-    <div id="splash">
-        <div class="logo">Z<span>CHAT</span></div>
-        <div id="load-bar" style="width:100px; height:2px; background:var(--border); margin-top:15px; overflow:hidden;">
-            <div id="progress" style="width:0%; height:100%; background:var(--accent); transition:0.3s;"></div>
-        </div>
-    </div>
-        <div class="layer" id="auth-view" style="display: flex; padding: 30px; justify-content: center; align-items: center;">
-        <div style="width: 100%; max-width: 400px;">
-            <div class="logo" style="margin-bottom: 5px;">Z<span>PRO</span></div>
-            <p id="auth-desc" style="color: var(--dim); font-size: 13px; margin-bottom: 35px; font-weight: 600;">Secure Node Communication</p>
-
-            <div id="login-box">
-                <div style="margin-bottom: 15px;">
-                    <input type="text" id="l-user" class="z-input" placeholder="ID Node (Username)">
-                </div>
-                <div style="margin-bottom: 25px;">
-                    <input type="password" id="l-pass" class="z-input" placeholder="Password">
-                </div>
-                <button onclick="doLogin()" class="z-btn">MASUK SISTEM</button>
-                <p onclick="switchAuth('REG')" style="text-align: center; margin-top: 20px; color: var(--accent); font-size: 13px; font-weight: 700; cursor: pointer;">Buat Identitas Baru (Daftar)</p>
-            </div>
-
-            <div id="reg-box" style="display: none;">
-                <div style="margin-bottom: 15px;">
-                    <input type="text" id="r-user" class="z-input" placeholder="Pilih ID Node">
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <input type="password" id="r-pass" class="z-input" placeholder="Setel Password (Min 6 Karakter)">
-                </div>
-                <div style="margin-bottom: 25px;">
-                    <input type="password" id="r-conf" class="z-input" placeholder="Ulangi Password">
-                </div>
-                <button onclick="doRegister()" class="z-btn">DAFTARKAN NODE</button>
-                <p onclick="switchAuth('LOGIN')" style="text-align: center; margin-top: 20px; color: var(--accent); font-size: 13px; font-weight: 700; cursor: pointer;">Sudah Punya Akses? Masuk</p>
-            </div>
+    <div id="z-toast-container">
+        <div id="main-toast" class="z-toast">
+            <div class="z-toast-icon"></div>
+            <span id="toast-msg">NODE SYSTEM INITIALIZED</span>
         </div>
     </div>
 
-    <div class="layer" id="main-view">
-        <header style="padding: 50px 20px 20px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div id="my-avatar" style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; border: 2px solid var(--border);">?</div>
-                <div>
-                    <div id="display-name" style="font-weight: 800; font-size: 14px;">USER</div>
-                    <div style="font-size: 9px; color: #30d158; font-weight: 800;">• ONLINE</div>
+    <div id="layer-boot" class="app-layer layer-active" style="justify-content: center; align-items: center; z-index: 9999;">
+        <div class="anim-scale" style="text-align: center;">
+            <div class="z-logo" style="font-size: 42px; margin-bottom: 10px;">Z<span>PRO</span></div>
+            <p style="color: var(--text-ghost); font-size: 10px; letter-spacing: 4px; font-weight: 700;">ENCRYPTED NETWORK</p>
+            
+            <div style="width: 160px; height: 3px; background: var(--bg-input); margin-top: 40px; border-radius: 10px; position: relative; overflow: hidden;">
+                <div id="boot-progress" style="position: absolute; width: 0%; height: 100%; background: var(--accent); transition: width 0.4s;"></div>
+            </div>
+            <p id="boot-status" style="margin-top: 15px; font-size: 9px; color: var(--text-secondary); font-family: 'JetBrains Mono';">CONNECTING TO RELAY...</p>
+        </div>
+    </div>
+
+    <div id="layer-auth" class="app-layer" style="padding: 40px 30px; justify-content: space-between;">
+        <div class="anim-slide-up">
+            <div class="z-logo" style="font-size: 28px; margin-bottom: 5px;">Z<span>CHAT</span></div>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 50px;">Authentication Gateway</p>
+
+            <div id="form-login" class="auth-form">
+                <div class="input-group">
+                    <label class="input-label">Node Identifier</label>
+                    <input type="text" id="auth-user" class="z-input-field" placeholder="username">
                 </div>
+                <div class="input-group">
+                    <label class="input-label">Secure Access Key</label>
+                    <input type="password" id="auth-pass" class="z-input-field" placeholder="••••••••">
+                </div>
+                <button onclick="handleLogin()" class="btn-primary" style="width: 100%; margin-top: 10px;">AUTHORIZE ACCESS</button>
+                <p onclick="toggleAuthMode('REG')" style="text-align: center; margin-top: 25px; font-size: 13px; color: var(--text-secondary); font-weight: 600;">Request new identity? <span style="color: var(--accent);">Register</span></p>
             </div>
-            <div style="display: flex; gap: 15px;">
-                <svg onclick="openSearch()" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <svg onclick="logout()" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff453a" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+
+            <div id="form-reg" class="auth-form" style="display: none;">
+                <div class="input-group">
+                    <label class="input-label">Create Node ID</label>
+                    <input type="text" id="reg-user" class="z-input-field" placeholder="min. 5 chars">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Set Access Key</label>
+                    <input type="password" id="reg-pass" class="z-input-field" placeholder="min. 6 chars">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Confirm Key</label>
+                    <input type="password" id="reg-conf" class="z-input-field" placeholder="verify key">
+                </div>
+                <button onclick="handleRegister()" class="btn-primary" style="width: 100%; margin-top: 10px;">INITIALIZE NODE</button>
+                <p onclick="toggleAuthMode('LOGIN')" style="text-align: center; margin-top: 25px; font-size: 13px; color: var(--text-secondary); font-weight: 600;">Have an identity? <span style="color: var(--accent);">Login</span></p>
             </div>
-        </header>
+        </div>
         
-        <div id="inbox-list" style="flex: 1; overflow-y: auto;">
-            </div>
+        <p style="text-align: center; font-size: 10px; color: var(--text-ghost); font-weight: 700; letter-spacing: 1px;">Z-PRO ENCRYPTION v4.0.2 - ASIA REGION</p>
+    </div>
+
+    <div id="layer-main" class="app-layer">
+        <header style="padding: calc(var(--safe-top) + 50px) 25px 20px; background: var(--bg-soft); border-bottom: var(--border-thin);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div id="my-profile-pic" class="pulse" style="width: 48px; height: 48px; border-radius: 50%; background: var(--bg-input); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px;">?</div>
+                    <div>
+                        <h2 id="my-display-name" style="font-size: 18px; font-weight: 800; letter-spacing: -0.5px;">NODE_USER</h2>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <div style="width: 7px; height: 7px; border-radius: 50%; background: var(--status-online);"></div>
+                            <span style="font-size: 10px; font-weight: 800; color: var(--status-online); letter-spacing: 1px;">ENCRYPTED</span>
                         </div>
-                            <div class="layer" id="chat-view" style="z-index: 100;">
-        <header style="padding: 50px 20px 15px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px;">
-            <svg onclick="backToMain()" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" style="cursor: pointer;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            <div id="chat-avatar" style="width: 38px; height: 38px; border-radius: 50%; background: var(--input); display: flex; align-items: center; justify-content: center; font-weight: 800; border: 1px solid var(--border);">?</div>
-            <div style="flex: 1;">
-                <div id="chat-target-name" style="font-weight: 800; font-size: 15px;">TARGET</div>
-                <div id="chat-target-status" style="font-size: 10px; color: var(--dim); font-weight: 700;">CONNECTING...</div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <div onclick="openSearchView()" style="width: 40px; height: 40px; border-radius: 12px; background: var(--bg-input); display: flex; align-items: center; justify-content: center;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                    <div onclick="executeLogout()" style="width: 40px; height: 40px; border-radius: 12px; background: rgba(255, 69, 58, 0.1); display: flex; align-items: center; justify-content: center;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff453a" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    </div>
+                </div>
             </div>
         </header>
 
-        <div id="msg-box" style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: #000;"></div>
-
-        <div style="padding: 12px 15px calc(15px + env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
-            <input type="text" id="m-input" style="flex: 1; background: var(--input); border: 1px solid var(--border); border-radius: 25px; padding: 12px 18px; color: white; outline: none; font-size: 15px;" placeholder="Ketik pesan...">
-            <button onclick="send()" style="width: 45px; height: 45px; border-radius: 50%; background: var(--accent); border: none; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0, 132, 255, 0.4);">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><line x1="22" y1="2" x2="11" y2="13"></line><polyline points="22 2 15 22 11 13 2 9 22 2"></polyline></svg>
-            </button>
+        <div style="padding: 20px 25px 10px;">
+            <p style="font-size: 11px; font-weight: 800; color: var(--text-ghost); letter-spacing: 2px; text-transform: uppercase;">Direct Transmissions</p>
         </div>
+        <div id="inbox-render-area" class="scrollable" style="flex: 1;">
+            </div>
+
+        <nav style="padding: 15px 40px calc(var(--safe-bottom) + 20px); background: var(--bg-soft); border-top: var(--border-thin); display: flex; justify-content: space-between; align-items: center;">
+            <div style="color: var(--accent);"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
+            <div style="color: var(--text-ghost);"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div>
+            <div style="color: var(--text-ghost);"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></div>
+        </nav>
     </div>
 
-    <div class="layer" id="search-view" style="z-index: 200;">
-        <div style="padding: 50px 20px 15px; background: var(--surface); display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border);">
-            <svg onclick="closeSearch()" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" style="cursor: pointer;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            <input type="text" id="s-input" style="flex: 1; background: transparent; border: none; color: white; font-size: 17px; outline: none;" placeholder="Cari ID Node User...">
+    <div id="layer-chat" class="app-layer" style="z-index: 50;">
+        <header style="padding: calc(var(--safe-top) + 50px) 20px 15px; background: var(--bg-soft); border-bottom: var(--border-thin); display: flex; align-items: center; gap: 15px;">
+            <div onclick="closeChatView()" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </div>
+            <div id="chat-target-avatar" style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-input); display: flex; align-items: center; justify-content: center; font-weight: 800; border: 1px solid var(--border-thick);">?</div>
+            <div style="flex: 1;">
+                <h3 id="chat-target-name" style="font-size: 16px; font-weight: 800;">TARGET_NODE</h3>
+                <p id="chat-target-status" style="font-size: 10px; color: var(--status-online); font-weight: 700;">STABLE CONNECTION</p>
+            </div>
+        </header>
+
+        <div id="chat-messages-area" class="scrollable" style="flex: 1; padding: 25px 20px; display: flex; flex-direction: column; gap: 15px; background: var(--bg-pure);">
+            </div>
+
+        <div id="typing-indicator" style="padding: 5px 25px; font-size: 10px; font-weight: 800; color: var(--accent); display: none; background: var(--bg-pure);">TARGET IS TYPING...</div>
+
+        <footer style="padding: 15px 20px calc(var(--safe-bottom) + 20px); background: var(--bg-soft); border-top: var(--border-thin); display: flex; align-items: center; gap: 12px;">
+            <div style="flex: 1; background: var(--bg-input); border-radius: 30px; padding: 5px 5px 5px 20px; border: var(--border-thin); display: flex; align-items: center;">
+                <input type="text" id="chat-input-field" style="flex: 1; background: transparent; border: none; color: white; padding: 10px 0; font-size: 15px;" placeholder="Send encrypted packet...">
+                <div onclick="executeSendMessage()" style="width: 42px; height: 42px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; margin-left: 10px; box-shadow: 0 4px 15px var(--accent-glow);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><line x1="22" y1="2" x2="11" y2="13"></line><polyline points="22 2 15 22 11 13 2 9 22 2"></polyline></svg>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <div id="layer-search" class="app-layer" style="z-index: 100;">
+        <div style="padding: calc(var(--safe-top) + 50px) 20px 15px; background: var(--bg-soft); display: flex; align-items: center; gap: 15px; border-bottom: var(--border-thin);">
+            <div onclick="closeSearchView()" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </div>
+            <input type="text" id="search-input-field" style="flex: 1; background: transparent; border: none; color: white; font-size: 18px; font-weight: 600;" placeholder="Search Node ID..." autofocus>
         </div>
-        <div id="search-results" style="flex: 1; overflow-y: auto; padding: 10px;">
+        <div id="search-results-area" class="scrollable" style="flex: 1; padding: 10px;">
             </div>
     </div>
         <script type="module">
+        // IMPORT FIREBASE MODULES
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getDatabase, ref, set, push, onValue, update, serverTimestamp, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // KONTROL CONFIG - Pastikan ini sesuai dengan Project Firebase Lu
+        // CONFIGURATION DATA (YOUR PROJECT)
         const firebaseConfig = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
             authDomain: "zchat-56639.firebaseapp.com",
@@ -164,172 +333,310 @@
             appId: "1:773931983053:web:a1c825be9a972e53dcc984"
         };
 
+        // INITIALIZE SYSTEM
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        let ME = null;
-        let ACTIVE_CHAT = null;
-
-        // --- SISTEM NOTIFIKASI (TOAST) ---
-        const toast = (m) => {
-            const t = document.getElementById('toast');
-            t.innerText = m;
-            t.classList.add('active');
-            setTimeout(() => t.classList.remove('active'), 3000);
+        // GLOBAL APPLICATION STATE
+        const State = {
+            ME: null,
+            ACTIVE_CHAT_UID: null,
+            ACTIVE_CHAT_NAME: null,
+            IS_BOOTED: false,
+            TYPING_TIMEOUT: null
         };
 
-        // --- SISTEM NAVIGASI ---
-        window.switchAuth = (m) => {
-            document.getElementById('login-box').style.display = m === 'LOGIN' ? 'block' : 'none';
-            document.getElementById('reg-box').style.display = m === 'REG' ? 'block' : 'none';
-        };
-        window.openSearch = () => document.getElementById('search-view').style.display = 'flex';
-        window.closeSearch = () => document.getElementById('search-view').style.display = 'none';
-        window.backToMain = () => { document.getElementById('chat-view').style.display = 'none'; ACTIVE_CHAT = null; };
-
-        // --- LOGIKA REGISTER (ANTI-FAILED) ---
-        window.doRegister = async () => {
-            const u = document.getElementById('r-user').value.trim().toLowerCase();
-            const p = document.getElementById('r-pass').value;
-            const c = document.getElementById('r-conf').value;
-
-            if (u.length < 5) return toast("ID Minimal 5 Karakter!");
-            if (p.length < 6) return toast("Password Minimal 6 Karakter!");
-            if (p !== c) return toast("Password Tidak Cocok!");
-
-            toast("Mendaftarkan Node...");
-            try {
-                // 1. Cek apakah username sudah dipakai
-                const check = await get(ref(db, `usernames/${u}`));
-                if (check.exists()) return toast("ID Sudah Terpakai!");
-
-                // 2. Buat Akun Auth
-                const res = await createUserWithEmailAndPassword(auth, `${u}@zpro.io`, p);
-                
-                // 3. Simpan Data ke Database
-                await set(ref(db, `users/${res.user.uid}`), { username: u, status: 'online' });
-                await set(ref(db, `usernames/${u}`), res.user.uid);
-                
-                toast("Berhasil! Memuat Sistem...");
-            } catch (err) {
-                console.error(err);
-                if (err.code === 'auth/email-already-in-use') toast("ID Sudah Ada!");
-                else if (err.code === 'auth/operation-not-allowed') toast("Aktifkan Email/Pass di Firebase!");
-                else toast("Error: " + err.message);
+        // --- UTILITY ENGINE ---
+        const UI = {
+            toast: (msg) => {
+                const el = document.getElementById('main-toast');
+                document.getElementById('toast-msg').innerText = msg.toUpperCase();
+                el.classList.add('show');
+                setTimeout(() => el.classList.remove('show'), 3000);
+            },
+            showLayer: (id) => {
+                document.querySelectorAll('.app-layer').forEach(l => l.classList.remove('layer-active'));
+                document.getElementById(id).classList.add('layer-active');
+            },
+            getAvatarColor: (name) => {
+                const colors = ['#0084ff', '#30d158', '#ff453a', '#ffd60a', '#af52de', '#ff9f0a'];
+                let hash = 0;
+                for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+                return colors[Math.abs(hash) % colors.length];
             }
         };
 
-        // --- LOGIKA LOGIN ---
-        window.doLogin = async () => {
-            const u = document.getElementById('l-user').value.trim().toLowerCase();
-            const p = document.getElementById('l-pass').value;
-            if (!u || !p) return toast("Isi Semua Field!");
+        // --- AUTH ENGINE ---
+        window.toggleAuthMode = (mode) => {
+            document.getElementById('form-login').style.display = mode === 'LOGIN' ? 'block' : 'none';
+            document.getElementById('form-reg').style.display = mode === 'REG' ? 'block' : 'none';
+        };
 
+        window.handleRegister = async () => {
+            const u = document.getElementById('reg-user').value.trim().toLowerCase();
+            const p = document.getElementById('reg-pass').value;
+            const c = document.getElementById('reg-conf').value;
+
+            if (u.length < 5) return UI.toast("ID_TOO_SHORT");
+            if (p.length < 6) return UI.toast("PASS_TOO_WEAK");
+            if (p !== c) return UI.toast("PASS_MISMATCH");
+
+            UI.toast("CREATING_IDENTITY...");
+            try {
+                // Check if username exists
+                const userCheck = await get(ref(db, `usernames/${u}`));
+                if (userCheck.exists()) return UI.toast("ID_ALREADY_TAKEN");
+
+                const res = await createUserWithEmailAndPassword(auth, `${u}@zpro.io`, p);
+                const userData = {
+                    uid: res.user.uid,
+                    username: u,
+                    status: 'online',
+                    bio: 'Secure node user.',
+                    avatarColor: UI.getAvatarColor(u),
+                    createdAt: serverTimestamp()
+                };
+
+                await set(ref(db, `users/${res.user.uid}`), userData);
+                await set(ref(db, `usernames/${u}`), res.user.uid);
+                
+                UI.toast("NODE_INITIALIZED");
+                location.reload();
+            } catch (err) {
+                UI.toast("AUTH_FAILED: " + err.code);
+            }
+        };
+
+        window.handleLogin = async () => {
+            const u = document.getElementById('auth-user').value.trim().toLowerCase();
+            const p = document.getElementById('auth-pass').value;
+
+            if (!u || !p) return UI.toast("DATA_INCOMPLETE");
+
+            UI.toast("AUTHORIZING...");
             try {
                 await signInWithEmailAndPassword(auth, `${u}@zpro.io`, p);
             } catch (err) {
-                toast("Akses Ditolak: Cek ID/Pass!");
+                UI.toast("ACCESS_DENIED");
             }
         };
 
-        // --- MONITOR STATUS AUTH ---
+        window.executeLogout = () => {
+            if (confirm("DISCONNECT FROM NETWORK?")) {
+                signOut(auth).then(() => location.reload());
+            }
+        };
+
+        // --- NAVIGATION HANDLERS ---
+        window.openSearchView = () => UI.showLayer('layer-search');
+        window.closeSearchView = () => UI.showLayer('layer-main');
+        window.closeChatView = () => {
+            UI.showLayer('layer-main');
+            State.ACTIVE_CHAT_UID = null;
+        };
+
+        // --- CORE SYSTEM BOOT ---
         onAuthStateChanged(auth, async (user) => {
-            const prog = document.getElementById('progress');
+            const prog = document.getElementById('boot-progress');
+            const stat = document.getElementById('boot-status');
+
             if (user) {
-                prog.style.width = "100%";
+                stat.innerText = "RETRIEVING_USER_PACKETS...";
+                prog.style.width = "60%";
+
                 const snap = await get(ref(db, `users/${user.uid}`));
-                ME = { uid: user.uid, ...snap.val() };
-                
-                document.getElementById('display-name').innerText = ME.username.toUpperCase();
-                document.getElementById('my-avatar').innerText = ME.username[0].toUpperCase();
-                
-                document.getElementById('splash').style.display = 'none';
-                document.getElementById('auth-view').style.display = 'none';
-                document.getElementById('main-view').style.display = 'flex';
-                renderInbox();
+                if (snap.exists()) {
+                    State.ME = snap.val();
+                    prog.style.width = "100%";
+                    stat.innerText = "HANDSHAKE_COMPLETE";
+
+                    // Sync UI
+                    document.getElementById('my-display-name').innerText = State.ME.username.toUpperCase();
+                    const av = document.getElementById('my-profile-pic');
+                    av.innerText = State.ME.username[0].toUpperCase();
+                    av.style.backgroundColor = State.ME.avatarColor;
+
+                    setTimeout(() => {
+                        UI.showLayer('layer-main');
+                        document.getElementById('layer-boot').style.display = 'none';
+                        renderInbox();
+                    }, 800);
+                }
             } else {
-                document.getElementById('splash').style.display = 'none';
-                document.getElementById('auth-view').style.display = 'flex';
-                document.getElementById('main-view').style.display = 'none';
+                setTimeout(() => {
+                    UI.showLayer('layer-auth');
+                    document.getElementById('layer-boot').style.display = 'none';
+                }, 1000);
             }
         });
 
-        window.logout = () => { if(confirm("Keluar dari Jaringan?")) signOut(auth); };
+        // --- SEARCH ENGINE ---
+        document.getElementById('search-input-field').oninput = async (e) => {
+            const val = e.target.value.trim().toLowerCase();
+            const area = document.getElementById('search-results-area');
+            area.innerHTML = '';
 
-        // --- SEARCH USER ---
-        document.getElementById('s-input').oninput = async (e) => {
-            const v = e.target.value.trim().toLowerCase();
-            const resBox = document.getElementById('search-results');
-            resBox.innerHTML = '';
-            if (v.length < 3) return;
+            if (val.length < 3) return;
 
-            const q = query(ref(db, 'users'), orderByChild('username'), equalTo(v));
+            const q = query(ref(db, 'users'), orderByChild('username'), equalTo(val));
             const snap = await get(q);
-            snap.forEach(c => {
-                if (c.key === ME.uid) return;
-                const d = c.val();
-                const div = document.createElement('div');
-                div.style = "padding:15px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;";
-                div.innerHTML = `<div style="width:35px; height:35px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:800;">${d.username[0].toUpperCase()}</div><b>${d.username.toUpperCase()}</b>`;
-                div.onclick = () => {
-                    closeSearch();
-                    openChat(c.key, d.username);
+            
+            if (!snap.exists()) {
+                area.innerHTML = `<p style="text-align:center; color:var(--text-ghost); margin-top:20px; font-size:12px;">NO NODE FOUND</p>`;
+                return;
+            }
+
+            snap.forEach(child => {
+                if (child.key === State.ME.uid) return;
+                const d = child.val();
+                const row = document.createElement('div');
+                row.className = 'anim-fade';
+                row.style = "padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: var(--border-thin); cursor: pointer;";
+                row.innerHTML = `
+                    <div style="width:40px; height:40px; border-radius:50%; background:${d.avatarColor}; display:flex; align-items:center; justify-content:center; font-weight:800;">${d.username[0].toUpperCase()}</div>
+                    <div style="flex:1">
+                        <p style="font-weight:800; font-size:15px;">${d.username.toUpperCase()}</p>
+                        <p style="font-size:10px; color:var(--text-secondary);">${d.bio}</p>
+                    </div>
+                `;
+                row.onclick = () => {
+                    closeSearchView();
+                    window.openChatView(d.uid, d.username, d.avatarColor);
                 };
-                resBox.appendChild(div);
+                area.appendChild(row);
             });
         };
 
-        // --- OPEN CHAT & REALTIME MESSAGE ---
-        window.openChat = (tid, name) => {
-            ACTIVE_CHAT = tid;
+        // --- CHAT ENGINE ---
+        window.openChatView = (uid, name, color) => {
+            State.ACTIVE_CHAT_UID = uid;
+            State.ACTIVE_CHAT_NAME = name;
+            
             document.getElementById('chat-target-name').innerText = name.toUpperCase();
-            document.getElementById('chat-avatar').innerText = name[0].toUpperCase();
-            document.getElementById('chat-view').style.display = 'flex';
+            const av = document.getElementById('chat-target-avatar');
+            av.innerText = name[0].toUpperCase();
+            av.style.backgroundColor = color;
+            
+            UI.showLayer('layer-chat');
 
-            const cid = [ME.uid, tid].sort().join('_');
-            onValue(ref(db, `messages/${cid}`), (snap) => {
-                const box = document.getElementById('msg-box');
-                box.innerHTML = '';
+            // Setup Realtime Listener
+            const chatID = [State.ME.uid, uid].sort().join('_');
+            const msgRef = ref(db, `messages/${chatID}`);
+            
+            onValue(msgRef, (snap) => {
+                const area = document.getElementById('chat-messages-area');
+                area.innerHTML = '';
+                
+                if (!snap.exists()) {
+                    area.innerHTML = `<div style="flex:1; display:flex; align-items:center; justify-content:center; color:var(--text-ghost); font-size:11px; font-weight:700; letter-spacing:1px;">ENCRYPTED CHANNEL ESTABLISHED</div>`;
+                }
+
                 snap.forEach(m => {
-                    const d = m.val();
-                    const isMe = d.s === ME.uid;
-                    const b = document.createElement('div');
-                    b.style = `max-width:80%; padding:10px 15px; border-radius:15px; font-size:14px; ${isMe ? 'align-self:flex-end; background:var(--accent);' : 'align-self:flex-start; background:var(--input);'}`;
-                    b.innerText = d.t;
-                    box.appendChild(b);
+                    const data = m.val();
+                    const isMe = data.sender === State.ME.uid;
+                    const bubble = document.createElement('div');
+                    
+                    bubble.className = 'anim-fade';
+                    bubble.style = `
+                        max-width: 80%;
+                        padding: 12px 16px;
+                        border-radius: 20px;
+                        font-size: 14px;
+                        line-height: 1.4;
+                        position: relative;
+                        word-wrap: break-word;
+                        ${isMe ? 
+                            'align-self: flex-end; background: var(--bg-bubble-me); color: white; border-bottom-right-radius: 4px;' : 
+                            'align-self: flex-start; background: var(--bg-bubble-you); color: white; border-bottom-left-radius: 4px;'
+                        }
+                    `;
+                    
+                    bubble.innerHTML = `
+                        ${data.text}
+                        <div style="font-size:8px; opacity:0.5; margin-top:5px; text-align:right;">${new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                    `;
+                    area.appendChild(bubble);
                 });
-                box.scrollTop = box.scrollHeight;
+                area.scrollTop = area.scrollHeight;
+            });
+
+            // Listen Typing Status
+            onValue(ref(db, `typing/${uid}/${State.ME.uid}`), (s) => {
+                document.getElementById('typing-indicator').style.display = s.exists() ? 'block' : 'none';
             });
         };
 
-        window.send = () => {
-            const i = document.getElementById('m-input');
-            if (!i.value.trim() || !ACTIVE_CHAT) return;
-            const cid = [ME.uid, ACTIVE_CHAT].sort().join('_');
-            const p = { s: ME.uid, t: i.value, ts: serverTimestamp() };
-            push(ref(db, `messages/${cid}`), p);
-            update(ref(db, `inbox/${ME.uid}/${ACTIVE_CHAT}`), { l: i.value, ts: serverTimestamp() });
-            update(ref(db, `inbox/${ACTIVE_CHAT}/${ME.uid}`), { l: i.value, ts: serverTimestamp() });
-            i.value = '';
+        window.executeSendMessage = () => {
+            const inp = document.getElementById('chat-input-field');
+            const txt = inp.value.trim();
+            if (!txt || !State.ACTIVE_CHAT_UID) return;
+
+            const chatID = [State.ME.uid, State.ACTIVE_CHAT_UID].sort().join('_');
+            const payload = {
+                sender: State.ME.uid,
+                text: txt,
+                timestamp: serverTimestamp()
+            };
+
+            push(ref(db, `messages/${chatID}`), payload);
+            
+            // Update Inbox
+            const inboxData = { lastMsg: txt, timestamp: serverTimestamp() };
+            update(ref(db, `inbox/${State.ME.uid}/${State.ACTIVE_CHAT_UID}`), inboxData);
+            update(ref(db, `inbox/${State.ACTIVE_CHAT_UID}/${State.ME.uid}`), inboxData);
+            
+            inp.value = '';
+            set(ref(db, `typing/${State.ME.uid}/${State.ACTIVE_CHAT_UID}`), null);
         };
 
+        // --- INBOX ENGINE ---
         function renderInbox() {
-            onValue(ref(db, `inbox/${ME.uid}`), (snap) => {
-                const box = document.getElementById('inbox-list');
-                box.innerHTML = '';
-                snap.forEach(c => {
-                    get(ref(db, `users/${c.key}`)).then(u => {
-                        const ud = u.val();
-                        const row = document.createElement('div');
-                        row.style = "padding:15px 20px; border-bottom:1px solid var(--border); display:flex; gap:15px; align-items:center;";
-                        row.innerHTML = `<div style="width:45px; height:45px; border-radius:50%; background:var(--input); display:flex; align-items:center; justify-content:center; font-weight:800; border:1px solid var(--border);">${ud.username[0].toUpperCase()}</div><div style="flex:1"><b>${ud.username.toUpperCase()}</b><br><small style="color:var(--dim)">${c.val().l}</small></div>`;
-                        row.onclick = () => openChat(c.key, ud.username);
-                        box.prepend(row);
-                    });
+            onValue(ref(db, `inbox/${State.ME.uid}`), (snap) => {
+                const area = document.getElementById('inbox-render-area');
+                area.innerHTML = '';
+                
+                if (!snap.exists()) {
+                    area.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-ghost); font-size:12px; font-weight:700;">NO TRANSMISSIONS YET</div>`;
+                    return;
+                }
+
+                let sorted = [];
+                snap.forEach(child => sorted.push({id: child.key, ...child.val()}));
+                sorted.sort((a, b) => b.timestamp - a.timestamp);
+
+                sorted.forEach(async (chat) => {
+                    const uSnap = await get(ref(db, `users/${chat.id}`));
+                    const u = uSnap.val();
+                    const row = document.createElement('div');
+                    row.className = 'anim-fade';
+                    row.style = "padding: 18px 25px; display:flex; align-items:center; gap:15px; border-bottom: var(--border-thin); cursor:pointer;";
+                    row.innerHTML = `
+                        <div style="width:50px; height:50px; border-radius:50%; background:${u.avatarColor}; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:18px;">${u.username[0].toUpperCase()}</div>
+                        <div style="flex:1; overflow:hidden;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                <h4 style="font-weight:800; font-size:15px;">${u.username.toUpperCase()}</h4>
+                                <span style="font-size:10px; color:var(--text-ghost);">${new Date(chat.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                            </div>
+                            <p style="font-size:13px; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${chat.lastMsg}</p>
+                        </div>
+                    `;
+                    row.onclick = () => window.openChatView(chat.id, u.username, u.avatarColor);
+                    area.appendChild(row);
                 });
             });
         }
+
+        // --- TYPING HANDLER ---
+        document.getElementById('chat-input-field').oninput = () => {
+            if (!State.ACTIVE_CHAT_UID) return;
+            set(ref(db, `typing/${State.ME.uid}/${State.ACTIVE_CHAT_UID}`), true);
+            
+            clearTimeout(State.TYPING_TIMEOUT);
+            State.TYPING_TIMEOUT = setTimeout(() => {
+                set(ref(db, `typing/${State.ME.uid}/${State.ACTIVE_CHAT_UID}`), null);
+            }, 3000);
+        };
     </script>
 </body>
 </html>
