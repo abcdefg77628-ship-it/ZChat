@@ -3,157 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZChat Master Edition</title>
+    <title>ZChat Pro v10</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
         :root {
-            --bg: #000;
-            --surf: #0a0a0a;
-            --card: #121212;
-            --blue: #007bff;
+            --bg: #050505;
+            --surface: #121212;
+            --accent: #0070f3;
             --border: #222;
-            --text: #fff;
-            --red: #ff3b30;
-            --green: #4cd964;
+            --text-main: #ffffff;
+            --text-dim: #888;
+            --danger: #ff4d4d;
+            --success: #00ff88;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--text);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, sans-serif; }
+        body { background: var(--bg); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         .hidden { display: none !important; }
 
-        /* UI Elements */
+        /* Input & Buttons */
         input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            background: var(--surf);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: #fff;
-            outline: none;
+            width: 100%; padding: 14px; margin-bottom: 12px;
+            background: #1a1a1a; border: 1px solid var(--border);
+            border-radius: 8px; color: #fff; outline: none; transition: 0.3s;
         }
-
+        input:focus { border-color: var(--accent); background: #222; }
+        
         .btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: 0.2s;
+            width: 100%; padding: 14px; border: none; border-radius: 8px;
+            font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 14px;
         }
-
-        .btn-p { background: var(--blue); color: #fff; }
-        .btn-p:active { opacity: 0.8; }
+        .btn-p { background: var(--accent); color: #fff; }
+        .btn-p:hover { filter: brightness(1.2); }
+        .btn-s { background: transparent; border: 1px solid var(--border); color: #fff; }
 
         /* Header */
         header {
-            background: var(--card);
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--blue);
-            z-index: 10;
+            background: rgba(18, 18, 18, 0.8); backdrop-filter: blur(10px);
+            padding: 15px 20px; display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 1px solid var(--border); z-index: 100;
         }
+        .logo { font-weight: 800; letter-spacing: 2px; font-size: 18px; color: var(--accent); }
 
-        /* Sidebar */
+        /* Sidebar / Slide Menu */
         #sidebar {
-            position: fixed;
-            top: 0;
-            right: -280px;
-            width: 260px;
-            height: 100%;
-            background: var(--card);
-            z-index: 1000;
-            transition: 0.3s ease-in-out;
-            padding: 20px;
-            border-left: 1px solid var(--blue);
+            position: fixed; top: 0; right: -100%; width: 320px; height: 100%;
+            background: var(--surface); z-index: 1000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 30px 25px; border-left: 1px solid var(--border);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
         }
-
         #sidebar.active { right: 0; }
-
-        /* Chat Bubbles */
-        #msgs {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+        .overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            z-index: 900; display: none; backdrop-filter: blur(3px);
         }
 
+        /* Nav Icons (SVG) */
+        .icon-btn { background: none; border: none; cursor: pointer; color: #fff; display: flex; align-items: center; }
+
+        /* Chat UI */
+        #msgs { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
         .bubble {
-            max-width: 80%;
-            padding: 10px 14px;
-            border-radius: 15px;
-            font-size: 14px;
-            line-height: 1.4;
+            max-width: 75%; padding: 12px 16px; border-radius: 12px;
+            font-size: 14px; line-height: 1.5; position: relative;
         }
+        .msg-me { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 2px; }
+        .msg-them { align-self: flex-start; background: #222; border-bottom-left-radius: 2px; }
 
-        .msg-me {
-            align-self: flex-end;
-            background: var(--blue);
-            border-bottom-right-radius: 2px;
+        /* Professional Modal */
+        .modal {
+            position: fixed; inset: 0; z-index: 3000; background: rgba(0,0,0,0.85);
+            display: none; align-items: center; justify-content: center; padding: 20px;
         }
-
-        .msg-them {
-            align-self: flex-start;
-            background: var(--surf);
-            border: 1px solid var(--border);
-            border-bottom-left-radius: 2px;
+        .modal-content {
+            background: var(--surface); width: 100%; max-width: 400px;
+            border-radius: 16px; border: 1px solid var(--border); padding: 25px;
         }
+        .modal-h { margin-bottom: 20px; font-size: 18px; font-weight: 700; }
 
-        /* Modals */
-        #adm-modal {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 2000;
-            padding: 20px;
-            overflow-y: auto;
-            display: none;
-        }
-
-        .adm-user-row {
-            background: var(--surf);
-            padding: 10px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
+        /* Custom Toast */
         #toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--blue);
-            padding: 10px 20px;
-            border-radius: 20px;
-            z-index: 5000;
-            display: none;
-            font-size: 13px;
-            font-weight: bold;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: #fff; color: #000; padding: 12px 24px; border-radius: 50px;
+            font-weight: 600; font-size: 13px; z-index: 5000; display: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -161,246 +97,226 @@
 
     <div id="toast"></div>
 
-    <div id="scr-auth" style="flex:1; display:flex; align-items:center; justify-content:center; padding:20px;">
-        <div style="width:100%; max-width:300px; text-align:center;">
-            <h1 style="color:var(--blue); font-size:60px; font-weight:900;">Z</h1>
-            <p id="auth-label" style="margin-bottom:20px; color:gray;">Login ke ZChat</p>
-            <input id="u-in" placeholder="Username" autocomplete="off">
+    <div id="custom-modal" class="modal">
+        <div class="modal-content">
+            <div id="modal-title" class="modal-h">Input</div>
+            <input id="modal-input" type="text" placeholder="Masukkan sesuatu...">
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-s" onclick="closeModal()">Batal</button>
+                <button class="btn btn-p" id="modal-confirm">Oke</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="scr-auth" style="flex:1; display:flex; align-items:center; justify-content:center; padding:30px;">
+        <div style="width:100%; max-width:320px;">
+            <div class="logo" style="font-size:40px; text-align:center; margin-bottom:40px;">ZCHAT.</div>
+            <input id="u-in" placeholder="Username" spellcheck="false">
             <input id="p-in" type="password" placeholder="Password">
-            <button class="btn btn-p" onclick="doAuth()">MASUK</button>
-            <p onclick="toggleM()" style="margin-top:15px; font-size:12px; color:var(--blue); cursor:pointer;">Belum punya akun? Daftar</p>
+            <button class="btn btn-p" onclick="doAuth()">SIGN IN</button>
+            <p onclick="toggleM()" style="text-align:center; margin-top:20px; font-size:12px; color:var(--text-dim); cursor:pointer;">
+                Belum punya akses? <span style="color:var(--accent)">Register</span>
+            </p>
         </div>
     </div>
 
     <div id="scr-app" class="hidden" style="flex:1; display:flex; flex-direction:column;">
         <header>
-            <div id="my-n" style="font-size:12px; font-weight:bold; color:var(--blue)"></div>
-            <b style="letter-spacing:3px;">ZCHAT</b>
-            <div onclick="toggleS(true)" style="cursor:pointer; font-size:24px;">☰</div>
+            <div class="logo">Z.</div>
+            <div style="display:flex; gap:15px; align-items:center;">
+                <span id="my-n" style="font-size:12px; color:var(--text-dim)"></span>
+                <button class="icon-btn" onclick="toggleS(true)">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+                </button>
+            </div>
         </header>
 
-        <div id="sidebar">
-            <h3 style="color:var(--blue); margin-bottom:15px;">MENU</h3>
-            <p style="font-size:10px; color:gray;">PERMINTAAN PERTEMANAN</p>
-            <div id="req-list" style="margin:10px 0;"></div>
-            
-            <hr style="border:0; border-top:1px solid #222; margin:15px 0;">
-            
-            <div class="btn" onclick="changeP()" style="font-size:13px; text-align:left; padding:0; margin-bottom:15px;">🔒 Ganti Password</div>
-            
-            <div id="adm-btn" class="hidden" onclick="openAdm()" style="padding:12px; border:1px solid var(--blue); color:var(--blue); border-radius:10px; text-align:center; font-weight:bold; cursor:pointer; margin-bottom:15px;">
-                ⚙️ ADMIN PANEL
+        <div class="overlay" onclick="toggleS(false)"></div>
+        <nav id="sidebar">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
+                <span style="font-weight:700; color:var(--text-dim); font-size:12px; letter-spacing:1px;">SETTINGS</span>
+                <button class="icon-btn" onclick="toggleS(false)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
             </div>
             
-            <button class="btn" style="background:var(--red); color:#fff; margin-top:10px;" onclick="logout()">KELUAR</button>
-            <button class="btn" style="margin-top:10px; background:#333; color:#fff;" onclick="toggleS(false)">TUTUP</button>
-        </div>
+            <div style="background:#1a1a1a; padding:15px; border-radius:12px; margin-bottom:30px;">
+                <div style="font-size:11px; color:gray; margin-bottom:5px;">LOGGED IN AS</div>
+                <div id="side-u" style="font-weight:700;">-</div>
+            </div>
 
-        <main style="padding:15px; flex:1; overflow-y:auto;">
-            <button class="btn btn-p" onclick="addF()">+ TAMBAH TEMAN</button>
-            <div id="flist" style="margin-top:20px;"></div>
+            <p style="font-size:11px; color:gray; margin-bottom:10px;">INCOMING REQUESTS</p>
+            <div id="req-list" style="margin-bottom:30px;"></div>
+
+            <button class="btn btn-s" style="margin-bottom:10px; text-align:left;" onclick="promptPass()">Change Password</button>
+            <div id="adm-btn" class="hidden">
+                <button class="btn btn-s" style="border-color:var(--accent); color:var(--accent); margin-bottom:10px;" onclick="openAdm()">Admin Dashboard</button>
+            </div>
+            <button class="btn btn-s" style="color:var(--danger); border-color:rgba(255,77,77,0.2);" onclick="logout()">Sign Out</button>
+        </nav>
+
+        <main style="padding:20px; flex:1; overflow-y:auto;">
+            <button class="btn btn-p" onclick="promptAddFriend()" style="margin-bottom:30px;">+ NEW CONNECTION</button>
+            <p style="font-size:11px; color:gray; letter-spacing:1px; margin-bottom:15px;">ACTIVE FRIENDS</p>
+            <div id="flist"></div>
         </main>
     </div>
 
-    <div id="chat-v" class="hidden" style="position:fixed; inset:0; background:#000; z-index:1500; display:flex; flex-direction:column;">
+    <div id="chat-v" class="hidden" style="position:fixed; inset:0; background:var(--bg); z-index:1500; display:flex; flex-direction:column;">
         <header>
-            <div onclick="closeC()" style="cursor:pointer; font-weight:bold; color:var(--blue)">← KEMBALI</div>
-            <b id="p-n">USERNAME</b>
-            <div style="width:50px;"></div>
+            <button class="icon-btn" onclick="closeC()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <b id="p-n" style="font-size:14px;">-</b>
+            <div style="width:24px;"></div>
         </header>
         <div id="msgs"></div>
-        <div style="padding:15px; background:var(--card); display:flex; gap:10px;">
-            <input id="m-in" placeholder="Ketik pesan..." style="margin:0; flex:1;">
-            <button class="btn btn-p" style="width:70px; margin:0;" onclick="sendM()">KIRIM</button>
+        <div style="padding:15px 20px 30px; background:var(--surface); display:flex; gap:10px;">
+            <input id="m-in" placeholder="Write a message..." style="margin:0; flex:1; background:#000;">
+            <button class="btn btn-p" style="width:auto; padding:0 25px;" onclick="sendM()">SEND</button>
         </div>
     </div>
 
-    <div id="adm-modal">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="color:var(--blue)">PANEL OWNER</h2>
-            <b onclick="document.getElementById('adm-modal').style.display='none'" style="color:var(--red); cursor:pointer;">X</b>
+    <div id="adm-modal" class="modal" style="display:none; align-items:start; padding-top:50px;">
+        <div class="modal-content" style="max-width:500px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:30px;">
+                <h2 style="font-size:20px;">System Control</h2>
+                <button class="icon-btn" onclick="document.getElementById('adm-modal').style.display='none'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+            </div>
+            <div id="adm-u"></div>
+            <button class="btn btn-s" onclick="clearDB()" style="margin-top:20px; color:var(--danger);">Purge All History</button>
         </div>
-        <div id="adm-u"></div>
-        <button class="btn" onclick="clearDB()" style="background:var(--red); color:#fff; margin-top:20px;">RESET SEMUA CHAT</button>
     </div>
 
     <script>
-        // Konfigurasi Firebase
-        const fbConfig = {
-            databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app"
-        };
+        // FIREBASE SETUP
+        const fbConfig = { databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(fbConfig);
         const db = firebase.database();
         const OWNER = "zZerr44";
 
         let me = null, peer = null, isReg = false;
 
-        // Utility: Toast
-        function tst(msg) {
-            const e = document.getElementById('toast');
-            e.innerText = msg;
-            e.style.display = 'block';
-            setTimeout(() => e.style.display = 'none', 2500);
+        // CUSTOM MODAL ENGINE
+        function showModal(title, placeholder, onConfirm) {
+            const m = document.getElementById('custom-modal');
+            document.getElementById('modal-title').innerText = title;
+            const input = document.getElementById('modal-input');
+            input.placeholder = placeholder;
+            input.value = "";
+            m.style.display = 'flex';
+            document.getElementById('modal-confirm').onclick = () => {
+                onConfirm(input.value);
+                closeModal();
+            };
         }
+        function closeModal() { document.getElementById('custom-modal').style.display = 'none'; }
 
-        // Auth Logic
+        // UI UTILS
+        function tst(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2500);
+        }
         function toggleM() {
             isReg = !isReg;
-            document.getElementById('auth-label').innerText = isReg ? "Daftar Akun Baru" : "Login ke ZChat";
-            document.querySelector('#scr-auth .btn-p').innerText = isReg ? "DAFTAR" : "MASUK";
+            document.querySelector('#scr-auth .logo').innerText = isReg ? "REGISTER." : "ZCHAT.";
+            document.querySelector('#scr-auth .btn-p').innerText = isReg ? "CREATE ACCOUNT" : "SIGN IN";
+        }
+        function toggleS(s) {
+            document.getElementById('sidebar').classList.toggle('active', s);
+            document.querySelector('.overlay').style.display = s ? 'block' : 'none';
         }
 
-        function toggleS(show) {
-            document.getElementById('sidebar').classList.toggle('active', show);
-        }
-
+        // AUTH
         async function doAuth() {
             const u = document.getElementById('u-in').value.trim().toLowerCase();
             const p = document.getElementById('p-in').value;
-            
-            if(!u || !p) return tst("Isi semua field!");
-
-            if (isReg) {
-                const s = await db.ref('u/' + u).once('value');
-                if(s.exists()) return tst("Username sudah dipakai!");
-                await db.ref('u/' + u).set({ u, p });
-                tst("Berhasil daftar! Silakan login.");
-                toggleM();
+            if(!u || !p) return tst("Missing credentials");
+            if(isReg) {
+                const s = await db.ref('u/'+u).once('value');
+                if(s.exists()) return tst("Username taken");
+                await db.ref('u/'+u).set({u, p});
+                tst("Account created"); toggleM();
             } else {
-                const s = await db.ref('u/' + u).once('value');
-                if (s.exists() && s.val().p === p) {
-                    me = s.val();
-                    startApp();
-                } else {
-                    tst("Username atau Password salah!");
-                }
+                const s = await db.ref('u/'+u).once('value');
+                if(s.exists() && s.val().p === p) { me = s.val(); start(); }
+                else tst("Invalid credentials");
             }
         }
 
-        // App Logic
-        function startApp() {
+        // APP CORE
+        function start() {
             document.getElementById('scr-auth').classList.add('hidden');
             document.getElementById('scr-app').classList.remove('hidden');
-            document.getElementById('my-n').innerText = "@" + me.u;
+            document.getElementById('side-u').innerText = me.u.toUpperCase();
+            document.getElementById('my-n').innerText = me.u;
+            if(me.u === OWNER.toLowerCase()) document.getElementById('adm-btn').classList.remove('hidden');
 
-            if (me.u === OWNER.toLowerCase()) {
-                document.getElementById('adm-btn').classList.remove('hidden');
-            }
-
-            // Listen Friend Requests
-            db.ref('req/' + me.u).on('value', s => {
-                const l = document.getElementById('req-list');
-                l.innerHTML = "";
-                if(!s.exists()) l.innerHTML = "<small style='color:gray'>Tidak ada permintaan</small>";
+            db.ref('req/'+me.u).on('value', s => {
+                const l = document.getElementById('req-list'); l.innerHTML = "";
+                if(!s.exists()) l.innerHTML = "<small style='color:#444'>No pending requests</small>";
                 s.forEach(i => {
-                    l.innerHTML += `
-                        <div class="adm-user-row">
-                            <span>${i.key}</span>
-                            <button onclick="acc('${i.key}')" style="background:var(--green); border:none; padding:4px 8px; border-radius:5px; color:#000; font-weight:bold;">TERIMA</button>
-                        </div>`;
+                    l.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; background:#222; padding:10px; border-radius:8px;">
+                        <span style="font-size:13px">${i.key}</span>
+                        <button onclick="acc('${i.key}')" style="background:var(--accent); border:none; color:#fff; padding:5px 10px; border-radius:4px; font-size:11px; font-weight:700;">ACCEPT</button>
+                    </div>`;
                 });
             });
 
-            // Listen Friend List
-            db.ref('f/' + me.u).on('value', s => {
-                const l = document.getElementById('flist');
-                l.innerHTML = "";
-                if(!s.exists()) l.innerHTML = "<p style='text-align:center; color:gray; margin-top:20px;'>Belum ada teman. Tambahkan teman dulu!</p>";
+            db.ref('f/'+me.u).on('value', s => {
+                const l = document.getElementById('flist'); l.innerHTML = "";
                 s.forEach(i => {
-                    l.innerHTML += `
-                        <div onclick="openC('${i.key}')" style="background:var(--card); padding:15px; margin-bottom:10px; border-radius:12px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-                            <b>${i.key.toUpperCase()}</b>
-                            <span style="color:var(--blue)">Chat →</span>
-                        </div>`;
+                    l.innerHTML += `<div onclick="openC('${i.key}')" style="background:var(--surface); padding:18px; border-radius:12px; margin-bottom:10px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                        <b style="font-size:14px; letter-spacing:0.5px;">${i.key.toUpperCase()}</b>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                    </div>`;
                 });
             });
         }
 
-        function addF() {
-            const t = prompt("Masukkan Username Teman:");
-            if (t && t.toLowerCase() !== me.u) {
-                db.ref('req/' + t.toLowerCase() + '/' + me.u).set(true);
-                tst("Permintaan terkirim ke " + t);
-            }
-        }
-
+        // ACTIONS
+        function promptAddFriend() { showModal("New Connection", "Enter username...", (val) => { if(val) db.ref('req/'+val.toLowerCase()+'/'+me.u).set(true); tst("Request sent"); }); }
+        function promptPass() { showModal("Change Password", "New password...", (val) => { if(val) db.ref('u/'+me.u+'/p').set(val); tst("Password updated"); }); }
+        
         async function acc(f) {
-            await db.ref('f/' + me.u + '/' + f).set(true);
-            await db.ref('f/' + f + '/' + me.u).set(true);
-            await db.ref('req/' + me.u + '/' + f).remove();
-            tst("Sekarang berteman dengan " + f);
+            await db.ref('f/'+me.u+'/'+f).set(true);
+            await db.ref('f/'+f+'/'+me.u).set(true);
+            await db.ref('req/'+me.u+'/'+f).remove();
         }
 
-        // Chat Logic
         function openC(n) {
-            peer = n;
-            document.getElementById('p-n').innerText = n.toUpperCase();
+            peer = n; document.getElementById('p-n').innerText = n.toUpperCase();
             document.getElementById('chat-v').classList.remove('hidden');
-            const room = [me.u, n].sort().join('_');
-            
-            db.ref('m/' + room).on('value', s => {
-                const l = document.getElementById('msgs');
-                l.innerHTML = "";
-                s.forEach(m => {
-                    const v = m.val();
-                    l.innerHTML += `<div class="bubble ${v.s === me.u ? 'msg-me' : 'msg-them'}">${v.t}</div>`;
-                });
+            db.ref('m/'+[me.u,n].sort().join('_')).on('value', s => {
+                const l = document.getElementById('msgs'); l.innerHTML = "";
+                s.forEach(m => { const v = m.val(); l.innerHTML += `<div class="bubble ${v.s===me.u?'msg-me':'msg-them'}">${v.t}</div>`; });
                 l.scrollTop = l.scrollHeight;
             });
         }
 
         function sendM() {
-            const i = document.getElementById('m-in');
-            if (!i.value.trim()) return;
-            const room = [me.u, peer].sort().join('_');
-            db.ref('m/' + room).push({ s: me.u, t: i.value });
+            const i = document.getElementById('m-in'); if(!i.value.trim()) return;
+            db.ref('m/'+[me.u,peer].sort().join('_')).push({s:me.u, t:i.value});
             i.value = "";
         }
 
-        function closeC() {
-            document.getElementById('chat-v').classList.add('hidden');
-            db.ref('m').off();
-        }
+        function closeC() { document.getElementById('chat-v').classList.add('hidden'); db.ref('m').off(); }
 
-        // Admin Logic
+        // ADMIN
         async function openAdm() {
-            document.getElementById('adm-modal').style.display = 'block';
-            const l = document.getElementById('adm-u');
-            const s = await db.ref('u').once('value');
+            document.getElementById('adm-modal').style.display = 'flex';
+            const l = document.getElementById('adm-u'); const s = await db.ref('u').once('value');
             l.innerHTML = "";
             s.forEach(u => {
                 const d = u.val();
-                l.innerHTML += `
-                    <div class="adm-user-row">
-                        <span><b>${d.u}</b> (${d.p})</span>
-                        <button onclick="kick('${d.u}')" style="color:var(--red); background:none; border:none; font-weight:bold;">HAPUS</button>
-                    </div>`;
+                l.innerHTML += `<div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid #222;">
+                    <span style="font-size:13px;">${d.u} <span style="color:gray">(${d.p})</span></span>
+                    ${d.u!==OWNER.toLowerCase()?`<button onclick="kick('${d.u}')" style="color:var(--danger); background:none; border:none; font-size:11px; font-weight:bold;">KICK</button>`:''}
+                </div>`;
             });
         }
-
-        async function kick(n) {
-            if(confirm("Hapus user " + n + "?")) {
-                await db.ref('u/' + n).remove();
-                openAdm();
-            }
-        }
-
-        function clearDB() {
-            if(confirm("Hapus SEMUA sejarah chat?")) {
-                db.ref('m').remove();
-                tst("Database chat dibersihkan!");
-            }
-        }
-
+        async function kick(n) { if(confirm("Ban "+n+"?")) { await db.ref('u/'+n).remove(); openAdm(); } }
+        function clearDB() { if(confirm("Purge history?")) db.ref('m').remove(); }
         function logout() { location.reload(); }
-
-        function changeP() {
-            const p = prompt("Masukkan Password Baru:");
-            if (p) {
-                db.ref('u/' + me.u + '/p').set(p);
-                tst("Password berhasil diubah!");
-            }
-        }
     </script>
 </body>
 </html>
