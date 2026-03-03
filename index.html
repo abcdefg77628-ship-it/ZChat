@@ -26,9 +26,9 @@
             border-radius: 0 0 10px 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
 
-        /* Modal System (Pengganti Alert/Prompt Google) */
+        /* Modal System */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
             display: none; justify-content: center; align-items: center; z-index: 2000;
         }
         .modal-content {
@@ -61,9 +61,13 @@
         .sidebar-left { background: #1e1f22; display: flex; flex-direction: column; align-items: center; padding: 15px 0; gap: 20px; border-right: 1px solid #000; }
         .sidebar-friends { background: #2b2d31; border-right: 1px solid #1e1f22; display: flex; flex-direction: column; }
         
+        /* Chat Wallpaper */
         .chat-area { display: flex; flex-direction: column; background: var(--chat-bg); position: relative; }
         .chat-header { height: 60px; background: rgba(30, 31, 34, 0.95); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; }
         
+        /* Blank State overlay */
+        #blank-state { position: absolute; inset: 0; background: var(--chat-bg); z-index: 10; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+
         .messages-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
         .msg { max-width: 75%; padding: 10px 15px; border-radius: 12px; font-size: 14px; position: relative; }
         .msg.sent { align-self: flex-end; background: var(--msg-sent); color: white; }
@@ -77,7 +81,7 @@
         .avatar { width: 48px; height: 48px; border-radius: 50%; background: #444; cursor: pointer; transition: 0.3s; border: 2px solid transparent; }
         .avatar:hover { border-color: var(--accent-z); transform: scale(1.05); }
 
-        .friend-item { padding: 15px; margin: 5px 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+        .friend-item { padding: 15px; margin: 5px 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
         .friend-item:hover { background: #35373c; }
         .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #555; }
         .status-dot.online { background: #23a55a; box-shadow: 0 0 8px #23a55a; }
@@ -86,9 +90,8 @@
         .dropdown-menu div { padding: 12px 15px; cursor: pointer; font-size: 13px; transition: 0.2s; }
         .dropdown-menu div:hover { background: #2b2d31; color: var(--accent-z); }
 
-        /* Animasi Tombol */
-        button { transition: 0.2s; }
-        button:active { transform: scale(0.9); }
+        button { transition: 0.1s; }
+        button:active { transform: scale(0.92); }
     </style>
 </head>
 <body>
@@ -100,7 +103,6 @@
         <div class="modal-content">
             <h3 id="modal-title" style="margin-bottom: 15px; color: var(--accent-z);">Judul</h3>
             <div id="modal-body"></div>
-            <div id="modal-input-container"></div>
             <button class="btn-main" onclick="closeModal()" style="margin-top: 20px;">TUTUP</button>
         </div>
     </div>
@@ -109,11 +111,9 @@
         <div class="auth-box" id="auth-ui">
             <div class="logo-z">Z</div>
             <h2 id="auth-title">Masuk ZChat</h2>
-            <p style="font-size: 11px; color: #666; margin-bottom: 20px;">zZerr44 Secure Connection</p>
-            
+            <p style="font-size: 11px; color: #666; margin-bottom: 20px;">zZerr44 Private Platform</p>
             <input type="text" id="user-input" placeholder="User minimal 8 karakter">
             <input type="password" id="pass-input" placeholder="Sandi minimal 8 angka">
-            
             <button class="btn-main" id="auth-btn" onclick="processAuth()">MASUK</button>
             <button class="btn-sub" id="switch-btn" onclick="toggleAuthMode()">Belum punya akun? Daftar</button>
         </div>
@@ -127,23 +127,26 @@
         </div>
 
         <div class="sidebar-friends">
-            <div style="padding: 20px; font-weight: bold; border-bottom: 1px solid #1e1f22;">Teman</div>
+            <div style="padding: 20px; font-weight: bold; border-bottom: 1px solid #1e1f22;">Daftar Teman</div>
             <div id="friend-list"></div>
         </div>
 
         <div class="chat-area">
+            <div id="blank-state">
+                <div class="logo-z" style="opacity: 0.2; transform: scale(1.5);">Z</div>
+                <h3 style="color: #444;">Pilih teman di kiri<br>untuk mulai mengobrol</h3>
+            </div>
+
             <div class="chat-header">
-                <div id="active-chat-user" style="font-weight: bold;">Selamat Datang</div>
+                <div id="active-chat-user" style="font-weight: bold;">...</div>
                 <div style="cursor: pointer; padding: 5px;" onclick="toggleMenu()">⋮</div>
                 <div class="dropdown-menu" id="menu-box">
                     <div onclick="showCopyrightModal()">Hak Cipta</div>
-                    <div onclick="logout()" style="color: #ff4d4d; border-top: 1px solid #222;">Logout</div>
+                    <div onclick="logout()" style="color: #ff4d4d;">Logout</div>
                 </div>
             </div>
 
-            <div class="messages-container" id="chat-box">
-                <div style="text-align: center; color: #555; margin-top: 50px;">Pilih teman untuk mulai kirim pesan</div>
-            </div>
+            <div class="messages-container" id="chat-box"></div>
             <div class="typing-info" id="typing-status"></div>
 
             <div class="input-box">
@@ -172,26 +175,26 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let currentUser = null;
+        let currentUser = localStorage.getItem('zchat_current_user');
         let isRegisterMode = false;
         let activeFriend = null;
 
-        // UI HELPERS
+        // --- NOTIFICATION ---
         window.showNotif = (txt) => {
             const n = document.getElementById('custom-notification');
             n.innerText = txt; n.style.top = '20px';
             setTimeout(() => n.style.top = '-100px', 3000);
         };
 
+        // --- MODAL ---
         window.openModal = (title, bodyHtml) => {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-body').innerHTML = bodyHtml;
             document.getElementById('modal-box').style.display = 'flex';
         };
+        window.closeModal = () => document.getElementById('modal-box').style.display = 'none';
 
-        window.closeModal = () => { document.getElementById('modal-box').style.display = 'none'; };
-
-        // AUTH LOGIC
+        // --- AUTH LOGIC ---
         window.toggleAuthMode = () => {
             isRegisterMode = !isRegisterMode;
             document.getElementById('auth-title').innerText = isRegisterMode ? "Daftar ZChat" : "Masuk ZChat";
@@ -200,9 +203,9 @@
         };
 
         window.processAuth = async () => {
-            const u = document.getElementById('user-input').value;
-            const p = document.getElementById('pass-input').value;
-            if(u.length < 8 || p.length < 8) return showNotif("Minimal 8 karakter!");
+            const u = document.getElementById('user-input').value.trim();
+            const p = document.getElementById('pass-input').value.trim();
+            if(u.length < 8 || p.length < 8) return showNotif("User & Pass Minimal 8 Karakter!");
 
             const userRef = ref(db, 'users/' + u);
             const snapshot = await get(userRef);
@@ -223,6 +226,7 @@
 
         function loginUser(u) {
             currentUser = u;
+            localStorage.setItem('zchat_current_user', u); // SIMPAN LOGIN
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('main-app').style.display = 'grid';
             
@@ -233,7 +237,12 @@
             loadFriends();
         }
 
-        // CHAT & FRIENDS
+        // --- CHECK IF ALREADY LOGGED IN ON REFRESH ---
+        if(currentUser) {
+            loginUser(currentUser);
+        }
+
+        // --- CHAT LOGIC ---
         function loadFriends() {
             onValue(ref(db, 'status'), (snapshot) => {
                 const list = document.getElementById('friend-list');
@@ -252,6 +261,7 @@
 
         window.startChat = (name) => {
             activeFriend = name;
+            document.getElementById('blank-state').style.display = 'none'; // Hilangkan wallpaper tengah
             document.getElementById('active-chat-user').innerText = name;
             const chatID = [currentUser, activeFriend].sort().join('_');
             
@@ -267,7 +277,7 @@
 
                     mDiv.oncontextmenu = (e) => {
                         e.preventDefault();
-                        if(confirm("Hapus pesan ini?")) remove(ref(db, `chats/${chatID}/${msg.key}`));
+                        if(confirm("Hapus pesan?")) remove(ref(db, `chats/${chatID}/${msg.key}`));
                     };
                     box.appendChild(mDiv);
                 });
@@ -289,14 +299,14 @@
         };
 
         window.sendTypingStatus = () => {
+            if(!activeFriend) return;
             update(ref(db, `status/${currentUser}`), { typing: true });
             clearTimeout(window.typeTimer);
             window.typeTimer = setTimeout(() => update(ref(db, `status/${currentUser}`), { typing: false }), 2000);
         };
 
-        // IMAGE HANDLER
         window.uploadImage = (input) => {
-            if(input.files[0]) {
+            if(input.files[0] && activeFriend) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const chatID = [currentUser, activeFriend].sort().join('_');
@@ -306,47 +316,39 @@
             }
         };
 
-        // CUSTOM MODAL FEATURES (No Google Alert)
+        // --- MENU & SETTINGS ---
         window.showCopyrightModal = () => {
-            openModal("Hak Cipta", `<p style="font-size:14px; color:#aaa; line-height:1.6;">Dilarang keras meniru desain dan kode tanpa izin dari <b>zZerr44</b>.<br><br>ZChat © 2026. All Rights Reserved.</p>`);
+            openModal("ZChat Hak Cipta", `<p style="color:#aaa;">Dibuat oleh zZerr44.<br>Dilarang keras menyalin tanpa izin.<br>© 2026 ZChat Platform.</p>`);
         };
 
         window.openProfileSettings = async () => {
             const snap = await get(ref(db, 'users/' + currentUser));
             const bio = snap.val().bio || "User ZChat";
-            openModal("Pengaturan Profil", `
-                <div style="text-align:left;">
-                    <label style="font-size:12px; color:#555;">BIO ANDA</label>
-                    <input type="text" id="new-bio" value="${bio}">
-                    <p style="font-size:11px; color:#444; margin-top:10px;">Klik tombol di bawah untuk simpan</p>
-                    <button class="btn-main" onclick="saveProfile()">SIMPAN BIO</button>
-                </div>
+            openModal("Ubah Bio", `
+                <input type="text" id="new-bio" value="${bio}">
+                <button class="btn-main" onclick="saveProfile()">UPDATE BIO</button>
             `);
         };
 
         window.saveProfile = () => {
             const b = document.getElementById('new-bio').value;
             update(ref(db, 'users/' + currentUser), { bio: b });
-            showNotif("Bio diperbarui!");
+            showNotif("Bio berhasil diubah!");
             closeModal();
         };
 
         window.openAddFriendModal = () => {
-            openModal("Tambah Teman", `
-                <input type="text" id="target-f" placeholder="Masukkan username">
-                <button class="btn-main" onclick="checkFriend()">CARI & TAMBAH</button>
+            openModal("Cari Teman", `
+                <input type="text" id="target-f" placeholder="Masukkan nama user">
+                <button class="btn-main" onclick="checkFriend()">TAMBAHKAN</button>
             `);
         };
 
         window.checkFriend = async () => {
             const f = document.getElementById('target-f').value;
             const snap = await get(ref(db, 'users/' + f));
-            if(snap.exists()) {
-                showNotif("Permintaan terkirim ke " + f);
-                closeModal();
-            } else {
-                showNotif("User tidak ditemukan!");
-            }
+            if(snap.exists()) { showNotif("Permintaan terkirim!"); closeModal(); }
+            else showNotif("Username tidak ditemukan!");
         };
 
         window.toggleMenu = () => {
@@ -354,9 +356,11 @@
             m.style.display = m.style.display === 'block' ? 'none' : 'block';
         };
 
-        window.logout = () => { location.reload(); };
+        window.logout = () => {
+            localStorage.removeItem('zchat_current_user');
+            location.reload();
+        };
 
     </script>
 </body>
-    </html>
-    
+</html>
