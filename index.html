@@ -12,24 +12,36 @@
             --accent-z: #00d4ff;
             --text-main: #ffffff;
             --msg-sent: #005c4b;
-            --msg-rec: #202329;
+            --msg-rec: #2b2d31;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; outline: none; }
         body { background-color: var(--bg-dark); color: var(--text-main); height: 100vh; overflow: hidden; }
 
         /* Custom Notification */
         #custom-notification {
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
             background: #2b2d31; border-bottom: 3px solid var(--accent-z);
-            padding: 15px 25px; z-index: 10000; transition: 0.5s; border-radius: 0 0 10px 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            padding: 15px 25px; z-index: 10000; transition: 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28); 
+            border-radius: 0 0 10px 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        /* Modal System (Pengganti Alert/Prompt Google) */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            display: none; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .modal-content {
+            background: #18191c; padding: 25px; border-radius: 12px;
+            width: 90%; max-width: 400px; text-align: center; border: 1px solid #333;
         }
 
         /* Auth Screen */
-        #auth-screen { position: fixed; inset: 0; background: var(--bg-dark); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .auth-box { background: #18191c; padding: 40px; border-radius: 12px; width: 350px; text-align: center; }
+        #auth-screen {
+            position: fixed; inset: 0; background: var(--bg-dark);
+            display: flex; justify-content: center; align-items: center; z-index: 5000;
+        }
+        .auth-box { background: #18191c; padding: 40px; border-radius: 12px; width: 350px; text-align: center; border: 1px solid #222; }
         
         .logo-z {
             width: 70px; height: 70px; border: 4px solid var(--accent-z); margin: 0 auto 20px;
@@ -39,45 +51,44 @@
         .logo-z::after { content: ''; position: absolute; width: 110%; height: 4px; background: var(--accent-z); transform: rotate(-45deg); }
 
         input { width: 100%; padding: 12px; margin: 8px 0; background: #1e1f22; border: 1px solid #333; color: white; border-radius: 5px; }
-        button { width: 100%; padding: 12px; margin-top: 10px; background: var(--accent-z); border: none; font-weight: bold; cursor: pointer; border-radius: 5px; }
-        button:active { transform: scale(0.95); transition: 0.1s; }
+        .btn-main { width: 100%; padding: 12px; margin-top: 10px; background: var(--accent-z); border: none; font-weight: bold; cursor: pointer; border-radius: 5px; color: #000; }
+        .btn-sub { width: 100%; padding: 10px; margin-top: 10px; background: transparent; border: 1px solid #444; color: #888; cursor: pointer; border-radius: 5px; font-size: 12px; }
 
         /* Main App */
         .app-container { display: none; height: 100vh; grid-template-columns: 70px 260px 1fr; }
-        .creator-tag { position: absolute; top: 10px; right: 15px; font-size: 11px; color: #555; z-index: 100; }
+        .creator-tag { position: absolute; top: 10px; right: 15px; font-size: 11px; color: #555; z-index: 100; pointer-events: none; }
 
-        .sidebar-left { background: #1e1f22; display: flex; flex-direction: column; align-items: center; padding: 15px 0; gap: 20px; }
+        .sidebar-left { background: #1e1f22; display: flex; flex-direction: column; align-items: center; padding: 15px 0; gap: 20px; border-right: 1px solid #000; }
         .sidebar-friends { background: #2b2d31; border-right: 1px solid #1e1f22; display: flex; flex-direction: column; }
         
         .chat-area { display: flex; flex-direction: column; background: var(--chat-bg); position: relative; }
-        .chat-header { height: 60px; background: rgba(30, 31, 34, 0.95); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; border-bottom: 1px solid #111; }
+        .chat-header { height: 60px; background: rgba(30, 31, 34, 0.95); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; }
         
         .messages-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .msg { max-width: 70%; padding: 10px 15px; border-radius: 15px; font-size: 14px; position: relative; line-height: 1.4; }
-        .msg.sent { align-self: flex-end; background: var(--msg-sent); border-bottom-right-radius: 2px; }
-        .msg.received { align-self: flex-start; background: var(--msg-rec); border-bottom-left-radius: 2px; }
+        .msg { max-width: 75%; padding: 10px 15px; border-radius: 12px; font-size: 14px; position: relative; }
+        .msg.sent { align-self: flex-end; background: var(--msg-sent); color: white; }
+        .msg.received { align-self: flex-start; background: var(--msg-rec); color: white; }
 
-        .typing-info { font-size: 11px; color: #00d4ff; padding: 5px 20px; height: 20px; font-style: italic; }
+        .typing-info { font-size: 11px; color: var(--accent-z); padding: 5px 20px; height: 20px; }
 
-        .input-box { padding: 20px; background: #1e1f22; display: flex; gap: 10px; align-items: center; }
-        .input-box input { flex: 1; margin: 0; }
-        .btn-icon { width: 45px; background: #333; color: white; padding: 10px; }
+        .input-box { padding: 20px; background: #1e1f22; display: flex; gap: 10px; align-items: center; border-top: 1px solid #000; }
+        .btn-icon { width: 45px; height: 45px; background: #333; border: none; color: white; cursor: pointer; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
 
-        .avatar { width: 45px; height: 45px; border-radius: 50%; background: #444; object-fit: cover; border: 2px solid transparent; }
-        .avatar.active { border-color: var(--accent-z); }
+        .avatar { width: 48px; height: 48px; border-radius: 50%; background: #444; cursor: pointer; transition: 0.3s; border: 2px solid transparent; }
+        .avatar:hover { border-color: var(--accent-z); transform: scale(1.05); }
 
-        .friend-item { padding: 12px; margin: 5px 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .friend-item { padding: 15px; margin: 5px 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; }
         .friend-item:hover { background: #35373c; }
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #888; }
-        .status-dot.online { background: #23a55a; box-shadow: 0 0 5px #23a55a; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #555; }
+        .status-dot.online { background: #23a55a; box-shadow: 0 0 8px #23a55a; }
 
-        .dropdown-menu { position: absolute; top: 55px; right: 10px; background: #18191c; border: 1px solid #333; border-radius: 5px; display: none; z-index: 500; min-width: 150px; }
-        .dropdown-menu div { padding: 12px; cursor: pointer; font-size: 13px; }
-        .dropdown-menu div:hover { background: #2b2d31; }
+        .dropdown-menu { position: absolute; top: 55px; right: 10px; background: #18191c; border: 1px solid #333; border-radius: 8px; display: none; z-index: 500; min-width: 160px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); overflow: hidden; }
+        .dropdown-menu div { padding: 12px 15px; cursor: pointer; font-size: 13px; transition: 0.2s; }
+        .dropdown-menu div:hover { background: #2b2d31; color: var(--accent-z); }
 
-        /* Hidden Scrollbar */
-        .messages-container::-webkit-scrollbar { width: 5px; }
-        .messages-container::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        /* Animasi Tombol */
+        button { transition: 0.2s; }
+        button:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
@@ -85,46 +96,60 @@
     <div id="custom-notification">Pesan</div>
     <div class="creator-tag">zZerr44</div>
 
+    <div id="modal-box" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modal-title" style="margin-bottom: 15px; color: var(--accent-z);">Judul</h3>
+            <div id="modal-body"></div>
+            <div id="modal-input-container"></div>
+            <button class="btn-main" onclick="closeModal()" style="margin-top: 20px;">TUTUP</button>
+        </div>
+    </div>
+
     <div id="auth-screen">
-        <div class="auth-box">
+        <div class="auth-box" id="auth-ui">
             <div class="logo-z">Z</div>
-            <h2 style="margin-bottom: 5px;">ZChat</h2>
-            <p style="font-size: 12px; color: #888; margin-bottom: 20px;">Private Real-time Connection</p>
-            <input type="text" id="user-input" placeholder="Username (Min 8 Karakter)">
-            <input type="password" id="pass-input" placeholder="Password (Min 8 Angka)">
-            <button onclick="handleAuth()">MASUK / DAFTAR</button>
+            <h2 id="auth-title">Masuk ZChat</h2>
+            <p style="font-size: 11px; color: #666; margin-bottom: 20px;">zZerr44 Secure Connection</p>
+            
+            <input type="text" id="user-input" placeholder="User minimal 8 karakter">
+            <input type="password" id="pass-input" placeholder="Sandi minimal 8 angka">
+            
+            <button class="btn-main" id="auth-btn" onclick="processAuth()">MASUK</button>
+            <button class="btn-sub" id="switch-btn" onclick="toggleAuthMode()">Belum punya akun? Daftar</button>
         </div>
     </div>
 
     <div class="app-container" id="main-app">
         <div class="sidebar-left">
-            <img id="my-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Z1" class="avatar" onclick="openSettings()" title="Pengaturan Profil">
+            <img id="my-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Z1" class="avatar" onclick="openProfileSettings()">
             <div style="flex: 1;"></div>
-            <button class="btn-icon" style="border-radius: 50%;" onclick="addFriend()">+</button>
+            <button class="btn-icon" onclick="openAddFriendModal()">+</button>
         </div>
 
         <div class="sidebar-friends">
             <div style="padding: 20px; font-weight: bold; border-bottom: 1px solid #1e1f22;">Teman</div>
-            <div id="friend-list" style="overflow-y: auto; flex: 1;"></div>
+            <div id="friend-list"></div>
         </div>
 
         <div class="chat-area">
             <div class="chat-header">
-                <div id="active-chat-user">Pilih teman untuk memulai</div>
-                <div style="cursor: pointer; font-size: 20px;" onclick="toggleMenu()">⋮</div>
+                <div id="active-chat-user" style="font-weight: bold;">Selamat Datang</div>
+                <div style="cursor: pointer; padding: 5px;" onclick="toggleMenu()">⋮</div>
                 <div class="dropdown-menu" id="menu-box">
-                    <div onclick="showCopyright()">Hak Cipta</div>
-                    <div onclick="logout()" style="color: #ff4747;">Logout</div>
+                    <div onclick="showCopyrightModal()">Hak Cipta</div>
+                    <div onclick="logout()" style="color: #ff4d4d; border-top: 1px solid #222;">Logout</div>
                 </div>
             </div>
 
-            <div class="messages-container" id="chat-box"></div>
+            <div class="messages-container" id="chat-box">
+                <div style="text-align: center; color: #555; margin-top: 50px;">Pilih teman untuk mulai kirim pesan</div>
+            </div>
             <div class="typing-info" id="typing-status"></div>
 
             <div class="input-box">
                 <button class="btn-icon" onclick="document.getElementById('file-input').click()">📷</button>
                 <input type="file" id="file-input" hidden accept="image/*" onchange="uploadImage(this)">
-                <input type="text" id="msg-input" placeholder="Tulis pesan..." oninput="sendTypingStatus()">
+                <input type="text" id="msg-input" placeholder="Ketik pesan..." oninput="sendTypingStatus()">
                 <button class="btn-icon" style="background: var(--accent-z); color: black;" onclick="sendChat()">➤</button>
             </div>
         </div>
@@ -132,7 +157,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, remove, update, onDisconnect } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set, push, onValue, remove, update, onDisconnect, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
@@ -141,44 +166,74 @@
             projectId: "zchat-56639",
             storageBucket: "zchat-56639.firebasestorage.app",
             messagingSenderId: "773931983053",
-            appId: "1:773931983053:web:a1c825be9a972e53dcc984",
-            measurementId: "G-ZDMK1DWV6S"
+            appId: "1:773931983053:web:a1c825be9a972e53dcc984"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let currentUser = localStorage.getItem('zchat_user') || null;
+        let currentUser = null;
+        let isRegisterMode = false;
         let activeFriend = null;
 
+        // UI HELPERS
         window.showNotif = (txt) => {
             const n = document.getElementById('custom-notification');
             n.innerText = txt; n.style.top = '20px';
             setTimeout(() => n.style.top = '-100px', 3000);
         };
 
-        window.handleAuth = () => {
-            const u = document.getElementById('user-input').value;
-            const p = document.getElementById('pass-input').value;
-            if(u.length < 8 || p.length < 8) return showNotif("User & Pass minimal 8 karakter!");
-            
-            currentUser = u;
-            localStorage.setItem('zchat_user', u);
-            initApp();
+        window.openModal = (title, bodyHtml) => {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-body').innerHTML = bodyHtml;
+            document.getElementById('modal-box').style.display = 'flex';
         };
 
-        function initApp() {
+        window.closeModal = () => { document.getElementById('modal-box').style.display = 'none'; };
+
+        // AUTH LOGIC
+        window.toggleAuthMode = () => {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('auth-title').innerText = isRegisterMode ? "Daftar ZChat" : "Masuk ZChat";
+            document.getElementById('auth-btn').innerText = isRegisterMode ? "DAFTAR" : "MASUK";
+            document.getElementById('switch-btn').innerText = isRegisterMode ? "Sudah punya akun? Masuk" : "Belum punya akun? Daftar";
+        };
+
+        window.processAuth = async () => {
+            const u = document.getElementById('user-input').value;
+            const p = document.getElementById('pass-input').value;
+            if(u.length < 8 || p.length < 8) return showNotif("Minimal 8 karakter!");
+
+            const userRef = ref(db, 'users/' + u);
+            const snapshot = await get(userRef);
+
+            if(isRegisterMode) {
+                if(snapshot.exists()) return showNotif("Username sudah dipakai!");
+                await set(userRef, { password: p, bio: "ZChat User", avatar: "Z1" });
+                showNotif("Berhasil Daftar!");
+                loginUser(u);
+            } else {
+                if(snapshot.exists() && snapshot.val().password === p) {
+                    loginUser(u);
+                } else {
+                    showNotif("User atau Sandi salah!");
+                }
+            }
+        };
+
+        function loginUser(u) {
+            currentUser = u;
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('main-app').style.display = 'grid';
             
-            // Set Online Status
             const statusRef = ref(db, 'status/' + currentUser);
             set(statusRef, { online: true, typing: false });
             onDisconnect(statusRef).remove();
-
+            
             loadFriends();
         }
 
+        // CHAT & FRIENDS
         function loadFriends() {
             onValue(ref(db, 'status'), (snapshot) => {
                 const list = document.getElementById('friend-list');
@@ -197,7 +252,7 @@
 
         window.startChat = (name) => {
             activeFriend = name;
-            document.getElementById('active-chat-user').innerText = `Chat dengan ${name}`;
+            document.getElementById('active-chat-user').innerText = name;
             const chatID = [currentUser, activeFriend].sort().join('_');
             
             onValue(ref(db, 'chats/' + chatID), (snapshot) => {
@@ -207,26 +262,18 @@
                     const data = msg.val();
                     const mDiv = document.createElement('div');
                     mDiv.className = `msg ${data.sender === currentUser ? 'sent' : 'received'}`;
-                    
-                    if(data.type === 'img') {
-                        mDiv.innerHTML = `<img src="${data.content}" style="max-width:100%; border-radius:10px;">`;
-                    } else {
-                        mDiv.innerText = data.content;
-                    }
+                    if(data.type === 'img') mDiv.innerHTML = `<img src="${data.content}" style="max-width:200px; border-radius:8px;">`;
+                    else mDiv.innerText = data.content;
 
-                    // Delete & Copy feature
                     mDiv.oncontextmenu = (e) => {
                         e.preventDefault();
-                        if(confirm("Salin pesan?")) navigator.clipboard.writeText(data.content);
-                        if(data.sender === currentUser && confirm("Hapus pesan ini?")) remove(ref(db, `chats/${chatID}/${msg.key}`));
+                        if(confirm("Hapus pesan ini?")) remove(ref(db, `chats/${chatID}/${msg.key}`));
                     };
-
                     box.appendChild(mDiv);
                 });
                 box.scrollTop = box.scrollHeight;
             });
 
-            // Listen Typing Status
             onValue(ref(db, `status/${activeFriend}/typing`), (snap) => {
                 document.getElementById('typing-status').innerText = snap.val() ? `${activeFriend} sedang mengetik...` : '';
             });
@@ -236,12 +283,7 @@
             const inp = document.getElementById('msg-input');
             if(!inp.value || !activeFriend) return;
             const chatID = [currentUser, activeFriend].sort().join('_');
-            push(ref(db, 'chats/' + chatID), {
-                sender: currentUser,
-                content: inp.value,
-                type: 'text',
-                time: Date.now()
-            });
+            push(ref(db, 'chats/' + chatID), { sender: currentUser, content: inp.value, type: 'text', time: Date.now() });
             inp.value = '';
             update(ref(db, `status/${currentUser}`), { typing: false });
         };
@@ -249,31 +291,62 @@
         window.sendTypingStatus = () => {
             update(ref(db, `status/${currentUser}`), { typing: true });
             clearTimeout(window.typeTimer);
-            window.typeTimer = setTimeout(() => {
-                update(ref(db, `status/${currentUser}`), { typing: false });
-            }, 2000);
+            window.typeTimer = setTimeout(() => update(ref(db, `status/${currentUser}`), { typing: false }), 2000);
         };
 
+        // IMAGE HANDLER
         window.uploadImage = (input) => {
             if(input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const chatID = [currentUser, activeFriend].sort().join('_');
-                    push(ref(db, 'chats/' + chatID), {
-                        sender: currentUser,
-                        content: e.target.result,
-                        type: 'img',
-                        time: Date.now()
-                    });
+                    push(ref(db, 'chats/' + chatID), { sender: currentUser, content: e.target.result, type: 'img', time: Date.now() });
                 };
                 reader.readAsDataURL(input.files[0]);
             }
         };
 
-        window.addFriend = () => {
-            const f = prompt("Masukkan username teman (Minimal 8 karakter):");
-            if(f && f.length >= 8) showNotif("Permintaan terkirim ke " + f);
-            else showNotif("User tidak valid!");
+        // CUSTOM MODAL FEATURES (No Google Alert)
+        window.showCopyrightModal = () => {
+            openModal("Hak Cipta", `<p style="font-size:14px; color:#aaa; line-height:1.6;">Dilarang keras meniru desain dan kode tanpa izin dari <b>zZerr44</b>.<br><br>ZChat © 2026. All Rights Reserved.</p>`);
+        };
+
+        window.openProfileSettings = async () => {
+            const snap = await get(ref(db, 'users/' + currentUser));
+            const bio = snap.val().bio || "User ZChat";
+            openModal("Pengaturan Profil", `
+                <div style="text-align:left;">
+                    <label style="font-size:12px; color:#555;">BIO ANDA</label>
+                    <input type="text" id="new-bio" value="${bio}">
+                    <p style="font-size:11px; color:#444; margin-top:10px;">Klik tombol di bawah untuk simpan</p>
+                    <button class="btn-main" onclick="saveProfile()">SIMPAN BIO</button>
+                </div>
+            `);
+        };
+
+        window.saveProfile = () => {
+            const b = document.getElementById('new-bio').value;
+            update(ref(db, 'users/' + currentUser), { bio: b });
+            showNotif("Bio diperbarui!");
+            closeModal();
+        };
+
+        window.openAddFriendModal = () => {
+            openModal("Tambah Teman", `
+                <input type="text" id="target-f" placeholder="Masukkan username">
+                <button class="btn-main" onclick="checkFriend()">CARI & TAMBAH</button>
+            `);
+        };
+
+        window.checkFriend = async () => {
+            const f = document.getElementById('target-f').value;
+            const snap = await get(ref(db, 'users/' + f));
+            if(snap.exists()) {
+                showNotif("Permintaan terkirim ke " + f);
+                closeModal();
+            } else {
+                showNotif("User tidak ditemukan!");
+            }
         };
 
         window.toggleMenu = () => {
@@ -281,16 +354,9 @@
             m.style.display = m.style.display === 'block' ? 'none' : 'block';
         };
 
-        window.showCopyright = () => alert("ZChat Hak Cipta © 2026 oleh zZerr44.\nSemua sistem berjalan di Firebase Realtime.");
+        window.logout = () => { location.reload(); };
 
-        window.logout = () => { localStorage.clear(); location.reload(); };
-
-        window.openSettings = () => {
-            const b = prompt("Ubah Bio kamu:");
-            if(b) showNotif("Bio diperbarui!");
-        };
-
-        if(currentUser) initApp();
     </script>
 </body>
-</html>
+    </html>
+    
