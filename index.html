@@ -3,599 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ZChat Pro - Private Network by zZerr44</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-
+    <title>ZChat</title>
     <style>
-        /* ============================================================
-           Z-CORE CSS FRAMEWORK VERSION 2.5
-           DEVELOPED EXCLUSIVELY BY ZZERR44
-           ============================================================
-        */
         :root {
-            --hitam-pekat: #050505;
-            --hitam-panel: #0d0d0f;
-            --hitam-input: #151517;
-            --biru-z: #00b2ff;
-            --merah-z: #ff3b3b;
-            --putih-z: #f2f2f2;
-            --abu-z: #949ba4;
-            --garis: #1e1e20;
-            --hijau-z: #23a55a;
+            --b: #000; --p: #0d0d0f; --i: #151517; --z: #00b2ff; 
+            --r: #ff3b3b; --w: #f2f2f2; --m: #949ba4; --g: #1e1e20; --s: #23a55a;
         }
-
-        /* RESET SISTEM DAN FIX GARIS PUTIH ATAS */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            outline: none;
-        }
-
-        html, body {
-            background-color: var(--hitam-pekat);
-            color: var(--putih-z);
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            position: fixed;
-            top: 0;
-            left: 0;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* SCROLLBAR CUSTOM */
-        ::-webkit-scrollbar { width: 3px; height: 3px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--biru-z); border-radius: 5px; }
-
-        /* ============================================================
-           LAYOUT UTAMA (Z-SHELL)
-           ============================================================
-        */
-        .z-app-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            width: 100%;
-        }
-
-        /* HEADER FIX */
-        .z-header {
-            height: 60px;
-            background: var(--hitam-pekat);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 15px;
-            border-bottom: 1px solid var(--garis);
-            z-index: 1000;
-        }
-
-        .z-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .z-logo-mini {
-            width: 28px;
-            height: 28px;
-            border: 2px solid var(--biru-z);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            color: var(--biru-z);
-            font-size: 14px;
-        }
-
-        .z-title {
-            font-weight: 900;
-            letter-spacing: 2px;
-            font-size: 16px;
-            text-transform: uppercase;
-        }
-
-        /* BADGE STATUS */
-        .z-status-wrap {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 10px;
-            font-weight: 800;
-            color: var(--abu-z);
-            text-transform: uppercase;
-        }
-
-        .z-dot {
-            width: 7px;
-            height: 7px;
-            background: var(--hijau-z);
-            border-radius: 50%;
-            box-shadow: 0 0 5px var(--hijau-z);
-        }
-
-        /* BODY LAYOUT */
-        .z-main-content {
-            display: flex;
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* ============================================================
-           SIDEBAR (DRAWER)
-           ============================================================
-        */
-        .z-sidebar {
-            position: absolute;
-            left: -100%;
-            top: 0;
-            width: 280px;
-            height: 100%;
-            background: var(--hitam-panel);
-            border-right: 1px solid var(--garis);
-            z-index: 2000;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .z-sidebar.active {
-            left: 0;
-            box-shadow: 15px 0 30px rgba(0,0,0,0.7);
-        }
-
-        .z-side-head {
-            padding: 20px;
-            font-size: 11px;
-            font-weight: 800;
-            color: var(--abu-z);
-            border-bottom: 1px solid var(--garis);
-            letter-spacing: 1px;
-        }
-
-        .z-friend-scroller {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-        }
-
-        .z-item-friend {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 3px;
-            cursor: pointer;
-            margin-bottom: 5px;
-            transition: 0.2s;
-            border: 1px solid transparent;
-        }
-
-        .z-item-friend:hover {
-            background: var(--hitam-input);
-            border-color: var(--garis);
-        }
-
-        .z-item-friend.active {
-            background: #1a1a1c;
-            border-left: 3px solid var(--biru-z);
-        }
-
-        .z-pfp-box {
-            width: 35px;
-            height: 35px;
-            background: #222;
-            border: 1px solid var(--garis);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            color: var(--biru-z);
-        }
-
-        /* ============================================================
-           VIEWPORT CHAT
-           ============================================================
-        */
-        .z-viewport {
-            flex: 1;
-            background: var(--hitam-pekat);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        #z-chat-flow {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding-bottom: 100px;
-        }
-
-        .z-msg-wrap {
-            display: flex;
-            gap: 15px;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .z-msg-content {
-            flex: 1;
-        }
-
-        .z-msg-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 4px;
-        }
-
-        .z-user-name { font-weight: 800; font-size: 13px; color: var(--biru-z); }
-        .z-timestamp { font-size: 9px; color: var(--abu-z); font-family: 'JetBrains Mono'; }
-
-        .z-text {
-            font-size: 14px;
-            line-height: 1.5;
-            color: #d1d1d1;
-            word-break: break-word;
-        }
-
-        /* INPUT BAR */
-        .z-input-bar {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            padding: 20px;
-            background: linear-gradient(transparent, var(--hitam-pekat) 40%);
-        }
-
-        .z-input-inner {
-            background: var(--hitam-input);
-            border: 1px solid var(--garis);
-            padding: 12px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-radius: 4px;
-        }
-
-        .z-input-main {
-            flex: 1;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 14px;
-        }
-
-        .z-btn-send {
-            background: none;
-            border: none;
-            color: var(--biru-z);
-            font-weight: 900;
-            font-size: 11px;
-            letter-spacing: 1px;
-            cursor: pointer;
-        }
-
-        /* ============================================================
-           MODAL & MENU SISTEM
-           ============================================================
-        */
-        .z-modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.95);
-            z-index: 5000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .z-modal-box {
-            width: 100%;
-            max-width: 400px;
-            background: var(--hitam-panel);
-            border: 1px solid var(--garis);
-            padding: 30px;
-            border-radius: 4px;
-        }
-
-        .z-modal-title {
-            font-weight: 900;
-            font-size: 16px;
-            margin-bottom: 25px;
-            text-align: center;
-            letter-spacing: 2px;
-            color: var(--biru-z);
-            text-transform: uppercase;
-        }
-
-        /* MENU KANAN */
-        .z-menu-right {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 3000;
-            display: none;
-            justify-content: flex-end;
-        }
-
-        .z-menu-panel {
-            width: 280px;
-            height: 100%;
-            background: var(--hitam-panel);
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .z-btn-opt {
-            width: 100%;
-            padding: 15px;
-            background: #151517;
-            border: 1px solid var(--garis);
-            color: white;
-            text-align: left;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .z-btn-opt:active {
-            background: var(--biru-z);
-            color: black;
-        }
-
-        /* AUTH LAYER */
-        .z-auth-layer {
-            position: fixed;
-            inset: 0;
-            background: var(--hitam-pekat);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 30px;
-        }
-
-        /* INPUT GLOBAL */
-        .z-form-group { margin-bottom: 15px; }
-        .z-form-group label { display: block; font-size: 10px; font-weight: 900; color: var(--abu-z); margin-bottom: 8px; text-transform: uppercase; }
-        
-        .z-input-field {
-            width: 100%;
-            padding: 15px;
-            background: #080808;
-            border: 1px solid var(--garis);
-            color: white;
-            font-size: 14px;
-            border-radius: 2px;
-        }
-
-        .z-btn-primary {
-            width: 100%;
-            padding: 16px;
-            background: var(--biru-z);
-            color: black;
-            border: none;
-            font-weight: 900;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .z-btn-ghost {
-            width: 100%;
-            padding: 14px;
-            background: transparent;
-            border: 1px solid var(--garis);
-            color: var(--abu-z);
-            font-size: 10px;
-            font-weight: 800;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-
-        /* COPYRIGHT BOX */
-        .z-copy-text {
-            font-size: 11px;
-            color: var(--abu-z);
-            line-height: 1.8;
-            height: 250px;
-            overflow-y: auto;
-            background: #050505;
-            padding: 15px;
-            border: 1px solid var(--garis);
-            text-align: justify;
-        }
-
-        #z-toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--biru-z);
-            color: black;
-            padding: 10px 25px;
-            font-weight: 900;
-            font-size: 11px;
-            z-index: 100000;
-            display: none;
-            text-transform: uppercase;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        html, body { background: var(--b); color: var(--w); height: 100vh; width: 100vw; overflow: hidden; position: fixed; font-family: sans-serif; }
+        ::-webkit-scrollbar { width: 2px; }
+        ::-webkit-scrollbar-thumb { background: var(--z); }
+        #auth-layer { position: fixed; inset: 0; background: var(--b); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 30px; }
+        .auth-box { width: 100%; max-width: 360px; text-align: center; }
+        .z-logo-big { width: 80px; height: 80px; border: 4px solid var(--z); margin: 0 auto 30px; display: flex; align-items: center; justify-content: center; color: var(--z); font-weight: 900; font-size: 35px; }
+        .main-title { font-size: 40px; font-weight: 900; letter-spacing: 10px; margin-bottom: 50px; }
+        .f-group { margin-bottom: 15px; text-align: left; }
+        .f-group label { display: block; font-size: 10px; font-weight: 900; color: var(--m); margin-bottom: 8px; letter-spacing: 1px; }
+        .z-in { width: 100%; padding: 16px; background: var(--p); border: 1px solid var(--g); color: #fff; font-size: 14px; border-radius: 4px; }
+        .z-btn { width: 100%; padding: 18px; border: none; font-weight: 900; letter-spacing: 2px; cursor: pointer; text-transform: uppercase; margin-top: 10px; border-radius: 4px; }
+        .btn-z { background: var(--z); color: #000; }
+        .btn-g { background: transparent; border: 1px solid var(--g); color: var(--m); margin-top: 15px; }
+        header { height: 60px; background: var(--b); border-bottom: 1px solid var(--g); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 1000; }
+        .menu-btn { width: 40px; height: 40px; display: flex; flex-direction: column; justify-content: center; gap: 6px; cursor: pointer; }
+        .menu-btn div { width: 25px; height: 2px; background: var(--w); }
+        .nav-side { position: fixed; left: -100%; top: 0; width: 280px; height: 100%; background: var(--p); z-index: 5000; transition: 0.3s; border-right: 1px solid var(--g); display: flex; flex-direction: column; }
+        .nav-side.active { left: 0; }
+        .list-wrap { flex: 1; overflow-y: auto; padding: 10px; }
+        .user-card { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 4px; cursor: pointer; margin-bottom: 5px; }
+        .pp-box { width: 40px; height: 40px; background: #222; border: 1px solid var(--g); display: flex; align-items: center; justify-content: center; font-weight: 900; position: relative; overflow: hidden; }
+        .pp-pixel { display: grid; grid-template-columns: repeat(5, 1fr); width: 100%; height: 100%; }
+        .pp-pixel div { width: 100%; height: 100%; }
+        .z-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-inner { width: 100%; max-width: 400px; background: var(--p); border: 1px solid var(--g); padding: 30px; }
+        .grid-pp { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; max-height: 300px; overflow-y: auto; }
+        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--z); color: #000; padding: 10px 20px; font-weight: 900; font-size: 11px; z-index: 100000; display: none; }
     </style>
 </head>
 <body>
 
-    <div id="z-toast">SISTEM_AKTIF</div>
+    <div id="toast">SISTEM AKTIF</div>
 
-    <div id="layer-auth" class="z-auth-layer">
-        <div style="width:100%; max-width:350px; text-align:center;">
-            <div style="width:70px; height:70px; border:4px solid var(--biru-z); margin:0 auto 20px; display:flex; align-items:center; justify-content:center;">
-                <span style="font-size:30px; font-weight:900; color:var(--biru-z);">Z</span>
-            </div>
-            <h1 style="letter-spacing:5px; font-weight:900; margin-bottom:5px;">ZCHAT</h1>
-            <p style="font-size:10px; color:var(--abu-z); font-weight:700; margin-bottom:40px; letter-spacing:2px;">SISTEM ENKRIPSI ZZERR44</p>
+    <div id="auth-layer">
+        <div class="auth-box">
+            <div class="z-logo-big">Z</div>
+            <div class="main-title">ZCHAT</div>
             
-            <div id="auth-awal">
-                <button class="z-btn-primary" onclick="bukaForm('REG')">DAFTAR IDENTITAS</button>
-                <button class="z-btn-ghost" onclick="bukaForm('LOGIN')">MASUK KE JARINGAN</button>
+            <div id="auth-main">
+                <button class="z-btn btn-z" onclick="setAuth('REG')">BUAT AKUN</button>
+                <button class="z-btn btn-g" onclick="setAuth('LOGIN')">MASUK</button>
             </div>
 
-            <div id="auth-form" style="display:none;">
-                <div class="z-form-group">
-                    <label>ID PENGGUNA</label>
-                    <input type="text" id="id-pengguna" class="z-input-field" placeholder="MINIMAL 3 HURUF">
+            <div id="auth-fields" style="display:none;">
+                <div class="f-group">
+                    <label>USER ID (MINIMAL 8)</label>
+                    <input type="text" id="in-u" class="z-in" autocomplete="off">
                 </div>
-                <div class="z-form-group">
-                    <label>KUNCI AKSES</label>
-                    <input type="password" id="id-sandi" class="z-input-field" placeholder="KATA SANDI AMAN">
+                <div class="f-group">
+                    <label>KATA SANDI (MINIMAL 8)</label>
+                    <input type="password" id="in-p" class="z-in">
                 </div>
-                <button class="z-btn-primary" id="btn-proses" onclick="eksekusiAuth()">KONFIRMASI</button>
-                <button class="z-btn-ghost" onclick="location.reload()">KEMBALI</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="z-app-container">
-        <header class="z-header">
-            <button class="z-btn-opt" style="width:auto; padding:8px 15px;" onclick="toggleSidebar()">DAFTAR_TEMAN</button>
-            <div class="z-brand">
-                <div class="z-logo-mini">Z</div>
-                <div id="chat-aktif-judul" class="z-title">Z-JARINGAN</div>
-            </div>
-            <button class="z-btn-opt" style="width:auto; padding:8px 15px; background:var(--biru-z); color:black;" onclick="toggleMenu()">OPSI</button>
-        </header>
-
-        <div class="z-main-content">
-            <aside id="z-drawer" class="z-sidebar">
-                <div class="z-side-head">NODES TERVERIFIKASI</div>
-                <div id="render-teman" class="z-friend-scroller">
-                    </div>
-                <div style="padding:15px; background:#080808; border-top:1px solid var(--garis); display:flex; align-items:center; gap:12px;">
-                    <div class="z-pfp-box" id="my-ava-mini">?</div>
-                    <div>
-                        <div id="my-id-label" style="font-weight:900; font-size:12px;">PENGGUNA</div>
-                        <div class="z-status-wrap"><div class="z-dot"></div>ONLINE</div>
-                    </div>
+                <div id="conf-wrap" class="f-group" style="display:none;">
+                    <label>KONFIRMASI KATA SANDI</label>
+                    <input type="password" id="in-cp" class="z-in">
                 </div>
-            </aside>
+                <button class="z-btn btn-z" onclick="runAuth()">KONFIRMASI</button>
+                <button class="z-btn btn-g" onclick="location.reload()">KEMBALI</button>
+            </div>
+        </div>
+    </div>
 
-            <main class="z-viewport" onclick="tutupSemua()">
-                <div id="z-chat-flow">
-                    <div style="margin:auto; text-align:center; opacity:0.1;">
-                        <h1 style="font-size:70px; font-weight:900;">Z</h1>
-                        <p style="letter-spacing:4px;">PRIVATE_NODE</p>
-                    </div>
+    <header>
+        <div class="menu-btn" onclick="toggleSide()">
+            <div></div><div></div><div></div>
+        </div>
+        <div style="font-weight:900; letter-spacing:3px;" id="head-title">ZCHAT</div>
+        <div style="width:40px; display:flex; justify-content:flex-end;">
+            <div onclick="toggleMenu()" style="cursor:pointer; font-size:18px; font-weight:900;">[=]</div>
+        </div>
+    </header>
+
+    <div style="display:flex; height:calc(100vh - 60px); position:relative;">
+        <nav id="z-side" class="nav-side">
+            <div style="padding:20px; font-size:11px; font-weight:900; color:var(--m); border-bottom:1px solid var(--g); letter-spacing:1px;">NODES_TERHUBUNG</div>
+            <div id="friend-render" class="list-wrap">
                 </div>
-
-                <div class="z-input-bar">
-                    <div class="z-input-inner">
-                        <input type="text" id="input-pesan" class="z-input-main" placeholder="Ketik pesan terenkripsi..." onkeypress="if(event.key=='Enter') kirimPesan()">
-                        <button class="z-btn-send" onclick="kirimPesan()">KIRIM</button>
-                    </div>
+            <div style="padding:15px; background:var(--b); border-top:1px solid var(--g); display:flex; align-items:center; gap:12px;">
+                <div id="my-pp" class="pp-box"></div>
+                <div style="flex:1; overflow:hidden;">
+                    <div id="my-id" style="font-weight:900; font-size:12px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">USER</div>
+                    <div style="font-size:9px; color:var(--s); font-weight:800;">STATUS: ONLINE</div>
                 </div>
-            </main>
-        </div>
-    </div>
-
-    <div id="menu-kanan" class="z-menu-right" onclick="toggleMenu()">
-        <div class="z-menu-panel" onclick="event.stopPropagation()">
-            <div class="z-side-head" style="padding:0; margin-bottom:20px; color:var(--biru-z);">PENGATURAN_CORE</div>
-            
-            <button class="z-btn-opt" onclick="bukaModal('m-sandi')">UBAH KATA SANDI</button>
-            <button class="z-btn-opt" onclick="bukaModal('m-profil')">DETAIL PROFIL</button>
-            <button class="z-btn-opt" onclick="aksiTambah()">TAMBAH TEMAN</button>
-            <button class="z-btn-opt" onclick="aksiKotakMasuk()">KOTAK MASUK</button>
-            <button class="z-btn-opt" onclick="bukaModal('m-hakcipta')">HAK CIPTA</button>
-            
-            <div style="flex:1;"></div>
-            <button class="z-btn-primary" style="background:var(--merah-z); color:white;" onclick="bukaModal('m-keluar')">KELUAR AKUN</button>
-            <p style="text-align:center; font-size:8px; color:var(--abu-z); letter-spacing:1px;">VERSI 2.5 • ZZERR44</p>
-        </div>
-    </div>
-
-    <div id="m-sandi" class="z-modal-overlay">
-        <div class="z-modal-box">
-            <div class="z-modal-title">Reset Sandi</div>
-            <div class="z-form-group">
-                <label>Sandi Baru</label>
-                <input type="password" id="baru-sandi" class="z-input-field">
             </div>
-            <button class="z-btn-primary" onclick="simpanSandi()">PERBARUI</button>
-            <button class="z-btn-ghost" onclick="tutupModal()">BATAL</button>
-        </div>
-    </div>
+        </nav>
 
-    <div id="m-profil" class="z-modal-overlay">
-        <div class="z-modal-box">
-            <div class="z-modal-title">Identitas Node</div>
-            <div id="data-dump" style="background:#050505; padding:20px; border:1px solid var(--garis); font-size:11px; line-height:2; font-family:'JetBrains Mono';">
+        <main onclick="closePop()">
+            <div id="chat-scroller">
+                <div style="margin:auto; opacity:0.03; text-align:center; pointer-events:none;">
+                    <h1 style="font-size:120px; font-weight:900;">Z</h1>
+                    <p style="letter-spacing:10px;">ENCRYPTED</p>
                 </div>
-            <button class="z-btn-ghost" style="width:100%;" onclick="tutupModal()">TUTUP</button>
+            </div>
+
+            <div class="input-area">
+                <div class="input-wrap">
+                    <input type="text" id="msg-in" placeholder="Ketik pesan rahasia..." onkeypress="if(event.key=='Enter') sendChat()">
+                    <button onclick="sendChat()" style="background:none; border:none; color:var(--z); font-weight:900; font-size:11px; cursor:pointer; padding:5px;">KIRIM</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="mod-menu" class="z-modal" onclick="closeMod()">
+        <div class="modal-inner" onclick="event.stopPropagation()">
+            <div style="font-weight:900; color:var(--z); margin-bottom:20px; letter-spacing:2px; text-align:center; border-bottom:1px solid var(--g); padding-bottom:10px;">PENGATURAN_CORE</div>
+            <button class="z-btn btn-g" style="text-align:left;" onclick="openPP()">PILIH PROFIL (30 VARIASI)</button>
+            <button class="z-btn btn-g" style="text-align:left;" onclick="actionAdd()">TAMBAH NODE BARU</button>
+            <button class="z-btn btn-g" style="text-align:left;" onclick="actionInbox()">PERMINTAAN MASUK</button>
+            <button class="z-btn btn-g" style="text-align:left;" onclick="showCopy()">LISENSI & HAK CIPTA</button>
+            <div style="height:30px;"></div>
+            <button class="z-btn btn-z" style="background:var(--r); color:#fff; border:none;" onclick="openOut()">TERMINASI SESI (LOGOUT)</button>
         </div>
     </div>
 
-    <div id="m-hakcipta" class="z-modal-overlay">
-        <div class="z-modal-box" style="max-width:500px;">
-            <div class="z-modal-title">Legalitas & Hak Cipta</div>
-            <div class="z-copy-text">
-                SELURUH INFRASTRUKTUR DIGITAL ZCHAT ADALAH HASIL PENGEMBANGAN MANDIRI OLEH <b>ZZERR44</b>. SISTEM INI BEROPERASI DI ATAS ARSITEKTUR "Z-PROTOCOL" YANG DIRANCANG KHUSUS UNTUK MENJAMIN PRIVASI DAN KEAMANAN TRANSMISI DATA ANTAR PENGGUNA SECARA EKSKLUSIF.<br><br>
-                HAK CIPTA ATAS KODE SUMBER, LOGIKA DATABASE, IDENTITAS VISUAL, DAN SEGALA BENTUK KOMPONEN DALAM APLIKASI INI DIMILIKI SEPENUHNYA OLEH ZZERR44. PENGGUNA DILARANG KERAS MELAKUKAN TINDAKAN BERIKUT:<br>
-                1. MELAKUKAN REKAYASA BALIK (REVERSE ENGINEERING) TERHADAP LOGIKA Z-PROTOCOL.<br>
-                2. MENDISTRIBUSIKAN ULANG KODE BINARI TANPA IZIN TERTULIS.<br>
-                3. MENGGUNAKAN NAMA ATAU LOGO ZCHAT UNTUK TUJUAN KOMERSIAL PIHAK KETIGA.<br><br>
-                KEAMANAN JARINGAN INI BERGANTUNG PADA KERAHSIAAN KUNCI AKSES SETIAP PENGGUNA. PENGEMBANG TIDAK BERTANGGUNG JAWAB ATAS KELALAIAN PENGGUNA DALAM MENJAGA KATA SANDI. SISTEM INI DIBANGUN TANPA BANTUAN WEB BUILDER OTOMATIS ATAU MODUL PIHAK KETIGA YANG BERSIFAT TERBUKA (OPEN SOURCE), SEHINGGA SETIAP CELAH KEAMANAN DIPANTAU LANGSUNG OLEH PENGEMBANG UTAMA.<br><br>
-                DENGAN MENGGUNAKAN LAYANAN INI, ANDA SECARA OTOMATIS MENYETUJUI SEGALA KETENTUAN HAK CIPTA DAN LISENSI PRIVASI YANG DITETAPKAN OLEH ZZERR44.
-            </div>
-            <button class="z-btn-primary" style="margin-top:20px;" onclick="tutupModal()">SAYA MENGERTI</button>
+    <div id="mod-pp" class="z-modal">
+        <div class="modal-inner" style="max-width:450px;">
+            <div style="font-weight:900; color:var(--z); margin-bottom:15px; text-align:center;">AVATAR SELECTOR</div>
+            <div style="font-size:10px; color:var(--m); margin-bottom:10px;">15 ANGKA + 15 PIXEL KARAKTER</div>
+            <div class="grid-pp" id="pp-grid">
+                </div>
+            <button class="z-btn btn-z" onclick="tutupPP()">TERAPKAN PERUBAHAN</button>
         </div>
     </div>
 
-    <div id="m-keluar" class="z-modal-overlay">
-        <div class="z-modal-box">
-            <div class="z-modal-title">Konfirmasi Keluar</div>
-            <p style="text-align:center; font-size:11px; color:var(--abu-z); margin-bottom:20px;">Masukkan akun Anda untuk verifikasi logout aman.</p>
-            <div class="z-form-group">
-                <label>ID PENGGUNA</label>
-                <input type="text" id="out-user" class="z-input-field">
+    <div id="mod-out" class="z-modal">
+        <div class="modal-inner">
+            <div style="font-weight:900; color:var(--r); margin-bottom:10px; text-align:center;">VERIFIKASI LOGOUT</div>
+            <p style="font-size:11px; color:var(--m); text-align:center; margin-bottom:20px;">Masukkan kredensial untuk menghapus sesi aktif.</p>
+            <div class="f-group">
+                <label>KONFIRMASI ID</label>
+                <input type="text" id="out-u" class="z-in" autocomplete="off">
             </div>
-            <div class="z-form-group">
-                <label>KATA SANDI</label>
-                <input type="password" id="out-pass" class="z-input-field">
+            <div class="f-group">
+                <label>KONFIRMASI SANDI</label>
+                <input type="password" id="out-p" class="z-in">
             </div>
-            <button class="z-btn-primary" style="background:var(--merah-z); color:white;" onclick="eksekusiKeluar()">LOGOUT SEKARANG</button>
-            <button class="z-btn-ghost" style="font-size:9px;" onclick="alert('Hubungi zzerr44 untuk pemulihan akses database')">LUPA KATA SANDI?</button>
-            <button class="z-btn-ghost" onclick="tutupModal()">BATAL</button>
+            <button class="z-btn btn-z" style="background:var(--r); color:#fff;" onclick="confirmOut()">HAPUS AKSES</button>
+            <button class="z-btn btn-g" onclick="closeMod()">BATALKAN</button>
         </div>
     </div>
 
-    <script type="module">
+    <div id="mod-copy" class="z-modal">
+        <div class="modal-inner">
+            <div style="font-weight:900; color:var(--z); margin-bottom:15px; text-align:center;">LEGALITAS SISTEM</div>
+            <div id="copy-content" style="font-size:11px; color:var(--m); line-height:1.8; text-align:justify; height:200px; overflow-y:auto; padding:15px; background:#050505; border:1px solid var(--g);">
+                Seluruh infrastruktur kode ZChat ini dirancang dan dibangun secara mandiri oleh <b>zzerr44</b>. Sistem menggunakan protokol komunikasi terenkripsi end-to-end melalui Z-Protocol-V2. 
+                <br><br>
+                Ketentuan Penggunaan:<br>
+                1. Dilarang mendistribusikan ulang kode tanpa atribusi.<br>
+                2. Penggunaan identitas palsu untuk mengelabui node lain dilarang.<br>
+                3. Seluruh log pesan bersifat privasi dan terenkripsi pada database Firebase.<br><br>
+                Copyright &copy; 2026 zzerr44. All Rights Reserved.
+            </div>
+            <button class="z-btn btn-z" style="margin-top:15px;" onclick="closeMod()">SAYA MENGERTI</button>
+        </div>
+        </div>
+                    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, push, onValue, remove, update, onDisconnect, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // CONFIG FIREBASE
-        const firebaseConfig = {
+        // KONFIGURASI PRIVATE DATABASE ZZERR44
+        const config = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
             authDomain: "zchat-56639.firebaseapp.com",
             databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -603,233 +180,289 @@
             appId: "1:773931983053:web:a1c825be9a972e53dcc984"
         };
 
-        const app = initializeApp(firebaseConfig);
+        const app = initializeApp(config);
         const db = getDatabase(app);
 
-        // STATE GLOBAL
-        let myUID = localStorage.getItem('z_uid');
-        let targetUID = null;
+        // GLOBAL STATE MANAGEMENT
+        let myID = localStorage.getItem('z_uid');
+        let toID = null;
         let authMode = 'LOGIN';
+        let currentPP = localStorage.getItem('z_pp') || 'N01';
 
-        // UI HELPERS
+        // UI CONTROLLER
         window.showToast = (m) => {
-            const t = document.getElementById('z-toast');
+            const t = document.getElementById('toast');
             t.innerText = m; t.style.display = 'block';
             setTimeout(() => t.style.display = 'none', 3000);
         };
 
-        window.toggleSidebar = () => document.getElementById('z-drawer').classList.toggle('active');
+        window.toggleSide = () => document.getElementById('z-side').classList.toggle('active');
         window.toggleMenu = () => {
-            const m = document.getElementById('menu-kanan');
+            const m = document.getElementById('mod-menu');
             m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
         };
-        window.tutupSemua = () => {
-            document.getElementById('z-drawer').classList.remove('active');
-            document.getElementById('menu-kanan').style.display = 'none';
+        window.closePop = () => {
+            document.getElementById('z-side').classList.remove('active');
+            document.getElementById('mod-menu').style.display = 'none';
+        };
+        window.closeMod = () => {
+            document.querySelectorAll('.z-modal').forEach(m => m.style.display = 'none');
         };
 
-        window.bukaForm = (m) => {
+        // SISTEM OTENTIKASI (8 KARAKTER MINIMAL)
+        window.setAuth = (m) => {
             authMode = m;
-            document.getElementById('auth-awal').style.display = 'none';
-            document.getElementById('auth-form').style.display = 'block';
-            document.getElementById('btn-proses').innerText = (m === 'REG') ? 'DAFTAR SEKARANG' : 'MASUK SEKARANG';
+            document.getElementById('auth-main').style.display = 'none';
+            document.getElementById('auth-fields').style.display = 'block';
+            document.getElementById('conf-wrap').style.display = (m === 'REG') ? 'block' : 'none';
         };
 
-        window.bukaModal = (id) => {
-            document.getElementById(id).style.display = 'flex';
-            if(id === 'm-profil') {
-                const dump = document.getElementById('data-dump');
-                dump.innerHTML = `
-                    <div style="color:var(--biru-z); font-weight:900;">[ NODE_INFO ]</div>
-                    ID: ${myUID}<br>
-                    RANK: CORE_USER<br>
-                    NET: Z-PROTOCOL-V2<br>
-                    STATUS: AKTIF/TERVERIFIKASI<br>
-                    WAKTU: ${new Date().toLocaleTimeString()}
-                `;
+        window.runAuth = async () => {
+            const u = document.getElementById('in-u').value.trim().toUpperCase();
+            const p = document.getElementById('in-p').value.trim();
+            const cp = document.getElementById('in-cp').value.trim();
+
+            if (u.length < 8 || p.length < 8) {
+                return showToast("ERROR: ID & SANDI MINIMAL 8 HURUF!");
             }
-        };
-        window.tutupModal = () => document.querySelectorAll('.z-modal-overlay').forEach(m => m.style.display = 'none');
 
-        // LOGIC: OTENTIKASI
-        window.eksekusiAuth = async () => {
-            const u = document.getElementById('id-pengguna').value.trim().toUpperCase();
-            const p = document.getElementById('id-sandi').value.trim();
+            const uRef = ref(db, `users/${u}`);
+            const snap = await get(uRef);
 
-            if(u.length < 3 || p.length < 3) return showToast("INPUT TIDAK VALID");
-
-            try {
-                const userRef = ref(db, `users/${u}`);
-                const snapshot = await get(userRef);
-
-                if(authMode === 'REG') {
-                    if(snapshot.exists()) return showToast("ID SUDAH TERPAKAI");
-                    await set(userRef, { p: p, t: Date.now() });
-                    startSession(u);
+            if (authMode === 'REG') {
+                if (p !== cp) return showToast("ERROR: KONFIRMASI SANDI SALAH!");
+                if (snap.exists()) return showToast("ERROR: ID SUDAH TERDAFTAR!");
+                
+                // Set Data Baru
+                await set(uRef, { p: p, pp: 'N01', t: Date.now() });
+                initSession(u);
+            } else {
+                if (snap.exists() && snap.val().p === p) {
+                    initSession(u);
                 } else {
-                    if(snapshot.exists() && snapshot.val().p === p) {
-                        startSession(u);
-                    } else {
-                        showToast("ID ATAU SANDI SALAH");
-                    }
+                    showToast("ERROR: AKSES DITOLAK! CEK ID/SANDI");
                 }
-            } catch (err) {
-                showToast("GALAT DATABASE");
             }
         };
 
-        function startSession(uid) {
-            myUID = uid;
+        // CORE SESSION
+        function initSession(uid) {
+            myID = uid;
             localStorage.setItem('z_uid', uid);
-            document.getElementById('layer-auth').style.display = 'none';
-            document.getElementById('my-id-label').innerText = uid;
-            document.getElementById('my-ava-mini').innerText = uid[0];
-            
+            document.getElementById('auth-layer').style.display = 'none';
+            document.getElementById('my-id').innerText = uid;
+
+            // Sync PP Pribadi
+            get(ref(db, `users/${uid}/pp`)).then(s => {
+                currentPP = s.val() || 'N01';
+                renderMyPP();
+            });
+
             const statusRef = ref(db, `status/${uid}`);
             update(statusRef, { online: true });
             onDisconnect(statusRef).update({ online: false });
 
-            syncNetwork();
-            showToast("AKSES DITERIMA");
+            loadNetwork();
+            showToast("BERHASIL TERHUBUNG KE JARINGAN");
         }
 
-        // LOGIC: JARINGAN & CHAT
-        function syncNetwork() {
-            onValue(ref(db, `users/${myUID}/friends`), (snap) => {
-                const list = document.getElementById('render-teman');
+        // SISTEM PP (30 VARIASI)
+        function generatePixelPP(id, target) {
+            target.innerHTML = '';
+            const g = document.createElement('div');
+            g.className = 'pp-pixel';
+            // Algoritma seed berdasarkan ID untuk pola unik
+            let seed = id.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+            for (let i = 0; i < 25; i++) {
+                let d = document.createElement('div');
+                let colorSeed = (seed * (i + 7)) % 10;
+                if (colorSeed > 5) d.style.background = 'var(--z)';
+                else if (colorSeed > 2) d.style.background = '#1a1a1c';
+                else d.style.background = '#050505';
+                g.appendChild(d);
+            }
+            target.appendChild(g);
+        }
+
+        function renderMyPP() {
+            const box = document.getElementById('my-pp');
+            box.innerHTML = '';
+            if (currentPP.startsWith('P')) {
+                generatePixelPP(myID + currentPP, box);
+            } else {
+                // PP Angka sesuai index pilihan
+                box.innerText = currentPP.slice(1);
+            }
+            localStorage.setItem('z_pp', currentPP);
+        }
+
+        window.openPP = () => {
+            const grid = document.getElementById('pp-grid');
+            grid.innerHTML = '';
+            
+            // 15 Variasi Angka (N01 - N15)
+            for (let i = 1; i <= 15; i++) {
+                let code = 'N' + i.toString().padStart(2, '0');
+                let d = document.createElement('div');
+                d.className = `pp-box pp-opt ${currentPP === code ? 'active' : ''}`;
+                d.innerText = i.toString().padStart(2, '0');
+                d.onclick = () => { currentPP = code; updatePPInDB(); };
+                grid.appendChild(d);
+            }
+
+            // 15 Variasi Pixel (P01 - P15)
+            for (let i = 1; i <= 15; i++) {
+                let code = 'P' + i.toString().padStart(2, '0');
+                let d = document.createElement('div');
+                d.className = `pp-box pp-opt ${currentPP === code ? 'active' : ''}`;
+                generatePixelPP(myID + code, d);
+                d.onclick = () => { currentPP = code; updatePPInDB(); };
+                grid.appendChild(d);
+            }
+            document.getElementById('mod-pp').style.display = 'flex';
+        };
+
+        function updatePPInDB() {
+            update(ref(db, `users/${myID}`), { pp: currentPP });
+            renderMyPP();
+            document.querySelectorAll('.pp-opt').forEach(el => el.classList.remove('active'));
+            showToast("PP TERPILIH");
+        }
+
+        window.tutupPP = () => {
+            closeMod();
+            showToast("PROFIL DIPERBARUI");
+        };
+
+        // NETWORK & CHAT LOGIC
+        function loadNetwork() {
+            onValue(ref(db, `users/${myID}/friends`), (snap) => {
+                const list = document.getElementById('friend-render');
                 list.innerHTML = '';
-                
-                if(!snap.exists()) {
-                    list.innerHTML = '<div style="text-align:center; font-size:9px; color:var(--abu-z); margin-top:20px;">BELUM ADA NODE</div>';
+                if (!snap.exists()) {
+                    list.innerHTML = '<div style="padding:20px; font-size:9px; color:var(--m); text-align:center;">TIDAK ADA NODE AKTIF</div>';
                     return;
                 }
-
                 snap.forEach(f => {
                     const fid = f.key;
-                    onValue(ref(db, `status/${fid}`), (st) => {
-                        let exist = document.getElementById(`node-${fid}`);
-                        if(exist) exist.remove();
+                    onValue(ref(db, `users/${fid}`), (uData) => {
+                        onValue(ref(db, `status/${fid}`), (st) => {
+                            let old = document.getElementById(`f-${fid}`);
+                            if (old) old.remove();
+                            
+                            const card = document.createElement('div');
+                            card.id = `f-${fid}`;
+                            card.className = `user-card ${toID === fid ? 'active' : ''}`;
+                            
+                            const pBox = document.createElement('div');
+                            pBox.className = 'pp-box';
+                            let fPP = uData.val().pp || 'N01';
+                            if (fPP.startsWith('P')) generatePixelPP(fid + fPP, pBox);
+                            else pBox.innerText = fPP.slice(1);
 
-                        const online = st.val()?.online;
-                        const item = document.createElement('div');
-                        item.id = `node-${fid}`;
-                        item.className = `z-item-friend ${targetUID === fid ? 'active' : ''}`;
-                        item.innerHTML = `
-                            <div class="z-pfp-box">${fid[0]}</div>
-                            <div style="flex:1">
-                                <div style="font-weight:800; font-size:13px;">${fid}</div>
-                                <div style="font-size:9px; color:${online?'var(--hijau-z)':'#444'}; font-weight:700;">
-                                    ${online ? 'ONLINE' : 'OFFLINE'}
+                            card.innerHTML = pBox.outerHTML + `
+                                <div style="flex:1">
+                                    <div style="font-weight:900; font-size:13px;">${fid}</div>
+                                    <div style="font-size:9px; color:${st.val()?.online ? 'var(--z)' : '#444'}; font-weight:800;">
+                                        ${st.val()?.online ? 'NODE ONLINE' : 'NODE OFFLINE'}
+                                    </div>
                                 </div>
-                            </div>
-                        `;
-                        item.onclick = () => muatObrolan(fid);
-                        list.appendChild(item);
+                            `;
+                            card.onclick = () => startChat(fid);
+                            list.appendChild(card);
+                        });
                     });
                 });
             });
         }
 
-        window.muatObrolan = (fid) => {
-            targetUID = fid;
-            document.getElementById('chat-aktif-judul').innerText = fid;
-            tutupSemua();
+        window.startChat = (id) => {
+            toID = id;
+            document.getElementById('head-title').innerText = id;
+            closePop();
             
-            const room = [myUID, fid].sort().join('_X_');
+            const room = [myID, id].sort().join('_Z_');
             onValue(ref(db, `chats/${room}`), (snap) => {
-                const flow = document.getElementById('z-chat-flow');
+                const flow = document.getElementById('chat-scroller');
                 flow.innerHTML = '';
-                
-                if(!snap.exists()) {
-                    flow.innerHTML = `<div style="margin:auto; opacity:0.2; font-size:10px;">BELUM ADA TRANSMISI</div>`;
-                } else {
-                    snap.forEach(m => {
-                        const d = m.val();
-                        const wrap = document.createElement('div');
-                        wrap.className = 'z-msg-wrap';
-                        wrap.innerHTML = `
-                            <div class="z-pfp-box" style="background:${d.s===myUID?'var(--biru-z)':'#222'}; color:${d.s===myUID?'#000':'#fff'}">${d.s[0]}</div>
-                            <div class="z-msg-content">
-                                <div class="z-msg-header">
-                                    <span class="z-user-name">${d.s}</span>
-                                    <span class="z-timestamp">${new Date(d.t).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
-                                </div>
-                                <div class="z-text">${d.c}</div>
+                snap.forEach(m => {
+                    const d = m.val();
+                    const wrap = document.createElement('div');
+                    wrap.style.cssText = "display:flex; gap:12px; margin-bottom:15px;";
+                    wrap.innerHTML = `
+                        <div class="pp-box" style="width:30px; height:30px; font-size:10px; background:${d.s === myID ? 'var(--z)' : '#222'}; color:${d.s === myID ? '#000' : '#fff'}">
+                            ${d.s[0]}
+                        </div>
+                        <div style="flex:1">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-weight:900; font-size:12px; color:var(--z);">${d.s}</span>
+                                <span style="font-size:8px; color:var(--m);">${new Date(d.t).toLocaleTimeString()}</span>
                             </div>
-                        `;
-                        flow.appendChild(wrap);
-                    });
-                    flow.scrollTop = flow.scrollHeight;
-                }
+                            <div style="font-size:14px; color:#ddd; margin-top:3px;">${d.c}</div>
+                        </div>
+                    `;
+                    flow.appendChild(wrap);
+                });
+                flow.scrollTop = flow.scrollHeight;
             });
         };
 
-        window.kirimPesan = () => {
-            const inp = document.getElementById('input-pesan');
-            const teks = inp.value.trim();
-            if(!teks || !targetUID) return;
-
-            const room = [myUID, targetUID].sort().join('_X_');
+        window.sendChat = () => {
+            const inp = document.getElementById('msg-in');
+            if (!inp.value.trim() || !toID) return;
+            const room = [myID, toID].sort().join('_Z_');
             push(ref(db, `chats/${room}`), {
-                s: myUID,
-                c: teks,
+                s: myID,
+                c: inp.value.trim(),
                 t: Date.now()
             });
             inp.value = '';
         };
 
-        // LOGIC: FITUR TAMBAHAN
-        window.simpanSandi = () => {
-            const s = document.getElementById('baru-sandi').value;
-            if(s.length < 3) return showToast("TERLALU PENDEK");
-            update(ref(db, `users/${myUID}`), { p: s });
-            showToast("SANDI DIPERBARUI");
-            tutupModal();
-        };
-
-        window.aksiTambah = () => {
-            const id = prompt("MASUKKAN ID TUJUAN:").toUpperCase();
-            if(id && id !== myUID) {
-                set(ref(db, `req/${id}/${myUID}`), { from: myUID, t: Date.now() });
-                showToast("PERMINTAAN TERKIRIM");
+        // ADDITIONAL ACTIONS
+        window.actionAdd = () => {
+            const target = prompt("MASUKKAN ID NODE TUJUAN (8+ HURUF):");
+            if (target && target.toUpperCase() !== myID) {
+                const tid = target.toUpperCase();
+                set(ref(db, `req/${tid}/${myID}`), { from: myID, t: Date.now() });
+                showToast("SINYAL PERTEMANAN DIKIRIM");
                 toggleMenu();
             }
         };
 
-        window.aksiKotakMasuk = () => {
-            get(ref(db, `req/${myUID}`)).then(snap => {
-                if(!snap.exists()) return showToast("KOTAK MASUK KOSONG");
+        window.actionInbox = () => {
+            get(ref(db, `req/${myID}`)).then(snap => {
+                if (!snap.exists()) return showToast("KOTAK MASUK KOSONG");
                 snap.forEach(r => {
-                    if(confirm(`TERIMA PERTEMANAN DARI ${r.key}?`)) {
-                        set(ref(db, `users/${myUID}/friends/${r.key}`), true);
-                        set(ref(db, `users/${r.key}/friends/${myUID}`), true);
-                        remove(ref(db, `req/${myUID}/${r.key}`));
-                        showToast("NODE TERHUBUNG");
+                    if (confirm(`TERIMA KONEKSI DARI NODE: ${r.key}?`)) {
+                        set(ref(db, `users/${myID}/friends/${r.key}`), true);
+                        set(ref(db, `users/${r.key}/friends/${myID}`), true);
+                        remove(ref(db, `req/${myID}/${r.key}`));
+                        showToast("KONEKSI ESTABLISHED");
                     }
                 });
             });
         };
 
-        window.eksekusiKeluar = async () => {
-            const u = document.getElementById('out-user').value.trim().toUpperCase();
-            const p = document.getElementById('out-pass').value.trim();
-            const snap = await get(ref(db, `users/${myUID}`));
+        window.openOut = () => document.getElementById('mod-out').style.display = 'flex';
+        window.showCopy = () => document.getElementById('mod-copy').style.display = 'flex';
 
-            if(u === myUID && p === snap.val().p) {
-                update(ref(db, `status/${myUID}`), { online: false });
+        window.confirmOut = async () => {
+            const u = document.getElementById('out-u').value.trim().toUpperCase();
+            const p = document.getElementById('out-p').value.trim();
+            const snap = await get(ref(db, `users/${myID}`));
+
+            if (u === myID && p === snap.val().p) {
+                update(ref(db, `status/${myID}`), { online: false });
                 localStorage.clear();
                 location.reload();
             } else {
-                showToast("VERIFIKASI GAGAL");
+                showToast("VERIFIKASI GAGAL! DATA TIDAK COCOK");
             }
         };
 
-        // STARTUP
-        if(myUID) {
-            startSession(myUID);
-        } else {
-            document.getElementById('layer-auth').style.display = 'flex';
-        }
+        // AUTO-INIT
+        if (myID) initSession(myID);
     </script>
 </body>
 </html>
