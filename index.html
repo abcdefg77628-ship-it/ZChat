@@ -3,171 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ZChat - Secure Communication</title>
+    <title>ZChat Professional</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* =========================================
-           CORE SYSTEM STYLING
-           ========================================= */
+        /* --- CORE DISCORD THEME --- */
         :root {
-            --bg-main: #0a0a0a;
-            --bg-side: #121315;
-            --bg-chat: #1e1f22;
-            --bg-input: #2b2d31;
+            --bg-darker: #0e0e10;
+            --bg-side: #1e1f22;
+            --bg-chat: #313338;
+            --bg-input: #383a40;
             --accent: #5865f2;
-            --text-p: #ffffff;
-            --text-s: #949ba4;
+            --cyan-btn: #00b2ff;
+            --text-main: #dbdee1;
+            --text-muted: #949ba4;
+            --white: #ffffff;
             --danger: #ed4245;
-            --success: #23a55a;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         body {
-            background-color: var(--bg-main);
-            color: var(--text-p);
+            background-color: var(--bg-darker);
+            color: var(--text-main);
             height: 100vh;
             width: 100vw;
-            display: flex;
             overflow: hidden;
-            position: fixed; /* Mencegah layar goyang saat keyboard muncul */
+            position: fixed; /* Kunci biar gak mental pas ngetik */
         }
 
-        /* LAYOUT ARCHITECTURE */
-        .app-shell { display: flex; width: 100%; height: 100%; position: relative; }
-
-        /* SIDEBAR (FRIENDS) */
-        .sidebar-container {
-            width: 260px;
-            background: var(--bg-side);
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid #26272b;
-            transition: transform 0.3s ease;
-            z-index: 500;
-        }
-
-        .sidebar-header {
+        /* --- NAVIGATION (Sesuai Screenshot) --- */
+        header {
             height: 60px;
-            padding: 0 16px;
+            background: var(--bg-darker);
             display: flex;
             align-items: center;
-            font-weight: 700;
-            font-size: 14px;
-            border-bottom: 1px solid #26272b;
-            color: var(--accent);
-            letter-spacing: 1px;
+            justify-content: space-between;
+            padding: 0 15px;
+            border-bottom: 1px solid #222;
+            position: relative;
+            z-index: 1000;
         }
 
-        .friend-list { flex: 1; overflow-y: auto; padding: 10px; }
-        
-        .friend-card {
+        .btn-top {
+            background: #2b2d31;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .btn-menu {
+            background: var(--cyan-btn);
+            color: black;
+        }
+
+        .chat-title {
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 1px;
+            color: var(--white);
+        }
+
+        /* --- LAYOUT SYSTEM --- */
+        .app-body {
+            display: flex;
+            height: calc(100vh - 60px);
+            width: 100%;
+            position: relative;
+        }
+
+        /* SIDEBAR TEMAN */
+        aside {
+            position: absolute;
+            left: -100%;
+            top: 0;
+            width: 280px;
+            height: 100%;
+            background: var(--bg-side);
+            z-index: 999;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 10px 0 20px rgba(0,0,0,0.5);
+        }
+
+        aside.active { left: 0; }
+
+        .side-head {
+            padding: 20px;
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-bottom: 1px solid #2b2d31;
+        }
+
+        .friend-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .friend-item {
             display: flex;
             align-items: center;
             gap: 12px;
             padding: 10px;
-            border-radius: 8px;
+            border-radius: 5px;
             cursor: pointer;
-            margin-bottom: 4px;
             transition: 0.2s;
+            margin-bottom: 2px;
         }
-        .friend-card:hover, .friend-card.active { background: #2b2d31; }
 
-        .ava-circle {
-            width: 36px;
-            height: 36px;
+        .friend-item:hover { background: #35373c; }
+        .friend-item.active { background: #3f4147; color: white; }
+
+        .avatar-box {
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             position: relative;
             background: #444;
         }
-        .status-dot {
+
+        .online-dot {
             width: 12px;
             height: 12px;
             border-radius: 50%;
             position: absolute;
-            bottom: 0;
-            right: 0;
+            bottom: -2px;
+            right: -2px;
             border: 2px solid var(--bg-side);
+            background: #555;
         }
 
-        /* MAIN CONTENT AREA */
-        .main-content {
+        .online-dot.on { background: #23a55a; }
+
+        /* --- CHAT AREA --- */
+        main {
             flex: 1;
+            background: var(--bg-chat);
             display: flex;
             flex-direction: column;
-            background: var(--bg-chat);
             position: relative;
         }
 
-        /* TOP NAVIGATION (DENGAN GARIS TIGA DI KANAN) */
-        .top-nav {
-            height: 60px;
-            background: rgba(18, 19, 21, 0.95);
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
-            z-index: 100;
-            border-bottom: 1px solid #26272b;
-        }
-
-        .nav-left { display: flex; align-items: center; gap: 12px; }
-        .burger-menu {
-            cursor: pointer;
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .burger-line { width: 22px; height: 2px; background: white; border-radius: 2px; }
-
-        /* MESSAGE AREA (ANTI KEPOTONG) */
-        .message-area {
+        #chat-scroller {
             flex: 1;
             overflow-y: auto;
-            padding: 20px 16px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 18px;
-            padding-bottom: 120px; /* Jarak aman dari input bar */
+            gap: 20px;
+            /* Jarak bawah biar input gak nutup pesan terakhir */
+            padding-bottom: 100px; 
         }
 
-        .msg-item { display: flex; gap: 14px; animation: fadeInUp 0.3s ease; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .msg-row {
+            display: flex;
+            gap: 15px;
+            animation: fadeIn 0.3s ease;
+        }
 
-        .msg-bubble { flex: 1; }
-        .msg-info { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-        .msg-user { font-weight: 700; font-size: 14px; color: white; }
-        .msg-time { font-size: 10px; color: var(--text-s); }
-        .msg-body { font-size: 15px; color: #dbdee1; line-height: 1.4; word-break: break-word; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* INPUT AREA (FIXED BOTTOM - ANTI KEPOTONG) */
-        .bottom-bar {
+        .msg-pfp {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .msg-content { flex: 1; }
+        .msg-user { 
+            font-weight: 700; 
+            font-size: 14px; 
+            color: white; 
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .msg-time { font-size: 10px; color: var(--text-muted); font-weight: 400; }
+        .msg-text { font-size: 15px; line-height: 1.5; color: #dcddde; word-break: break-word; }
+
+        /* --- INPUT BAR (ANTI-KEPOTONG) --- */
+        .input-area {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(transparent, var(--bg-chat) 30%);
-            padding: 10px 16px 30px; /* Padding bawah gede buat HP */
-            z-index: 200;
+            padding: 10px 15px 25px; /* Tambah padding bawah buat HP */
+            background: linear-gradient(transparent, var(--bg-chat) 20%);
         }
 
-        .input-box {
+        .input-wrapper {
             background: var(--bg-input);
-            border-radius: 12px;
-            padding: 12px 16px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+            padding: 12px 15px;
+            gap: 15px;
         }
 
-        .input-box input {
+        .input-wrapper input {
             flex: 1;
             background: none;
             border: none;
@@ -176,174 +227,199 @@
             outline: none;
         }
 
-        /* MENU MODAL (POJOK KANAN) */
+        /* --- MENU OVERLAY (RIGHT) --- */
         .menu-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             z-index: 2000;
             display: none;
             justify-content: flex-end;
-            padding: 10px;
         }
-        .menu-card {
-            background: var(--bg-side);
-            width: 280px;
-            height: fit-content;
-            border-radius: 12px;
-            padding: 20px;
-            animation: slideInRight 0.3s ease;
-            box-shadow: -5px 0 20px rgba(0,0,0,0.5);
-        }
-        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
-        .menu-item {
+        .menu-panel {
+            width: 300px;
+            height: 100%;
+            background: var(--bg-side);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            animation: slideLeft 0.3s ease;
+        }
+
+        @keyframes slideLeft { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        .menu-btn {
+            width: 100%;
             padding: 12px;
-            border-radius: 8px;
+            border-radius: 5px;
+            border: none;
+            background: #2b2d31;
+            color: white;
+            text-align: left;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 8px;
-            background: #1e1f22;
-            font-weight: 600;
-            font-size: 14px;
         }
-        .menu-item:hover { background: var(--accent); }
 
-        /* AUTH SCREEN */
-        .auth-screen {
+        .menu-btn:hover { background: var(--accent); }
+        .menu-btn.logout { color: var(--danger); }
+
+        /* --- AUTH SCREEN --- */
+        .auth-wrap {
             position: fixed;
             inset: 0;
-            background: black;
-            z-index: 10000;
+            background: var(--bg-darker);
+            z-index: 99999;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 30px;
+            padding: 25px;
         }
-        .auth-form { width: 100%; max-width: 360px; text-align: center; }
-        .z-input {
+
+        .auth-card {
             width: 100%;
-            padding: 14px;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .auth-card h1 { font-size: 28px; margin-bottom: 10px; color: white; }
+        .auth-card p { color: var(--text-muted); margin-bottom: 30px; font-size: 14px; }
+
+        .field {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 12px;
             background: #111;
-            border: 1px solid #333;
+            border: 1px solid #222;
             color: white;
-            border-radius: 8px;
-            margin-bottom: 12px;
+            border-radius: 5px;
             outline: none;
         }
-        .z-btn {
+
+        .primary-btn {
             width: 100%;
             padding: 14px;
             background: var(--accent);
-            border: none;
             color: white;
+            border: none;
+            border-radius: 5px;
             font-weight: 700;
-            border-radius: 8px;
             cursor: pointer;
+            margin-top: 10px;
         }
 
-        /* MOBILE RESPONSIVE */
-        @media (max-width: 768px) {
-            .sidebar-container { position: fixed; left: -260px; height: 100%; }
-            .sidebar-container.open { transform: translateX(260px); }
-        }
-
-        #toast {
+        /* --- TOAST --- */
+        #z-toast {
             position: fixed;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
             background: var(--accent);
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 10px 25px;
+            border-radius: 50px;
             font-weight: 700;
+            font-size: 12px;
             z-index: 100000;
             display: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
     </style>
 </head>
 <body>
 
-    <div id="toast">Notif</div>
+    <div id="z-toast">Notification</div>
 
-    <div class="app-shell">
-        <aside class="sidebar-container" id="side-bar">
-            <div class="sidebar-header" id="txt-dm">DAFTAR TEMAN</div>
-            <div class="friend-list" id="dom-friends">
+    <div class="auth-wrap" id="auth-layer">
+        <div class="auth-card">
+            <h1>ZChat</h1>
+            <p id="auth-sub">Masukkan kredensial Anda</p>
+            <div class="field">
+                <label>USERNAME</label>
+                <input type="text" id="auth-u" autocomplete="off">
+            </div>
+            <div class="field">
+                <label>PASSWORD</label>
+                <input type="password" id="auth-p">
+            </div>
+            <button class="primary-btn" onclick="processAuth('LOGIN')" id="btn-login-txt">MASUK</button>
+            <button class="menu-btn" style="background:none; justify-content:center; font-size:12px; color:var(--cyan-btn)" onclick="processAuth('REG')" id="btn-reg-txt">Daftar Akun Baru</button>
+        </div>
+    </div>
+
+    <header>
+        <button class="btn-top" onclick="toggleSide()" id="nav-teman">TEMAN</button>
+        <div class="chat-title" id="active-name">ZCHAT</div>
+        <button class="btn-top btn-menu" onclick="toggleMenu()" id="nav-menu">MENU</button>
+    </header>
+
+    <div class="app-body">
+        <aside id="sidebar-ui">
+            <div class="side-head" id="txt-friend-list">PESAN LANGSUNG</div>
+            <div class="friend-list" id="dom-friends"></div>
+            <div style="padding:15px; background:#111214; display:flex; align-items:center; gap:12px">
+                <img id="my-pfp" src="" style="width:35px; height:35px; border-radius:50%">
+                <div>
+                    <div id="my-user-display" style="font-weight:700; font-size:13px">User</div>
+                    <div style="font-size:10px; color:var(--text-muted)">Online</div>
                 </div>
-            <div style="padding:15px; background:#0e0f11; display:flex; align-items:center; gap:10px">
-                <img id="my-ava" src="" style="width:32px; height:32px; border-radius:50%">
-                <div style="font-size:12px; font-weight:700" id="my-name">USER</div>
             </div>
         </aside>
 
-        <main class="main-content">
-            <div class="auth-screen" id="auth-box">
-                <div class="auth-form">
-                    <h1 style="color:var(--accent); letter-spacing:3px; margin-bottom:30px">ZCHAT</h1>
-                    <input type="text" id="in-u" class="z-input" placeholder="USERNAME">
-                    <input type="password" id="in-p" class="z-input" placeholder="PASSWORD">
-                    <button class="z-btn" onclick="handleLogin('LOGIN')" id="btn-login-label">MASUK</button>
-                    <p style="font-size:12px; margin-top:15px; color:var(--text-s)" onclick="handleLogin('REG')" id="btn-reg-label">Belum punya akun? Daftar</p>
+        <main onclick="closePanels()">
+            <div id="chat-scroller">
+                <div style="margin: auto; text-align:center; opacity:0.2">
+                    <h2 id="txt-welcome-head">Selamat Datang</h2>
+                    <p id="txt-welcome-sub">Pilih teman untuk memulai</p>
                 </div>
             </div>
 
-            <header class="top-nav">
-                <div class="nav-left">
-                    <div class="burger-menu" onclick="toggleSidebar()" id="btn-side">
-                        <div class="burger-line"></div>
-                        <div class="burger-line"></div>
-                        <div class="burger-line"></div>
-                    </div>
-                    <span id="active-chat" style="font-weight:700">Pilih Teman</span>
-                </div>
-                
-                <div class="burger-menu" onclick="toggleMenu()" style="align-items: flex-end;">
-                    <div class="burger-line" style="width: 24px;"></div>
-                    <div class="burger-line" style="width: 18px;"></div>
-                    <div class="burger-line" style="width: 24px;"></div>
-                </div>
-            </header>
-
-            <div class="message-area" id="chat-flow" onclick="closeAll()">
-                <div style="margin:auto; text-align:center; opacity:0.3">
-                    <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=ZChat" style="width:100px">
-                    <p id="txt-welcome">Mulai obrolan aman</p>
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <input type="text" id="msg-input" placeholder="Tulis pesan..." onkeypress="if(event.key=='Enter') sendMessage()">
+                    <button onclick="sendMessage()" style="background:none; border:none; color:var(--cyan-btn); font-weight:800; cursor:pointer" id="btn-send-txt">KIRIM</button>
                 </div>
             </div>
-
-            <footer class="bottom-bar">
-                <div class="input-box">
-                    <input type="text" id="m-in" placeholder="Tulis pesan..." onkeypress="if(event.key=='Enter') pushChat()">
-                    <button onclick="pushChat()" style="background:none; border:none; color:var(--accent); font-weight:800; cursor:pointer" id="btn-send">KIRIM</button>
-                </div>
-            </footer>
         </main>
     </div>
 
-    <div class="menu-overlay" id="menu-box" onclick="toggleMenu()">
-        <div class="menu-card" onclick="event.stopPropagation()">
-            <h3 style="margin-bottom:20px" id="txt-settings">Pengaturan</h3>
+    <div class="menu-overlay" id="menu-ui" onclick="toggleMenu()">
+        <div class="menu-panel" onclick="event.stopPropagation()">
+            <h2 style="color:white; margin-bottom:10px" id="txt-sett">Pengaturan</h2>
             
-            <label style="font-size:10px; color:var(--text-s); font-weight:800" id="txt-lang">BAHASA / LANGUAGE</label>
-            <select id="lang-pick" onchange="setLang(this.value)" style="width:100%; padding:10px; background:#111; color:white; border:1px solid #333; border-radius:8px; margin:8px 0 20px">
-                <option value="id">Indonesia</option>
-                <option value="en">English</option>
-            </select>
+            <div style="margin-bottom:20px">
+                <label style="font-size:11px; font-weight:800; color:var(--text-muted)" id="txt-lang-label">BAHASA / LANGUAGE</label>
+                <select id="lang-select" onchange="updateLang(this.value)" style="width:100%; margin-top:8px; padding:10px; background:#111; color:white; border:1px solid #333; border-radius:5px">
+                    <option value="id">Bahasa Indonesia</option>
+                    <option value="en">English (US)</option>
+                </select>
+            </div>
 
-            <div class="menu-item" onclick="addFriendUI()" id="txt-add">
-                <span>➕</span> <span id="label-add">Tambah Teman</span>
-            </div>
-            <div class="menu-item" onclick="showReq()" id="txt-req">
-                <span>📩</span> <span id="label-req">Permintaan</span>
-            </div>
-            <div class="menu-item" onclick="logout()" style="color:var(--danger)">
-                <span>🚪</span> <span id="label-out">Keluar</span>
-            </div>
-            <button class="z-btn" style="background:#333; margin-top:20px" onclick="toggleMenu()" id="txt-close">TUTUP</button>
+            <button class="menu-btn" onclick="uiAddFriend()">
+                <span>➕</span> <span id="txt-add-f">Tambah Teman</span>
+            </button>
+            <button class="menu-btn" onclick="uiRequests()">
+                <span>📩</span> <span id="txt-req-f">Permintaan</span>
+            </button>
+            <div style="flex:1"></div>
+            <button class="menu-btn logout" onclick="doLogout()">
+                <span>🚪</span> <span id="txt-logout">Keluar Akun</span>
+            </button>
         </div>
     </div>
 
@@ -351,7 +427,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, push, onValue, remove, update, onDisconnect, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        const conf = {
+        const config = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
             authDomain: "zchat-56639.firebaseapp.com",
             databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -360,156 +436,125 @@
             appId: "1:773931983053:web:a1c825be9a972e53dcc984"
         };
 
-        const app = initializeApp(conf);
+        const app = initializeApp(config);
         const db = getDatabase(app);
 
-        let user = localStorage.getItem('z_user');
-        let target = null;
-        let lang = localStorage.getItem('z_lang') || 'id';
+        let myID = localStorage.getItem('z_uid');
+        let targetID = null;
+        let currentLang = localStorage.getItem('z_lang') || 'id';
 
-        const dict = {
-            id: { 
-                dm: "DAFTAR TEMAN", settings: "PENGATURAN", add: "Tambah Teman", 
-                req: "Permintaan", out: "Keluar", close: "TUTUP", 
+        const dictionary = {
+            id: {
+                teman: "TEMAN", menu: "MENU", direct: "PESAN LANGSUNG", 
+                welcomeH: "Selamat Datang", welcomeS: "Pilih teman untuk memulai",
                 place: "Tulis pesan...", send: "KIRIM", login: "MASUK", 
-                reg: "Belum punya akun? Daftar", welcome: "Mulai obrolan aman" 
+                reg: "Daftar Akun Baru", sett: "Pengaturan", lang: "BAHASA",
+                add: "Tambah Teman", req: "Permintaan", out: "Keluar Akun", sub: "Masukkan kredensial Anda"
             },
-            en: { 
-                dm: "FRIENDS LIST", settings: "SETTINGS", add: "Add Friend", 
-                req: "Requests", out: "Logout", close: "CLOSE", 
+            en: {
+                teman: "FRIENDS", menu: "MENU", direct: "DIRECT MESSAGES", 
+                welcomeH: "Welcome Back", welcomeS: "Select a friend to start",
                 place: "Type a message...", send: "SEND", login: "LOGIN", 
-                reg: "No account? Register", welcome: "Start secure chat" 
+                reg: "Register New Account", sett: "Settings", lang: "LANGUAGE",
+                add: "Add Friend", req: "Requests", out: "Sign Out", sub: "Enter your credentials"
             }
         };
 
-        window.showT = (m) => { const t = document.getElementById('toast'); t.innerText = m; t.style.display='block'; setTimeout(()=>t.style.display='none', 2000); };
-        window.toggleSidebar = () => document.getElementById('side-bar').classList.toggle('open');
+        // --- UI HELPERS ---
+        window.showToast = (m) => {
+            const t = document.getElementById('z-toast');
+            t.innerText = m; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2500);
+        };
+
+        window.toggleSide = () => document.getElementById('sidebar-ui').classList.toggle('active');
         window.toggleMenu = () => {
-            const m = document.getElementById('menu-box');
+            const m = document.getElementById('menu-ui');
             m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
         };
-        window.closeAll = () => {
-            document.getElementById('side-bar').classList.remove('open');
-            document.getElementById('menu-box').style.display = 'none';
+        window.closePanels = () => {
+            document.getElementById('sidebar-ui').classList.remove('active');
+            document.getElementById('menu-ui').style.display = 'none';
         };
 
-        window.setLang = (l) => {
-            lang = l; localStorage.setItem('z_lang', l);
-            const d = dict[l];
-            document.getElementById('txt-dm').innerText = d.dm;
-            document.getElementById('txt-settings').innerText = d.settings;
-            document.getElementById('label-add').innerText = d.add;
-            document.getElementById('label-req').innerText = d.req;
-            document.getElementById('label-out').innerText = d.out;
-            document.getElementById('txt-close').innerText = d.close;
-            document.getElementById('m-in').placeholder = d.place;
-            document.getElementById('btn-send').innerText = d.send;
-            document.getElementById('btn-login-label').innerText = d.login;
-            document.getElementById('btn-reg-label').innerText = d.reg;
-            document.getElementById('txt-welcome').innerText = d.welcome;
+        window.updateLang = (l) => {
+            currentLang = l; localStorage.setItem('z_lang', l);
+            const d = dictionary[l];
+            document.getElementById('nav-teman').innerText = d.teman;
+            document.getElementById('nav-menu').innerText = d.menu;
+            document.getElementById('txt-friend-list').innerText = d.direct;
+            document.getElementById('txt-welcome-head').innerText = d.welcomeH;
+            document.getElementById('txt-welcome-sub').innerText = d.welcomeS;
+            document.getElementById('msg-input').placeholder = d.place;
+            document.getElementById('btn-send-txt').innerText = d.send;
+            document.getElementById('btn-login-txt').innerText = d.login;
+            document.getElementById('btn-reg-txt').innerText = d.reg;
+            document.getElementById('txt-sett').innerText = d.sett;
+            document.getElementById('txt-lang-label').innerText = d.lang;
+            document.getElementById('txt-add-f').innerText = d.add;
+            document.getElementById('txt-req-f').innerText = d.req;
+            document.getElementById('txt-logout').innerText = d.out;
+            document.getElementById('auth-sub').innerText = d.sub;
         };
 
-        window.handleLogin = async (mode) => {
-            const u = document.getElementById('in-u').value.trim().toUpperCase();
-            const p = document.getElementById('in-p').value.trim();
-            if(u.length < 3) return showT("Username minimal 3 karakter!");
+        // --- AUTH LOGIC ---
+        window.processAuth = async (type) => {
+            const u = document.getElementById('auth-u').value.trim().toUpperCase();
+            const p = document.getElementById('auth-p').value.trim();
+            if(u.length < 3) return showToast("Min 3 characters!");
 
-            if(mode === 'REG') {
+            if(type === 'REG') {
                 const s = await get(ref(db, `users/${u}`));
-                if(s.exists()) return showT("User sudah ada!");
-                await set(ref(db, `users/${u}`), { p, ava: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${u}_${Date.now()}` });
-                start(u);
+                if(s.exists()) return showToast("User exists!");
+                await set(ref(db, `users/${u}`), { p, pfp: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${u}_${Date.now()}` });
+                initApp(u);
             } else {
                 const s = await get(ref(db, `users/${u}`));
-                if(s.exists() && s.val().p === p) start(u); else showT("Salah Login!");
+                if(s.exists() && s.val().p === p) initApp(u); else showToast("Wrong Login!");
             }
         };
 
-        async function start(u) {
-            user = u; localStorage.setItem('z_user', u);
-            document.getElementById('auth-box').style.display = 'none';
-            document.getElementById('my-name').innerText = u;
+        async function initApp(id) {
+            myID = id; localStorage.setItem('z_uid', id);
+            document.getElementById('auth-layer').style.display = 'none';
+            document.getElementById('my-user-display').innerText = id;
             
-            const s = await get(ref(db, `users/${u}`));
-            document.getElementById('my-ava').src = s.val().ava;
+            const s = await get(ref(db, `users/${id}`));
+            document.getElementById('my-pfp').src = s.val().pfp;
             
-            update(ref(db, `status/${u}`), { online: true, ava: s.val().ava });
-            onDisconnect(ref(db, `status/${u}`)).update({ online: false });
+            update(ref(db, `status/${id}`), { online: true, pfp: s.val().pfp });
+            onDisconnect(ref(db, `status/${id}`)).update({ online: false });
             
-            loadFriends();
-            setLang(lang);
-            document.getElementById('lang-pick').value = lang;
+            syncFriends();
+            updateLang(currentLang);
+            document.getElementById('lang-select').value = currentLang;
         }
 
-        function loadFriends() {
-            onValue(ref(db, `users/${user}/friends`), (snap) => {
-                const area = document.getElementById('dom-friends'); area.innerHTML = '';
-                snap.forEach(c => {
-                    onValue(ref(db, `status/${c.key}`), (st) => {
+        // --- CORE CHAT & FRIENDS ---
+        function syncFriends() {
+            onValue(ref(db, `users/${myID}/friends`), (snap) => {
+                const dom = document.getElementById('dom-friends'); dom.innerHTML = '';
+                snap.forEach(f => {
+                    onValue(ref(db, `status/${f.key}`), (st) => {
                         const d = st.val();
-                        let old = document.getElementById(`f-${c.key}`); if(old) old.remove();
+                        let old = document.getElementById(`f-card-${f.key}`); if(old) old.remove();
                         const card = document.createElement('div');
-                        card.id = `f-${c.key}`; card.className = `friend-card ${target===c.key?'active':''}`;
-                        card.innerHTML = `<div class="ava-circle"><img src="${d.ava}" style="width:100%; border-radius:50%"><div class="status-dot" style="background:${d.online?'var(--success)':'#555'}"></div></div>
-                                         <div><div style="font-weight:700; font-size:14px">${c.key}</div><div style="font-size:10px; color:var(--text-s)">${d.online?'Online':'Offline'}</div></div>`;
-                        card.onclick = () => openChat(c.key);
-                        area.appendChild(card);
+                        card.id = `f-card-${f.key}`; card.className = `friend-item ${targetID===f.key?'active':''}`;
+                        card.innerHTML = `<div class="avatar-box"><img src="${d.pfp}" style="width:100%; border-radius:50%"><div class="online-dot ${d.online?'on':''}"></div></div>
+                                         <div style="font-weight:600; font-size:14px">${f.key}</div>`;
+                        card.onclick = () => loadConversation(f.key);
+                        dom.appendChild(card);
                     });
                 });
             });
         }
 
-        window.openChat = (id) => {
-            target = id; document.getElementById('active-chat').innerText = id;
-            closeAll();
-            const cid = [user, id].sort().join('_');
-            onValue(ref(db, `chats/${cid}`), (snap) => {
-                const box = document.getElementById('chat-flow'); box.innerHTML = '';
+        window.loadConversation = (id) => {
+            targetID = id; document.getElementById('active-name').innerText = id;
+            closePanels();
+            const room = [myID, id].sort().join('_');
+            onValue(ref(db, `chats/${room}`), (snap) => {
+                const box = document.getElementById('chat-scroller'); box.innerHTML = '';
                 snap.forEach(m => {
                     const d = m.val();
-                    const div = document.createElement('div');
-                    div.className = 'msg-item';
-                    div.innerHTML = `<img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=${d.s}" style="width:36px; height:36px; border-radius:50%">
-                                    <div class="msg-bubble"><div class="msg-info"><span class="msg-user">${d.s}</span><span class="msg-time">Today</span></div><div class="msg-body">${d.c}</div></div>`;
-                    box.appendChild(div);
-                });
-                box.scrollTop = box.scrollHeight;
-            });
-        };
-
-        window.pushChat = () => {
-            const i = document.getElementById('m-in'); if(!i.value || !target) return;
-            const cid = [user, target].sort().join('_');
-            push(ref(db, `chats/${cid}`), { s: user, c: i.value, t: Date.now() });
-            i.value = '';
-        };
-
-        window.addFriendUI = () => {
-            const f = prompt("Username teman:");
-            if(f) {
-                const tu = f.toUpperCase();
-                set(ref(db, `req/${tu}/${user}`), { from: user });
-                showT("Permintaan dikirim!");
-                toggleMenu();
-            }
-        };
-
-        window.showReq = () => {
-            onValue(ref(db, `req/${user}`), (snap) => {
-                if(!snap.exists()) return showT("Tidak ada permintaan.");
-                snap.forEach(c => {
-                    if(confirm(`Terima pertemanan dari ${c.key}?`)) {
-                        set(ref(db, `users/${user}/friends/${c.key}`), true);
-                        set(ref(db, `users/${c.key}/friends/${user}`), true);
-                        remove(ref(db, `req/${user}/${c.key}`));
-                    }
-                });
-            }, {onlyOnce: true});
-        };
-
-        window.logout = () => { localStorage.clear(); location.reload(); };
-
-        if(user) start(user);
-    </script>
-</body>
-</html>
+                    const row = document.createElement('di
