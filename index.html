@@ -12,112 +12,116 @@
         :root {
             --biru-utama: #007bff;
             --biru-tua: #004a99;
-            --biru-muda: #e7f3ff;
+            --hitam-reg: #121212;
             --putih: #ffffff;
-            --abu-bg: #f0f2f5;
+            --abu-bubble: #f1f0f0;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--abu-bg); color: #333; height: 100vh; }
+        body { background-color: #000; color: #fff; height: 100vh; overflow: hidden; }
         .hidden { display: none !important; }
 
-        /* --- HALAMAN AUTH (DUA OPSI) --- */
+        /* --- CUSTOM TOAST NOTIFICATION --- */
+        #toast-container {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 123, 255, 0.9); color: white; padding: 12px 25px;
+            border-radius: 50px; z-index: 9999; font-size: 14px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: none; animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from { bottom: -50px; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+
+        /* --- AUTH PAGE (Background Hitam) --- */
         #auth-page {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100vh; background: var(--biru-utama);
+            height: 100vh; background: var(--hitam-reg);
         }
 
         .auth-card {
-            background: var(--putih); padding: 40px 30px; border-radius: 20px;
+            background: #1e1e1e; padding: 40px 30px; border-radius: 20px;
             width: 90%; max-width: 400px; text-align: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 1px solid #333;
         }
 
-        /* Logo Kubus Z */
         .logo-z {
             width: 80px; height: 80px; background: var(--biru-utama); color: white;
             font-size: 55px; font-weight: bold; margin: 0 auto 20px;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 8px 8px 0px var(--biru-tua); /* Efek Kubus */
-            border: 2px solid white;
+            box-shadow: 8px 8px 0px var(--biru-tua);
+            border-radius: 4px;
         }
 
-        .app-title { font-size: 1.5rem; margin-bottom: 25px; color: var(--biru-tua); font-weight: 800; }
+        .app-title { font-size: 1.5rem; margin-bottom: 25px; color: var(--biru-utama); }
 
         input {
             width: 100%; padding: 14px; margin: 10px 0;
-            border: 2px solid #eee; border-radius: 10px; outline: none; transition: 0.3s;
+            border: 1px solid #444; border-radius: 12px; outline: none;
+            background: #252525; color: white;
         }
-        input:focus { border-color: var(--biru-utama); }
 
         .btn-main {
             width: 100%; padding: 14px; background: var(--biru-utama);
-            color: white; border: none; border-radius: 10px;
+            color: white; border: none; border-radius: 12px;
             font-weight: bold; cursor: pointer; margin-top: 10px;
         }
+
         .btn-outline {
             width: 100%; padding: 12px; background: transparent;
-            color: var(--biru-utama); border: 2px solid var(--biru-utama);
-            border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px;
+            color: #aaa; border: 1px solid #444;
+            border-radius: 12px; cursor: pointer; margin-top: 15px;
         }
 
-        /* --- HALAMAN UTAMA --- */
+        /* --- MAIN APP --- */
+        #main-app { background: #fff; color: #333; height: 100vh; display: flex; flex-direction: column; }
+        
         header {
-            background: var(--putih); padding: 15px 20px;
+            background: var(--biru-utama); color: white; padding: 15px;
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 2px solid var(--biru-utama);
         }
 
-        .profile-box { cursor: pointer; }
         .pp-square {
-            width: 45px; height: 45px; background: var(--biru-utama);
-            color: white; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 20px; border-radius: 5px;
+            width: 42px; height: 42px; background: white; color: var(--biru-utama);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; border-radius: 6px; border-bottom: 3px solid var(--biru-tua);
         }
-        .pp-line { width: 45px; height: 4px; background: var(--biru-utama); margin-top: 5px; border-radius: 2px; }
 
-        .menu-icon { cursor: pointer; width: 30px; }
-        .menu-icon span { display: block; height: 4px; background: var(--biru-utama); margin: 5px 0; border-radius: 2px; }
+        /* --- MODERN BUBBLE CHAT --- */
+        #chat-window { position: fixed; inset: 0; background: #f7f9fb; z-index: 2000; display: flex; flex-direction: column; }
+        
+        #chat-msgs { flex: 1; overflow-y: auto; padding: 20px; background: #e5ddd5; /* Warna klasik chat */ }
 
-        /* Sidebar Slide */
+        .bubble { 
+            max-width: 80%; padding: 10px 14px; margin-bottom: 8px; font-size: 15px;
+            position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .me { 
+            align-self: flex-end; background: #dcf8c6; color: #000; 
+            border-radius: 15px 0px 15px 15px; 
+        }
+
+        .them { 
+            align-self: flex-start; background: var(--putih); color: #000;
+            border-radius: 0px 15px 15px 15px;
+        }
+
+        .chat-input-area { padding: 12px; background: #f0f0f0; display: flex; align-items: center; }
+        .chat-input-area input { margin: 0; flex: 1; background: white; color: #000; border: none; }
+
+        /* Sidebar */
         #sidebar {
             position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
-            background: var(--putih); z-index: 1000; transition: 0.4s cubic-bezier(0.1, 0.7, 1.0, 0.1);
-            padding: 30px 20px; box-shadow: -10px 0 20px rgba(0,0,0,0.1);
+            background: white; z-index: 3000; transition: 0.3s; padding: 20px;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.2);
         }
         #sidebar.open { right: 0; }
-        .side-btn { 
-            display: block; width: 100%; padding: 15px; text-align: left;
-            background: none; border: none; border-bottom: 1px solid #eee;
-            font-size: 16px; cursor: pointer; color: #444;
-        }
-        .side-btn:hover { background: var(--biru-muda); color: var(--biru-utama); }
+        .side-btn { width: 100%; padding: 15px; border: none; background: none; text-align: left; border-bottom: 1px solid #eee; cursor: pointer; }
 
-        /* Chat UI */
-        #friend-list { padding: 20px; overflow-y: auto; }
-        .friend-item {
-            background: white; padding: 15px; border-radius: 12px;
-            display: flex; align-items: center; margin-bottom: 12px;
-            cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .friend-item:active { transform: scale(0.98); }
-
-        /* Chat Window */
-        #chat-window {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--abu-bg); z-index: 2000; display: flex; flex-direction: column;
-        }
-        .chat-top { background: var(--biru-utama); color: white; padding: 15px; display: flex; align-items: center; font-weight: bold; }
-        #chat-msgs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; }
-        .bubble { 
-            max-width: 75%; padding: 12px 16px; border-radius: 15px; margin-bottom: 10px;
-            line-height: 1.4; word-wrap: break-word; font-size: 15px;
-        }
-        .me { align-self: flex-end; background: var(--biru-utama); color: white; border-bottom-right-radius: 2px; }
-        .them { align-self: flex-start; background: white; color: #333; border-bottom-left-radius: 2px; }
     </style>
 </head>
 <body>
+
+    <div id="toast-container">Pesan Notifikasi</div>
 
     <div id="auth-page">
         <div class="auth-card">
@@ -125,8 +129,8 @@
             <h1 class="app-title">ZChat by zZerr44</h1>
 
             <div id="auth-choice">
-                <button class="btn-main" onclick="showForm('login')">SIGN IN</button>
-                <button class="btn-outline" onclick="showForm('register')">REGISTER</button>
+                <button class="btn-main" onclick="showForm('login')">MASUK</button>
+                <button class="btn-outline" onclick="showForm('register')">DAFTAR AKUN</button>
             </div>
 
             <div id="login-form" class="hidden">
@@ -140,7 +144,7 @@
                 <input type="text" id="r-user" placeholder="Username Baru">
                 <input type="password" id="r-pass" placeholder="Password">
                 <input type="password" id="r-confirm" placeholder="Konfirmasi Password">
-                <button class="btn-main" onclick="doRegister()">Daftar Sekarang</button>
+                <button class="btn-main" onclick="doRegister()">Daftar</button>
                 <button class="btn-outline" onclick="showForm('choice')">Kembali</button>
             </div>
         </div>
@@ -148,43 +152,40 @@
 
     <div id="main-app" class="hidden">
         <header>
-            <div class="profile-box">
+            <div onclick="toggleSidebar()">
                 <div id="my-initial" class="pp-square">?</div>
-                <div class="pp-line"></div>
             </div>
-            <div class="menu-icon" onclick="toggleSidebar()">
-                <span></span><span></span><span></span>
-            </div>
+            <div style="font-weight: bold; letter-spacing: 1px;">ZCHAT</div>
+            <div onclick="addFriend()" style="font-size: 24px; cursor: pointer;">+</div>
         </header>
 
-        <div id="friend-list">
-            <button class="btn-main" onclick="addFriend()">+ Cari Teman</button>
-            <div id="list-container" style="margin-top: 20px;"></div>
+        <div id="friend-list" style="flex:1; overflow-y:auto; padding:15px;">
+            <div id="list-container"></div>
         </div>
 
         <div id="sidebar">
-            <h2 style="margin-bottom: 20px; color: var(--biru-utama);">Menu</h2>
-            <button class="side-btn" onclick="alert('Username: ' + currentUser.username)">Profil Saya</button>
-            <button class="side-btn" onclick="changePass()">Ganti Sandi</button>
-            <button class="side-btn" onclick="alert('ZChat v1.0 by zZerr44')">Hak Cipta</button>
-            <button class="side-btn" style="color: red; margin-top: 20px;" onclick="doLogout()">Keluar (Log Out)</button>
+            <h2 style="color:var(--biru-utama); margin-bottom:20px;">Menu Z</h2>
+            <button class="side-btn" onclick="changePass()">Keamanan (Ganti Sandi)</button>
+            <button class="side-btn" onclick="showNotif('ZChat v1.0 © zZerr44')">Hak Cipta</button>
+            <button class="side-btn" style="color:red;" onclick="doLogout()">Log Out</button>
+            <button class="btn-outline" onclick="toggleSidebar()">Tutup</button>
         </div>
     </div>
 
     <div id="chat-window" class="hidden">
-        <div class="chat-top">
-            <span onclick="closeChat()" style="margin-right: 20px; font-size: 24px; cursor: pointer;">←</span>
+        <div style="background:var(--biru-utama); color:white; padding:15px; display:flex; align-items:center;">
+            <span onclick="closeChat()" style="margin-right:20px; font-size:24px; cursor:pointer;">←</span>
             <span id="target-name">Username</span>
         </div>
         <div id="chat-msgs"></div>
-        <div style="padding: 15px; background: white; display: flex;">
-            <input type="text" id="chat-input" placeholder="Tulis pesan..." style="margin: 0; flex: 1; margin-right: 10px;">
-            <button class="btn-main" style="width: 80px; margin: 0;" onclick="sendMsg()">Kirim</button>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Ketik pesan...">
+            <button onclick="sendMsg()" style="background:var(--biru-utama); color:white; border:none; padding:10px 20px; border-radius:8px; margin-left:10px;">Kirim</button>
         </div>
     </div>
 
     <script>
-        // --- FIREBASE CONFIG ---
+        // --- CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
             authDomain: "zchat-56639.firebaseapp.com",
@@ -200,103 +201,100 @@
         let currentUser = null;
         let activeFriend = null;
 
-        // --- NAVIGATION AUTH ---
+        // --- CUSTOM NOTIF (TOAST) ---
+        function showNotif(msg) {
+            const toast = document.getElementById('toast-container');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        // --- UI LOGIC ---
         function showForm(type) {
             document.getElementById('auth-choice').classList.add('hidden');
             document.getElementById('login-form').classList.add('hidden');
             document.getElementById('register-form').classList.add('hidden');
-
             if(type === 'login') document.getElementById('login-form').classList.remove('hidden');
             else if(type === 'register') document.getElementById('register-form').classList.remove('hidden');
             else document.getElementById('auth-choice').classList.remove('hidden');
         }
 
-        // --- REGISTER LOGIC ---
         async function doRegister() {
             const u = document.getElementById('r-user').value.trim().toLowerCase();
             const p = document.getElementById('r-pass').value;
             const c = document.getElementById('r-confirm').value;
-
-            if(!u || !p) return alert("Data tidak boleh kosong!");
-            if(p !== c) return alert("Konfirmasi password salah!");
-
+            if(!u || !p) return showNotif("Data tidak boleh kosong!");
+            if(p !== c) return showNotif("Password tidak cocok!");
+            
             const check = await db.ref('users/' + u).once('value');
-            if(check.exists()) return alert("Username sudah ada!");
+            if(check.exists()) return showNotif("Username sudah ada!");
 
-            const userData = { username: u, password: p, ppVar: Math.floor(Math.random() * 5) };
-            await db.ref('users/' + u).set(userData);
-            alert("Berhasil! Silakan Masuk.");
+            await db.ref('users/' + u).set({ username: u, password: p });
+            showNotif("Pendaftaran Berhasil!");
             showForm('login');
         }
 
-        // --- LOGIN LOGIC ---
         async function doLogin() {
             const u = document.getElementById('l-user').value.trim().toLowerCase();
             const p = document.getElementById('l-pass').value;
-
             const snap = await db.ref('users/' + u).once('value');
             if(snap.exists() && snap.val().password === p) {
-                saveAndLaunch(snap.val());
+                launch(snap.val());
             } else {
-                alert("Username/Password salah!");
+                showNotif("Username/Password salah!");
             }
         }
 
-        function saveAndLaunch(data) {
+        function launch(data) {
             currentUser = data;
-            localStorage.setItem('z_session', JSON.stringify(data));
+            localStorage.setItem('z_sess', JSON.stringify(data));
             document.getElementById('auth-page').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             document.getElementById('my-initial').innerText = data.username[0].toUpperCase();
-            listenFriends();
+            loadFriends();
         }
 
-        // --- KEEP LOGIN CHECK ---
-        const session = localStorage.getItem('z_session');
-        if(session) saveAndLaunch(JSON.parse(session));
+        if(localStorage.getItem('z_sess')) launch(JSON.parse(localStorage.getItem('z_sess')));
 
-        // --- SIDEBAR & LOGOUT ---
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-        
+
         function doLogout() {
-            const confirm = prompt("Ketik 'out' untuk keluar:");
-            if(confirm === 'out') {
-                localStorage.removeItem('z_session');
+            const res = prompt("Ketik 'out' untuk keluar:");
+            if(res === 'out') {
+                localStorage.removeItem('z_sess');
                 location.reload();
             }
         }
 
-        // --- CHAT & FRIENDS ---
         function addFriend() {
-            const target = prompt("Masukkan Username Teman:").toLowerCase();
-            if(target === currentUser.username) return;
-            db.ref('users/' + target).once('value', snap => {
-                if(!snap.exists()) return alert("User tidak ditemukan!");
-                db.ref(`friends/${currentUser.username}/${target}`).set(true);
-                db.ref(`friends/${target}/${currentUser.username}`).set(true);
+            const t = prompt("Masukkan Username Teman:").toLowerCase();
+            if(!t || t === currentUser.username) return;
+            db.ref('users/' + t).once('value', snap => {
+                if(!snap.exists()) return showNotif("User tidak ditemukan!");
+                db.ref(`friends/${currentUser.username}/${t}`).set(true);
+                db.ref(`friends/${t}/${currentUser.username}`).set(true);
+                showNotif("Berhasil menambah teman!");
             });
         }
 
-        function listenFriends() {
+        function loadFriends() {
             db.ref(`friends/${currentUser.username}`).on('value', snap => {
-                const container = document.getElementById('list-container');
-                container.innerHTML = "";
-                snap.forEach(child => {
-                    const name = child.key;
+                const cont = document.getElementById('list-container');
+                cont.innerHTML = "";
+                snap.forEach(c => {
+                    const name = c.key;
                     const div = document.createElement('div');
-                    div.className = "friend-item";
-                    div.innerHTML = `<div class="pp-square" style="margin-right:15px">${name[0].toUpperCase()}</div><b>${name}</b>`;
-                    div.onclick = () => openChat(name);
-                    container.appendChild(div);
+                    div.style = "padding:15px; background:#f9f9f9; margin-bottom:10px; border-radius:10px; display:flex; align-items:center; cursor:pointer;";
+                    div.innerHTML = `<div class="pp-square" style="background:var(--biru-utama); color:white; margin-right:15px;">${name[0].toUpperCase()}</div><b>${name}</b>`;
+                    div.onclick = () => {
+                        activeFriend = name;
+                        document.getElementById('target-name').innerText = name;
+                        document.getElementById('chat-window').classList.remove('hidden');
+                        loadMsgs();
+                    };
+                    cont.appendChild(div);
                 });
             });
-        }
-
-        function openChat(name) {
-            activeFriend = name;
-            document.getElementById('target-name').innerText = name;
-            document.getElementById('chat-window').classList.remove('hidden');
-            loadMsgs();
         }
 
         function closeChat() { document.getElementById('chat-window').classList.add('hidden'); }
@@ -304,28 +302,22 @@
         function sendMsg() {
             const txt = document.getElementById('chat-input').value;
             if(!txt) return;
-            const chatID = [currentUser.username, activeFriend].sort().join('_');
-            db.ref(`chats/${chatID}`).push({
-                sender: currentUser.username,
-                text: txt,
-                time: Date.now()
-            });
+            const id = [currentUser.username, activeFriend].sort().join('_');
+            db.ref(`chats/${id}`).push({ sender: currentUser.username, text: txt });
             document.getElementById('chat-input').value = "";
         }
 
         function loadMsgs() {
-            const chatID = [currentUser.username, activeFriend].sort().join('_');
-            db.ref(`chats/${chatID}`).off();
-            db.ref(`chats/${chatID}`).on('value', snap => {
+            const id = [currentUser.username, activeFriend].sort().join('_');
+            db.ref(`chats/${id}`).on('value', snap => {
                 const box = document.getElementById('chat-msgs');
                 box.innerHTML = "";
-                snap.forEach(child => {
-                    const m = child.val();
+                snap.forEach(c => {
+                    const m = c.val();
                     const d = document.createElement('div');
                     d.className = `bubble ${m.sender === currentUser.username ? 'me' : 'them'}`;
                     d.innerText = m.text;
-                    // Fitur Salin
-                    d.onclick = () => { if(confirm("Salin pesan?")) navigator.clipboard.writeText(m.text); };
+                    d.onclick = () => { if(confirm("Salin teks?")) navigator.clipboard.writeText(m.text); };
                     box.appendChild(d);
                 });
                 box.scrollTop = box.scrollHeight;
@@ -333,15 +325,14 @@
         }
 
         function changePass() {
-            const old = prompt("Password lama:");
+            const old = prompt("Masukkan password lama:");
             if(old === currentUser.password) {
-                const baru = prompt("Password baru:");
-                const kinf = prompt("Konfirmasi password baru:");
-                if(baru === kinf) {
-                    db.ref(`users/${currentUser.username}/password`).set(baru);
-                    currentUser.password = baru;
-                    alert("Sukses!");
-                }
+                const baru = prompt("Masukkan password baru:");
+                db.ref(`users/${currentUser.username}/password`).set(baru);
+                currentUser.password = baru;
+                showNotif("Password berhasil diubah!");
+            } else {
+                showNotif("Password lama salah!");
             }
         }
     </script>
