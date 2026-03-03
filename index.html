@@ -3,125 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZChat Pro - zZerr44</title>
+    <title>ZChat Pro - Elite Edition</title>
     <style>
         :root {
-            --bg-dark: #0a0a0a;
-            --sidebar-color: #111214;
-            --friend-list-bg: #1e1f22;
-            --chat-bg: radial-gradient(circle, #002288 0%, #000000 100%);
+            --bg-dark: #070707;
+            --sidebar-color: #0f1012;
+            --friend-list-bg: #151619;
+            --chat-bg: radial-gradient(circle at center, #001a4d 0%, #000000 100%);
             --accent-z: #00d4ff;
-            --msg-sent: #005c4b;
-            --msg-rec: #2b2d31;
-            --panel-bg: #18191c;
+            --msg-sent: #004d40;
+            --msg-rec: #262626;
+            --panel-bg: #121315;
+            --anim-speed: 0.3s;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
         body { background-color: var(--bg-dark); color: white; height: 100vh; overflow: hidden; }
 
-        /* --- LAYOUT --- */
-        .app-container { display: none; height: 100vh; grid-template-columns: 65px 260px 1fr; }
-        .nav-left { background: var(--sidebar-color); border-right: 1px solid #000; display: flex; flex-direction: column; align-items: center; padding: 15px 0; gap: 15px; }
-        .nav-icon { width: 45px; height: 45px; border-radius: 12px; background: #313338; cursor: pointer; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid #222; }
-        .friend-panel { background: var(--friend-list-bg); border-right: 1px solid #111; display: flex; flex-direction: column; }
-        .friend-card { padding: 12px; margin: 4px 8px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .friend-card:hover { background: #35373c; }
-        .friend-card.active { background: #404249; border-left: 3px solid var(--accent-z); }
+        /* --- ANIMASI KEYFRAMES --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideInRight { from { right: -300px; } to { right: 0; } }
+        @keyframes scaleUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* --- UI STRUCTURE --- */
+        .app-container { display: none; height: 100vh; grid-template-columns: 70px 280px 1fr; animation: fadeIn var(--anim-speed) ease; }
+        .nav-left { background: var(--sidebar-color); border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 20px; }
+        .nav-icon { width: 50px; height: 50px; border-radius: 15px; background: #1e1f22; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; border: 1px solid #222; overflow: hidden; }
+        .nav-icon:hover { border-color: var(--accent-z); transform: translateY(-2px); }
+
+        .friend-panel { background: var(--friend-list-bg); border-right: 1px solid #000; display: flex; flex-direction: column; }
+        .friend-card { padding: 15px; margin: 5px 10px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; animation: fadeIn 0.4s ease; border: 1px solid transparent; }
+        .friend-card:hover { background: #202225; }
+        .friend-card.active { background: #2b2d31; border-color: var(--accent-z); }
 
         /* --- CHAT AREA --- */
         .chat-area { display: flex; flex-direction: column; background: var(--chat-bg); position: relative; }
-        .chat-header { height: 60px; background: rgba(24, 25, 28, 0.95); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; z-index: 100; border-bottom: 1px solid #000; }
-        .messages-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .msg { max-width: 75%; padding: 10px 14px; border-radius: 10px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
-        .msg.sent { align-self: flex-end; background: var(--msg-sent); }
-        .msg.received { align-self: flex-start; background: var(--msg-rec); }
-
-        /* --- INPUTS & UI --- */
-        .input-bar { padding: 15px 20px; background: #1e1f22; display: flex; gap: 10px; border-top: 1px solid #000; }
-        input { width: 100%; padding: 12px; background: #2b2d31; border: 1px solid #333; color: white; border-radius: 5px; margin: 5px 0; outline: none; }
-        .btn-z { background: var(--accent-z); color: black; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
-        .btn-outline { background: transparent; border: 1px solid var(--accent-z); color: var(--accent-z); margin-top: 10px; }
+        .chat-header { height: 65px; background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(10px); display: flex; align-items: center; padding: 0 25px; justify-content: space-between; z-index: 100; border-bottom: 1px solid #1a1a1a; }
         
-        /* --- MENU SLIDE --- */
-        .slide-menu { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: var(--panel-bg); z-index: 10000; transition: 0.4s; padding: 25px; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
-        .slide-menu.active { right: 0; }
-        .menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; display: none; backdrop-filter: blur(2px); }
-        .menu-item { padding: 14px 15px; border-radius: 8px; cursor: pointer; font-size: 12px; text-transform: uppercase; color: #aaa; font-weight: 600; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
-        .menu-item:hover { background: #2b2d31; color: var(--accent-z); }
-        .badge { background: #ff4d4d; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; }
+        .messages-container { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
+        .msg { max-width: 70%; padding: 12px 16px; border-radius: 15px; font-size: 14px; line-height: 1.5; word-wrap: break-word; animation: scaleUp 0.2s ease-out; position: relative; }
+        .msg.sent { align-self: flex-end; background: var(--msg-sent); border-bottom-right-radius: 2px; }
+        .msg.received { align-self: flex-start; background: var(--msg-rec); border-bottom-left-radius: 2px; }
+
+        .input-bar { padding: 20px; background: #0f1012; display: flex; gap: 12px; border-top: 1px solid #1a1a1a; }
+        input { flex: 1; padding: 14px; background: #1e1f22; border: 1px solid #333; color: white; border-radius: 8px; outline: none; transition: 0.2s; }
+        input:focus { border-color: var(--accent-z); }
+        .btn-send { background: var(--accent-z); color: black; border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-send:active { transform: scale(0.9); }
+
+        /* --- MOBILE --- */
+        @media (max-width: 768px) {
+            .app-container { grid-template-columns: 1fr; }
+            .nav-left { display: none; }
+            .friend-panel { position: fixed; left: -100%; top: 0; width: 85%; height: 100%; z-index: 1000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 20px 0 50px rgba(0,0,0,0.8); }
+            .friend-panel.active { left: 0; }
+        }
+
+        /* --- SLIDE MENU --- */
+        .slide-menu { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: var(--panel-bg); z-index: 10000; transition: var(--anim-speed); padding: 30px; display: flex; flex-direction: column; }
+        .slide-menu.active { right: 0; animation: slideInRight var(--anim-speed) forwards; }
+        .menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; backdrop-filter: blur(4px); }
 
         /* --- MODAL --- */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 20000; display: none; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: #18191c; width: 100%; max-width: 400px; border-radius: 10px; padding: 25px; border: 1px solid #333; }
-        .avatar-opt { width: 50px; height: 50px; border-radius: 8px; cursor: pointer; margin: 4px; filter: grayscale(1); border: 2px solid transparent; }
-        .avatar-opt.selected { filter: grayscale(0); border-color: var(--accent-z); }
-
-        @media (max-width: 768px) { .app-container { grid-template-columns: 55px 1fr; } .friend-panel { display: none; } }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 20000; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: #18191c; width: 100%; max-width: 400px; border-radius: 15px; padding: 30px; border: 1px solid #333; animation: scaleUp 0.2s ease; }
+        
+        .btn-z { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px; transition: 0.2s; }
+        .btn-primary { background: var(--accent-z); color: black; }
+        .btn-secondary { background: #2b2d31; color: white; border: 1px solid #444; }
     </style>
 </head>
 <body>
 
-    <div id="custom-notification" style="position:fixed; top:-100px; left:50%; transform:translateX(-50%); background:#2b2d31; border:1px solid var(--accent-z); padding:12px 25px; z-index:50000; transition:0.5s; font-size:11px; text-transform:uppercase;">NOTIFIKASI</div>
+    <div id="notif-box" style="position:fixed; top:-100px; left:50%; transform:translateX(-50%); background:#1e1f22; border:1px solid var(--accent-z); padding:12px 25px; z-index:50000; transition:0.4s; font-size:12px; border-radius:50px; box-shadow: 0 10px 30px rgba(0,0,0,0.5)"></div>
     <div id="menu-overlay" class="menu-overlay" onclick="toggleMenu()"></div>
 
-    <div id="slide-menu" class="slide-menu">
-        <h4 style="color:var(--accent-z); margin-bottom:20px; letter-spacing:2px; border-bottom:1px solid #333; padding-bottom:10px">ZCHAT MENU</h4>
-        <div class="menu-item" onclick="openAddFriend()">TAMBAH TEMAN</div>
-        <div class="menu-item" onclick="openRequests()">PERMINTAAN <span id="req-badge" class="badge" style="display:none">0</span></div>
-        <div class="menu-item" onclick="openProfileSettings()">PENGATURAN PROFIL</div>
-        <div style="flex:1"></div>
-        <div class="menu-item" onclick="logout()" style="color:#ff4d4d; border-top:1px solid #333">LOGOUT</div>
-    </div>
-
     <div id="auth-screen" style="position:fixed; inset:0; background:black; z-index:40000; display:flex; justify-content:center; align-items:center;">
-        <div style="background:#18191c; padding:40px; border-radius:10px; width:340px; text-align:center; border:1px solid #222;">
-            <div style="font-size:30px; color:var(--accent-z); font-weight:bold; margin-bottom:25px; letter-spacing:5px">ZCHAT</div>
-            <input type="text" id="user-input" placeholder="USERNAME">
-            <input type="password" id="pass-input" placeholder="PASSWORD">
-            <div style="margin-top:10px">
-                <button class="btn-z" id="btn-login">MASUK</button>
-                <button class="btn-z btn-outline" id="btn-register">DAFTAR AKUN BARU</button>
-            </div>
+        <div style="background:#111; padding:45px; border-radius:20px; width:360px; text-align:center; border:1px solid #222; animation:scaleUp 0.3s ease;">
+            <h1 style="color:var(--accent-z); font-size:35px; letter-spacing:8px; margin-bottom:10px">ZCHAT</h1>
+            <p style="font-size:10px; color:#555; margin-bottom:30px; letter-spacing:3px">PRO ELITE EDITION</p>
+            <input type="text" id="auth-user" placeholder="USERNAME" style="margin-bottom:10px">
+            <input type="password" id="auth-pass" placeholder="PASSWORD">
+            <button class="btn-z btn-primary" id="go-login" style="margin-top:20px">LOGIN</button>
+            <button class="btn-z btn-secondary" id="go-reg">DAFTAR AKUN</button>
         </div>
     </div>
 
     <div class="app-container" id="main-app">
         <div class="nav-left">
-            <div class="nav-icon" style="background:var(--accent-z); color:black; font-weight:bold;">Z</div>
-            <div class="nav-icon" onclick="openProfileSettings()"><img id="my-nav-avatar" src="" style="width:100%"></div>
+            <div class="nav-icon" style="background:var(--accent-z); color:black; font-weight:bold; font-size:20px">Z</div>
+            <div class="nav-icon" onclick="openProfile()"><img id="my-avatar" src="" style="width:100%"></div>
         </div>
-        <div class="friend-panel">
-            <div style="padding:20px; font-weight:bold; font-size:11px; color:#555; letter-spacing:1px">KONTAK</div>
-            <div id="friend-list-container" style="flex:1; overflow-y:auto"></div>
-        </div>
-        <div class="chat-area">
-            <div id="blank-state" style="position:absolute; inset:0; background:var(--chat-bg); z-index:50; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-                <div style="font-size:80px; color:var(--accent-z); opacity:0.05; font-weight:bold;">Z</div>
-                <p style="color:#333; font-size:10px; letter-spacing:2px">PILIH TEMAN</p>
+
+        <div class="friend-panel" id="friend-panel">
+            <div style="padding:25px; background:rgba(0,0,0,0.2); display:flex; justify-content:space-between; align-items:center">
+                <span style="font-size:11px; font-weight:bold; letter-spacing:2px; color:var(--accent-z)">DAFTAR KONTAK</span>
+                <button onclick="toggleFPanel()" style="background:none; border:none; color:#555; font-size:18px" id="close-f-btn">&times;</button>
             </div>
+            <div id="friend-list-area" style="flex:1; overflow-y:auto"></div>
+        </div>
+
+        <div class="chat-area">
             <div class="chat-header">
-                <div id="active-user-title" style="font-weight:bold; font-size:14px; text-transform:uppercase; letter-spacing:1px">ZCHAT</div>
-                <div style="cursor:pointer; font-size:12px; font-weight:bold; color:var(--accent-z)" onclick="toggleMenu()">MENU</div>
+                <button onclick="toggleFPanel()" style="background:#1e1f22; border:1px solid #333; color:white; padding:8px 15px; border-radius:8px; font-size:11px; font-weight:bold" id="mobile-f-btn">TEMAN</button>
+                <div id="active-title" style="font-weight:bold; letter-spacing:1px">ZCHAT PRO</div>
+                <div onclick="toggleMenu()" style="cursor:pointer; background:var(--accent-z); color:black; padding:5px 12px; border-radius:5px; font-size:11px; font-weight:bold">MENU</div>
             </div>
             <div class="messages-container" id="chat-box"></div>
             <div class="input-bar">
-                <input type="text" id="msg-input" placeholder="TULIS PESAN..." onkeypress="if(event.key=='Enter') sendChat()">
-                <button onclick="sendChat()" style="background:none; border:none; color:var(--accent-z); font-weight:bold; cursor:pointer; letter-spacing:1px">KIRIM</button>
+                <input type="text" id="chat-input" placeholder="Tulis pesan rahasia..." onkeypress="if(event.key=='Enter') pushChat()">
+                <button class="btn-send" onclick="pushChat()">KIRIM</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-box" class="modal-overlay">
+    <div id="slide-menu" class="slide-menu">
+        <h3 style="color:var(--accent-z); margin-bottom:30px; font-size:14px; border-bottom:1px solid #333; padding-bottom:10px">PENGATURAN</h3>
+        <div style="display:flex; flex-direction:column; gap:10px">
+            <button class="btn-z btn-secondary" onclick="uiAddFriend()">TAMBAH TEMAN</button>
+            <button class="btn-z btn-secondary" onclick="uiRequests()">PERMINTAAN <span id="req-count" style="color:var(--accent-z)"></span></button>
+            <button class="btn-z btn-secondary" onclick="openProfile()">PROFIL SAYA</button>
+            <div style="height:50px"></div>
+            <button class="btn-z btn-secondary" onclick="logout()" style="border-color:#f44; color:#f44">KELUAR</button>
+        </div>
+    </div>
+
+    <div id="modal-wrap" class="modal-overlay">
         <div class="modal-content">
-            <h3 id="modal-title" style="margin-bottom:20px; color:var(--accent-z); text-transform:uppercase; font-size:15px"></h3>
+            <h3 id="modal-head" style="margin-bottom:20px; text-transform:uppercase; font-size:14px"></h3>
             <div id="modal-body"></div>
-            <button class="btn-z" onclick="closeModal()" style="margin-top:20px">TUTUP</button>
+            <button class="btn-z btn-secondary" onclick="closeModal()">TUTUP</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, remove, update, onDisconnect, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set, push, onValue, remove, update, onDisconnect, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.app";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
@@ -135,184 +152,170 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        let myID = localStorage.getItem('zchat_user');
+        let chatTarget = null;
 
-        let currentUser = localStorage.getItem('zchat_user');
-        let activeFriend = null;
-        const avatars = Array.from({length: 10}, (_, i) => `https://api.dicebear.com/7.x/pixel-art/svg?seed=Z${i+700}`);
-
-        // --- GLOBAL HELPERS ---
-        window.showNotif = (t) => { const n = document.getElementById('custom-notification'); n.innerText = t; n.style.top = '20px'; setTimeout(() => n.style.top = '-100px', 3000); };
-        window.toggleMenu = () => { const m = document.getElementById('slide-menu'); const o = document.getElementById('menu-overlay'); m.classList.toggle('active'); o.style.display = m.classList.contains('active') ? 'block' : 'none'; };
-        window.openModal = (t, b) => { document.getElementById('modal-title').innerText = t; document.getElementById('modal-body').innerHTML = b; document.getElementById('modal-box').style.display = 'flex'; };
-        window.closeModal = () => document.getElementById('modal-box').style.display = 'none';
+        // --- UI HELPERS ---
+        window.showNotif = (m) => { const b = document.getElementById('notif-box'); b.innerText = m; b.style.top = '25px'; setTimeout(() => b.style.top = '-100px', 2500); };
+        window.toggleMenu = () => { document.getElementById('slide-menu').classList.toggle('active'); document.getElementById('menu-overlay').style.display = document.getElementById('slide-menu').classList.contains('active') ? 'block' : 'none'; };
+        window.toggleFPanel = () => document.getElementById('friend-panel').classList.toggle('active');
+        window.closeModal = () => document.getElementById('modal-wrap').style.display = 'none';
         window.logout = () => { localStorage.clear(); location.reload(); };
 
-        // --- AUTH LOGIC (FIXED) ---
-        const doLogin = async () => {
-            const u = document.getElementById('user-input').value.trim().toUpperCase();
-            const p = document.getElementById('pass-input').value.trim();
-            if(!u || !p) return showNotif("ISI SEMUA DATA");
-            const snap = await get(ref(db, 'users/' + u));
-            if(!snap.exists()) return showNotif("USER TIDAK ADA");
-            if(snap.val().password !== p) return showNotif("SANDI SALAH");
-            authSuccess(u);
+        // --- AUTH ---
+        document.getElementById('go-login').onclick = async () => {
+            const u = document.getElementById('auth-user').value.trim().toUpperCase();
+            const p = document.getElementById('auth-pass').value.trim();
+            if(!u || !p) return showNotif("ISI DATA!");
+            const s = await get(ref(db, 'users/'+u));
+            if(s.exists() && s.val().password === p) startApp(u); else showNotif("AKUN SALAH");
         };
 
-        const doRegister = async () => {
-            const u = document.getElementById('user-input').value.trim().toUpperCase();
-            const p = document.getElementById('pass-input').value.trim();
-            if(u.length < 4 || p.length < 4) return showNotif("MINIMAL 4 HURUF");
-            const snap = await get(ref(db, 'users/' + u));
-            if(snap.exists()) return showNotif("USER SUDAH ADA");
-            await set(ref(db, 'users/' + u), { password: p, nickname: u, avatar: avatars[0], bio: "ZCHAT USER" });
-            showNotif("BERHASIL DAFTAR");
-            authSuccess(u);
+        document.getElementById('go-reg').onclick = async () => {
+            const u = document.getElementById('auth-user').value.trim().toUpperCase();
+            const p = document.getElementById('auth-pass').value.trim();
+            if(u.length < 3) return showNotif("MIN 3 HURUF");
+            const s = await get(ref(db, 'users/'+u));
+            if(s.exists()) return showNotif("USER SUDAH ADA");
+            await set(ref(db, 'users/'+u), {password:p, nickname:u, avatar: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${u}`, bio: "ZChat User"});
+            startApp(u);
         };
 
-        document.getElementById('btn-login').onclick = doLogin;
-        document.getElementById('btn-register').onclick = doRegister;
-
-        async function authSuccess(u) {
-            currentUser = u;
-            localStorage.setItem('zchat_user', u);
+        async function startApp(u) {
+            myID = u; localStorage.setItem('zchat_user', u);
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('main-app').style.display = 'grid';
-            
-            const userSnap = await get(ref(db, 'users/' + u));
-            document.getElementById('my-nav-avatar').src = userSnap.val().avatar;
-            
-            update(ref(db, 'status/' + u), { online: true, nickname: u, avatar: userSnap.val().avatar });
-            onDisconnect(ref(db, 'status/' + u)).update({ online: false });
-            
-            initFriendSystem();
-            listenRequests();
+            const s = await get(ref(db, 'users/'+u));
+            document.getElementById('my-avatar').src = s.val().avatar;
+            update(ref(db, 'status/'+u), {online:true, avatar:s.val().avatar, name:u});
+            onDisconnect(ref(db, 'status/'+u)).update({online:false});
+            loadContacts();
+            trackRequests();
         }
 
-        // --- FRIEND SYSTEM ---
-        function initFriendSystem() {
-            onValue(ref(db, `users/${currentUser}/friends`), (snap) => {
-                const container = document.getElementById('friend-list-container');
-                container.innerHTML = '';
-                if(!snap.exists()) return container.innerHTML = '<p style="text-align:center; font-size:9px; color:#444; margin-top:20px">KOSONG</p>';
-
-                snap.forEach(child => {
-                    const fName = child.key;
-                    onValue(ref(db, 'status/' + fName), (s) => {
-                        if(!s.exists()) return;
-                        const d = s.val();
-                        let old = document.getElementById('f-'+fName); if(old) old.remove();
-                        const div = document.createElement('div');
-                        div.id = 'f-'+fName;
-                        div.className = `friend-card ${activeFriend === fName ? 'active' : ''}`;
-                        div.innerHTML = `<img src="${d.avatar}" style="width:35px; border-radius:5px">
-                            <div style="flex:1"><div style="font-weight:bold; font-size:13px">${d.nickname}</div><div style="font-size:9px; color:${d.online?'#23a55a':'#555'}">${d.online?'ONLINE':'OFFLINE'}</div></div>`;
-                        div.onclick = () => startChat(fName, d.nickname);
-                        container.appendChild(div);
+        // --- CONTACTS ---
+        function loadContacts() {
+            onValue(ref(db, `users/${myID}/friends`), (snap) => {
+                const area = document.getElementById('friend-list-area'); area.innerHTML = '';
+                if(!snap.exists()) area.innerHTML = '<p style="color:#333; font-size:10px; text-align:center; margin-top:30px">BELUM ADA TEMAN</p>';
+                snap.forEach(c => {
+                    onValue(ref(db, 'status/'+c.key), (st) => {
+                        if(!st.exists()) return;
+                        const d = st.val();
+                        let old = document.getElementById('card-'+c.key); if(old) old.remove();
+                        const card = document.createElement('div');
+                        card.id = 'card-'+c.key;
+                        card.className = `friend-card ${chatTarget === c.key ? 'active' : ''}`;
+                        card.innerHTML = `<img src="${d.avatar}" style="width:38px; border-radius:10px">
+                                          <div style="flex:1"><b style="font-size:14px">${c.key}</b><br>
+                                          <small style="color:${d.online?'#00d4ff':'#555'}">${d.online?'ONLINE':'OFFLINE'}</small></div>`;
+                        card.onclick = () => openConversation(c.key);
+                        area.appendChild(card);
                     });
                 });
             });
         }
 
-        window.openAddFriend = () => { toggleMenu(); openModal("TAMBAH TEMAN", `<input type="text" id="target-u" placeholder="USERNAME"><button class="btn-z" id="btn-send-req">KIRIM PERMINTAAN</button>`); 
-            document.getElementById('btn-send-req').onclick = async () => {
-                const t = document.getElementById('target-u').value.trim().toUpperCase();
-                if(!t || t === currentUser) return showNotif("GAGAL");
-                const snap = await get(ref(db, 'users/' + t));
-                if(!snap.exists()) return showNotif("TIDAK ADA");
-                await set(ref(db, `requests/${t}/${currentUser}`), { from: currentUser });
-                showNotif("TERKIRIM"); closeModal();
-            };
-        };
-
-        function listenRequests() {
-            onValue(ref(db, `requests/${currentUser}`), (snap) => {
-                const b = document.getElementById('req-badge');
-                let c = 0; snap.forEach(() => c++);
-                b.innerText = c; b.style.display = c > 0 ? 'block' : 'none';
-            });
-        }
-
-        window.openRequests = () => {
-            toggleMenu();
-            onValue(ref(db, `requests/${currentUser}`), (snap) => {
-                let h = '<div style="max-height:250px; overflow-y:auto">';
-                if(!snap.exists()) h += '<p style="font-size:11px; color:#555">KOSONG</p>';
-                snap.forEach(child => {
-                    h += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#111; margin-bottom:5px; border:1px solid #333">
-                        <span style="font-size:12px">${child.key}</span>
-                        <button onclick="acceptFriend('${child.key}')" style="background:#23a55a; color:white; border:none; padding:5px 10px; border-radius:3px; font-size:10px; cursor:pointer">ACC</button>
-                    </div>`;
-                });
-                h += '</div>';
-                openModal("PERMINTAAN MASUK", h);
-            }, {onlyOnce: true});
-        };
-
-        window.acceptFriend = async (u) => {
-            await set(ref(db, `users/${currentUser}/friends/${u}`), true);
-            await set(ref(db, `users/${u}/friends/${currentUser}`), true);
-            await remove(ref(db, `requests/${currentUser}/${u}`));
-            showNotif("TEMAN DITAMBAHKAN"); closeModal();
-        };
-
-        // --- CHAT LOGIC ---
-        window.startChat = (name, nick) => {
-            activeFriend = name; document.getElementById('blank-state').style.display = 'none';
-            document.getElementById('active-user-title').innerText = nick;
+        window.openConversation = (id) => {
+            chatTarget = id; document.getElementById('active-title').innerText = id;
+            if(window.innerWidth <= 768) toggleFPanel();
             document.querySelectorAll('.friend-card').forEach(c => c.classList.remove('active'));
-            const activeCard = document.getElementById('f-'+name); if(activeCard) activeCard.classList.add('active');
+            document.getElementById('card-'+id).classList.add('active');
             
-            const chatID = [currentUser, activeFriend].sort().join('_');
-            onValue(ref(db, 'chats/' + chatID), (snap) => {
+            const chatID = [myID, chatTarget].sort().join('_');
+            onValue(ref(db, 'chats/'+chatID), (snap) => {
                 const box = document.getElementById('chat-box'); box.innerHTML = '';
-                snap.forEach(msg => {
-                    const d = msg.val(); const m = document.createElement('div');
-                    m.className = `msg ${d.sender === currentUser ? 'sent' : 'received'}`;
-                    m.innerText = d.content; box.appendChild(m);
+                snap.forEach(m => {
+                    const d = m.val();
+                    const div = document.createElement('div');
+                    div.className = `msg ${d.s === myID ? 'sent' : 'received'}`;
+                    div.innerText = d.c; box.appendChild(div);
                 });
                 box.scrollTop = box.scrollHeight;
             });
         };
 
-        window.sendChat = () => {
-            const inp = document.getElementById('msg-input'); if(!inp.value || !activeFriend) return;
-            const chatID = [currentUser, activeFriend].sort().join('_');
-            push(ref(db, 'chats/' + chatID), { sender: currentUser, content: inp.value });
-            inp.value = '';
+        window.pushChat = () => {
+            const i = document.getElementById('chat-input'); if(!i.value || !chatTarget) return;
+            const chatID = [myID, chatTarget].sort().join('_');
+            push(ref(db, 'chats/'+chatID), {s:myID, c:i.value, t:Date.now()});
+            i.value = '';
         };
 
-        // --- PROFILE SETTINGS ---
-        window.openProfileSettings = async () => {
+        // --- FEATURES ---
+        window.uiAddFriend = () => {
+            toggleMenu();
+            const body = `<input type="text" id="add-id" placeholder="USERNAME TARGET">
+                          <button class="btn-z btn-primary" onclick="actAdd()">KIRIM PERMINTAAN</button>`;
+            document.getElementById('modal-head').innerText = "Cari Teman";
+            document.getElementById('modal-body').innerHTML = body;
+            document.getElementById('modal-wrap').style.display = 'flex';
+        };
+
+        window.actAdd = async () => {
+            const t = document.getElementById('add-id').value.toUpperCase();
+            if(!t || t === myID) return showNotif("GAGAL");
+            const s = await get(ref(db, 'users/'+t));
+            if(!s.exists()) return showNotif("USER TIDAK ADA");
+            await set(ref(db, `req/${t}/${myID}`), {from:myID});
+            showNotif("PERMINTAAN TERKIRIM"); closeModal();
+        };
+
+        function trackRequests() {
+            onValue(ref(db, `req/${myID}`), (s) => {
+                let count = 0; s.forEach(() => count++);
+                document.getElementById('req-count').innerText = count > 0 ? `(${count})` : '';
+            });
+        }
+
+        window.uiRequests = () => {
+            toggleMenu();
+            onValue(ref(db, `req/${myID}`), (snap) => {
+                let h = '<div style="max-height:200px; overflow-y:auto">';
+                if(!snap.exists()) h += '<p style="color:#555">Tidak ada permintaan</p>';
+                snap.forEach(c => {
+                    h += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#111; margin-bottom:5px; border-radius:8px">
+                            <span style="font-size:13px">${c.key}</span>
+                            <button class="btn-z btn-primary" style="width:auto; padding:5px 15px" onclick="actAcc('${c.key}')">TERIMA</button>
+                          </div>`;
+                });
+                h += '</div>';
+                document.getElementById('modal-head').innerText = "Permintaan Masuk";
+                document.getElementById('modal-body').innerHTML = h;
+                document.getElementById('modal-wrap').style.display = 'flex';
+            }, {onlyOnce:true});
+        };
+
+        window.actAcc = async (u) => {
+            await set(ref(db, `users/${myID}/friends/${u}`), true);
+            await set(ref(db, `users/${u}/friends/${myID}`), true);
+            await remove(ref(db, `req/${myID}/${u}`));
+            showNotif("BERTEMAN!"); closeModal();
+        };
+
+        window.openProfile = async () => {
             if(document.getElementById('slide-menu').classList.contains('active')) toggleMenu();
-            const snap = await get(ref(db, 'users/' + currentUser));
-            const d = snap.val();
-            let avH = '<div style="display:flex; flex-wrap:wrap; justify-content:center; margin:15px 0">';
-            avatars.forEach(a => avH += `<img src="${a}" class="avatar-opt ${d.avatar===a?'selected':''}" onclick="selectAv(this, '${a}')">`);
-            avH += '</div>';
-            openModal("PROFIL", `<div>
-                <input type="text" id="edit-nick" value="${d.nickname}" placeholder="NAMA">
-                <input type="text" id="edit-bio" value="${d.bio}" placeholder="BIO">
-                ${avH}
-                <button class="btn-z" id="btn-save-prof">SIMPAN PERUBAHAN</button>
-            </div>`);
-            document.getElementById('btn-save-prof').onclick = async () => {
-                const nickname = document.getElementById('edit-nick').value.toUpperCase();
-                const bio = document.getElementById('edit-bio').value;
-                const updates = { nickname, bio };
-                if(window.tempAv) { updates.avatar = window.tempAv; document.getElementById('my-nav-avatar').src = window.tempAv; }
-                await update(ref(db, 'users/' + currentUser), updates);
-                await update(ref(db, 'status/' + currentUser), { nickname, avatar: updates.avatar || d.avatar });
-                showNotif("SUKSES"); closeModal();
-            };
+            const s = await get(ref(db, 'users/'+myID));
+            const d = s.val();
+            const body = `<div style="text-align:center">
+                            <img src="${d.avatar}" style="width:80px; border-radius:20px; border:2px solid var(--accent-z); margin-bottom:15px">
+                            <h4>${myID}</h4><p style="color:#555; font-size:12px; margin-bottom:20px">${d.bio}</p>
+                            <input type="text" id="new-bio" value="${d.bio}" placeholder="Update Bio...">
+                            <button class="btn-z btn-primary" onclick="actSaveProf()">SIMPAN</button>
+                          </div>`;
+            document.getElementById('modal-head').innerText = "Profil Saya";
+            document.getElementById('modal-body').innerHTML = body;
+            document.getElementById('modal-wrap').style.display = 'flex';
         };
 
-        window.selectAv = (el, url) => {
-            document.querySelectorAll('.avatar-opt').forEach(img => img.classList.remove('selected'));
-            el.classList.add('selected'); window.tempAv = url;
+        window.actSaveProf = async () => {
+            const b = document.getElementById('new-bio').value;
+            await update(ref(db, 'users/'+myID), {bio:b});
+            showNotif("BIO DIPERBARUI"); closeModal();
         };
 
-        if(currentUser) authSuccess(currentUser);
+        if(myID) startApp(myID);
     </script>
 </body>
-    </html>
-    
+                                                                                                                                               </html>
+                                                                                                                                               
