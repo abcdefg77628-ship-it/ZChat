@@ -1,643 +1,510 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Z-CHAT ULTIMATE NODE v4.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZChat Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
-
     <style>
-        /* VARIABLE ENGINE */
         :root {
-            --bg-pure: #000000;
-            --bg-soft: #0a0a0c;
-            --bg-card: #111114;
-            --bg-input: #16161a;
-            --bg-bubble-me: #0084ff;
-            --bg-bubble-you: #1c1c1e;
-            
-            --accent: #0084ff;
-            --accent-gradient: linear-gradient(135deg, #0084ff 0%, #00c6ff 100%);
-            --accent-glow: rgba(0, 132, 255, 0.5);
-            
+            --bg-dark: #0f111a;
+            --bg-side: #161925;
+            --accent: #3d5afe;
             --text-main: #ffffff;
-            --text-secondary: #8e8e93;
-            --text-ghost: #48484a;
-            
-            --border-thin: 1px solid #242426;
-            --border-thick: 2px solid #2c2c2e;
-            
-            --status-online: #30d158;
-            --status-offline: #ff453a;
-            --status-away: #ffd60a;
-            
-            --radius-xl: 32px;
-            --radius-lg: 24px;
-            --radius-md: 16px;
-            --radius-sm: 12px;
-            
-            --shadow-sm: 0 4px 12px rgba(0,0,0,0.5);
-            --shadow-lg: 0 12px 40px rgba(0,0,0,0.8);
-            
-            --safe-top: env(safe-area-inset-top);
-            --safe-bottom: env(safe-area-inset-bottom);
+            --text-dim: #94a3b8;
+            --bubble-me: #3d5afe;
+            --bubble-them: #232736;
+            --danger: #ff5252;
+            --success: #00e676;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* RESET & BASE */
+        [data-theme="light"] {
+            --bg-dark: #f8fafc;
+            --bg-side: #ffffff;
+            --text-main: #1e293b;
+            --text-dim: #64748b;
+            --bubble-me: #3d5afe;
+            --bubble-them: #e2e8f0;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            outline: none;
+            font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
-            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         body, html {
-            background-color: var(--bg-pure);
-            color: var(--text-main);
-            width: 100%;
             height: 100%;
+            width: 100%;
             overflow: hidden;
-            position: fixed;
-            font-size: 16px;
-            font-weight: 400;
-            line-height: 1.5;
-        }
-
-        /* SCROLLBAR ENGINE */
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
-        .scrollable { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
-
-        /* ANIMATION LIBRARY */
-        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes slideDown { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(0, 132, 255, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(0, 132, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 132, 255, 0); } }
-
-        .anim-fade { animation: fadeIn 0.4s ease-out; }
-        .anim-slide-up { animation: slideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .anim-scale { animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-
-        /* TOAST SYSTEM STYLING */
-        #z-toast-container {
-            position: fixed;
-            top: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10000;
-            pointer-events: none;
-        }
-
-        .z-toast {
-            background: rgba(20, 20, 22, 0.95);
-            backdrop-filter: blur(20px);
-            border: var(--border-thin);
-            padding: 14px 24px;
-            border-radius: 50px;
+            background-color: var(--bg-dark);
             color: var(--text-main);
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 10px;
+        }
+
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-dark);
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 12px;
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-100px);
-            transition: 0.6s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            z-index: 9999;
         }
 
-        .z-toast.show { transform: translateY(0); }
-        .z-toast-icon { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); }
+        .loader {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--accent);
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            animation: rotation 1s linear infinite;
+        }
 
-        /* LAYER ENGINE */
-        .app-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Auth Layout */
+        .auth-container {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--bg-side);
+            padding: 40px;
+            border-radius: 16px;
             width: 100%;
-            height: 100%;
-            display: none;
-            flex-direction: column;
-            background-color: var(--bg-pure);
-            z-index: 10;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
-        .layer-active { display: flex; }
+        .auth-card h2 { margin-bottom: 24px; text-align: center; font-weight: 700; }
 
-        /* TYPOGRAPHY */
-        .z-logo { font-family: 'JetBrains Mono', monospace; font-weight: 800; letter-spacing: -1.5px; }
-        .z-logo span { color: var(--accent); }
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            background: var(--bg-dark);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: white;
+            outline: none;
+        }
 
-        /* SHARED COMPONENTS */
-        .btn-primary {
-            background: var(--accent-gradient);
+        [data-theme="light"] input { color: #000; border: 1px solid #ddd; }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
             color: white;
             border: none;
-            padding: 18px;
-            border-radius: var(--radius-md);
-            font-weight: 800;
-            font-size: 15px;
+            border-radius: 8px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            transition: var(--transition);
         }
 
-        .btn-primary:active { transform: scale(0.96); opacity: 0.9; }
+        button:active { transform: scale(0.98); }
 
-        .input-group {
-            position: relative;
+        .auth-toggle {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-dim);
+            cursor: pointer;
+        }
+
+        /* Main App Layout */
+        #app-interface {
+            display: none;
+            height: 100vh;
+            grid-template-columns: 280px 1fr;
+        }
+
+        .sidebar {
+            background: var(--bg-side);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .profile-section {
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             margin-bottom: 20px;
         }
 
-        .input-label {
-            display: block;
-            font-size: 11px;
-            font-weight: 800;
-            color: var(--text-ghost);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 8px;
-            margin-left: 4px;
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .avatar { 
+            width: 45px; height: 45px; 
+            background: var(--accent); 
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold;
         }
 
-        .z-input-field {
-            width: 100%;
-            background: var(--bg-input);
-            border: var(--border-thick);
-            border-radius: var(--radius-md);
-            padding: 18px 20px;
+        .online-badge { font-size: 12px; color: var(--success); }
+
+        .menu-list { flex: 1; list-style: none; }
+        .menu-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px; border-radius: 8px; cursor: pointer;
+            transition: var(--transition); color: var(--text-dim);
+        }
+        .menu-item:hover { background: rgba(255,255,255,0.05); color: white; }
+
+        /* Chat Area */
+        .chat-main {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+
+        .chat-header {
+            padding: 16px 24px;
+            background: var(--bg-side);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        #message-container {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .msg {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 14px;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .msg.me {
+            align-self: flex-end;
+            background: var(--bubble-me);
             color: white;
-            font-size: 16px;
-            transition: all 0.3s;
+            border-bottom-right-radius: 2px;
         }
 
-        .z-input-field:focus {
-            border-color: var(--accent);
-            background: var(--bg-pure);
-            box-shadow: 0 0 20px rgba(0, 132, 255, 0.15);
+        .msg.them {
+            align-self: flex-start;
+            background: var(--bubble-them);
+            border-bottom-left-radius: 2px;
+        }
+
+        .msg-info { font-size: 11px; margin-bottom: 4px; opacity: 0.7; }
+        .msg-time { font-size: 10px; margin-top: 4px; text-align: right; opacity: 0.6; }
+
+        .msg-actions {
+            position: absolute; top: 0; right: -30px;
+            display: none; cursor: pointer; color: var(--danger);
+        }
+        .msg.me:hover .msg-actions { display: block; }
+
+        /* Input Area */
+        .input-area {
+            padding: 20px 24px;
+            background: var(--bg-side);
+            display: flex;
+            gap: 12px;
+        }
+
+        .input-area input { margin-bottom: 0; flex: 1; }
+
+        /* Modals */
+        .modal {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: none; justify-content: center; align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--bg-side);
+            padding: 30px; border-radius: 16px;
+            width: 90%; max-width: 400px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #app-interface { grid-template-columns: 1fr; }
+            .sidebar { 
+                position: fixed; left: -100%; top: 0; height: 100%; width: 80%; 
+                z-index: 100; transition: 0.3s; 
+            }
+            .sidebar.active { left: 0; }
         }
     </style>
 </head>
-<body>
-    <div id="z-toast-container">
-        <div id="main-toast" class="z-toast">
-            <div class="z-toast-icon"></div>
-            <span id="toast-msg">NODE SYSTEM INITIALIZED</span>
+<body data-theme="dark">
+
+    <div id="loading-screen"><div class="loader"></div></div>
+
+    <div id="auth-interface" class="auth-container">
+        <div class="auth-card" id="login-form">
+            <h2>ZChat Pro</h2>
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-pass" placeholder="Password">
+            <button onclick="handleLogin()">Login</button>
+            <div class="auth-toggle" onclick="toggleAuth(true)">Don't have an account? Register</div>
+        </div>
+
+        <div class="auth-card" id="register-form" style="display: none;">
+            <h2>Create Account</h2>
+            <input type="text" id="reg-user" placeholder="Username">
+            <input type="email" id="reg-email" placeholder="Email">
+            <input type="password" id="reg-pass" placeholder="Password">
+            <input type="password" id="reg-confirm" placeholder="Confirm Password">
+            <button onclick="handleRegister()">Register</button>
+            <div class="auth-toggle" onclick="toggleAuth(false)">Already have an account? Login</div>
         </div>
     </div>
 
-    <div id="layer-boot" class="app-layer layer-active" style="justify-content: center; align-items: center; z-index: 9999;">
-        <div class="anim-scale" style="text-align: center;">
-            <div class="z-logo" style="font-size: 42px; margin-bottom: 10px;">Z<span>PRO</span></div>
-            <p style="color: var(--text-ghost); font-size: 10px; letter-spacing: 4px; font-weight: 700;">ENCRYPTED NETWORK</p>
-            
-            <div style="width: 160px; height: 3px; background: var(--bg-input); margin-top: 40px; border-radius: 10px; position: relative; overflow: hidden;">
-                <div id="boot-progress" style="position: absolute; width: 0%; height: 100%; background: var(--accent); transition: width 0.4s;"></div>
-            </div>
-            <p id="boot-status" style="margin-top: 15px; font-size: 9px; color: var(--text-secondary); font-family: 'JetBrains Mono';">CONNECTING TO RELAY...</p>
-        </div>
-    </div>
-
-    <div id="layer-auth" class="app-layer" style="padding: 40px 30px; justify-content: space-between;">
-        <div class="anim-slide-up">
-            <div class="z-logo" style="font-size: 28px; margin-bottom: 5px;">Z<span>CHAT</span></div>
-            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 50px;">Authentication Gateway</p>
-
-            <div id="form-login" class="auth-form">
-                <div class="input-group">
-                    <label class="input-label">Node Identifier</label>
-                    <input type="text" id="auth-user" class="z-input-field" placeholder="username">
-                </div>
-                <div class="input-group">
-                    <label class="input-label">Secure Access Key</label>
-                    <input type="password" id="auth-pass" class="z-input-field" placeholder="••••••••">
-                </div>
-                <button onclick="handleLogin()" class="btn-primary" style="width: 100%; margin-top: 10px;">AUTHORIZE ACCESS</button>
-                <p onclick="toggleAuthMode('REG')" style="text-align: center; margin-top: 25px; font-size: 13px; color: var(--text-secondary); font-weight: 600;">Request new identity? <span style="color: var(--accent);">Register</span></p>
-            </div>
-
-            <div id="form-reg" class="auth-form" style="display: none;">
-                <div class="input-group">
-                    <label class="input-label">Create Node ID</label>
-                    <input type="text" id="reg-user" class="z-input-field" placeholder="min. 5 chars">
-                </div>
-                <div class="input-group">
-                    <label class="input-label">Set Access Key</label>
-                    <input type="password" id="reg-pass" class="z-input-field" placeholder="min. 6 chars">
-                </div>
-                <div class="input-group">
-                    <label class="input-label">Confirm Key</label>
-                    <input type="password" id="reg-conf" class="z-input-field" placeholder="verify key">
-                </div>
-                <button onclick="handleRegister()" class="btn-primary" style="width: 100%; margin-top: 10px;">INITIALIZE NODE</button>
-                <p onclick="toggleAuthMode('LOGIN')" style="text-align: center; margin-top: 25px; font-size: 13px; color: var(--text-secondary); font-weight: 600;">Have an identity? <span style="color: var(--accent);">Login</span></p>
-            </div>
-        </div>
-        
-        <p style="text-align: center; font-size: 10px; color: var(--text-ghost); font-weight: 700; letter-spacing: 1px;">Z-PRO ENCRYPTION v4.0.2 - ASIA REGION</p>
-    </div>
-
-    <div id="layer-main" class="app-layer">
-        <header style="padding: calc(var(--safe-top) + 50px) 25px 20px; background: var(--bg-soft); border-bottom: var(--border-thin);">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div id="my-profile-pic" class="pulse" style="width: 48px; height: 48px; border-radius: 50%; background: var(--bg-input); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px;">?</div>
+    <div id="app-interface">
+        <aside class="sidebar" id="sidebar">
+            <div class="profile-section">
+                <div class="user-info">
+                    <div class="avatar" id="my-initial">Z</div>
                     <div>
-                        <h2 id="my-display-name" style="font-size: 18px; font-weight: 800; letter-spacing: -0.5px;">NODE_USER</h2>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <div style="width: 7px; height: 7px; border-radius: 50%; background: var(--status-online);"></div>
-                            <span style="font-size: 10px; font-weight: 800; color: var(--status-online); letter-spacing: 1px;">ENCRYPTED</span>
-                        </div>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 15px;">
-                    <div onclick="openSearchView()" style="width: 40px; height: 40px; border-radius: 12px; background: var(--bg-input); display: flex; align-items: center; justify-content: center;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    </div>
-                    <div onclick="executeLogout()" style="width: 40px; height: 40px; border-radius: 12px; background: rgba(255, 69, 58, 0.1); display: flex; align-items: center; justify-content: center;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff453a" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        <div id="my-username" style="font-weight: 600;">Username</div>
+                        <div class="online-badge">Online</div>
                     </div>
                 </div>
             </div>
-        </header>
+            <ul class="menu-list">
+                <li class="menu-item" onclick="openSettings()">
+                    <span class="material-icons-round">settings</span> Settings
+                </li>
+                <li class="menu-item" onclick="toggleTheme()">
+                    <span class="material-icons-round">dark_mode</span> Change Theme
+                </li>
+                <li class="menu-item" style="color: var(--danger)" onclick="handleLogout()">
+                    <span class="material-icons-round">logout</span> Logout
+                </li>
+            </ul>
+            <div style="font-size: 12px; color: var(--text-dim);">
+                Online Members: <span id="online-count">0</span>
+            </div>
+        </aside>
 
-        <div style="padding: 20px 25px 10px;">
-            <p style="font-size: 11px; font-weight: 800; color: var(--text-ghost); letter-spacing: 2px; text-transform: uppercase;">Direct Transmissions</p>
+        <main class="chat-main">
+            <header class="chat-header">
+                <span class="material-icons-round" id="menu-toggle" style="cursor: pointer;">menu</span>
+                <div style="font-weight: 600;">Global Group Chat</div>
+                <div id="typing-status" style="font-size: 12px; color: var(--text-dim);"></div>
+            </header>
+
+            <div id="message-container"></div>
+
+            <div class="input-area">
+                <input type="text" id="msg-input" placeholder="Type a message..." onkeypress="checkEnter(event)">
+                <button style="width: 60px;" onclick="sendMessage()">
+                    <span class="material-icons-round">send</span>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal" id="settings-modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 style="margin-bottom: 20px;">Settings</h3>
+            <p style="color: var(--text-dim); margin-bottom: 20px;">Manage your account and privacy.</p>
+            <button onclick="closeModal(null)">Close</button>
         </div>
-        <div id="inbox-render-area" class="scrollable" style="flex: 1;">
-            </div>
-
-        <nav style="padding: 15px 40px calc(var(--safe-bottom) + 20px); background: var(--bg-soft); border-top: var(--border-thin); display: flex; justify-content: space-between; align-items: center;">
-            <div style="color: var(--accent);"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
-            <div style="color: var(--text-ghost);"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div>
-            <div style="color: var(--text-ghost);"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></div>
-        </nav>
     </div>
 
-    <div id="layer-chat" class="app-layer" style="z-index: 50;">
-        <header style="padding: calc(var(--safe-top) + 50px) 20px 15px; background: var(--bg-soft); border-bottom: var(--border-thin); display: flex; align-items: center; gap: 15px;">
-            <div onclick="closeChatView()" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            </div>
-            <div id="chat-target-avatar" style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-input); display: flex; align-items: center; justify-content: center; font-weight: 800; border: 1px solid var(--border-thick);">?</div>
-            <div style="flex: 1;">
-                <h3 id="chat-target-name" style="font-size: 16px; font-weight: 800;">TARGET_NODE</h3>
-                <p id="chat-target-status" style="font-size: 10px; color: var(--status-online); font-weight: 700;">STABLE CONNECTION</p>
-            </div>
-        </header>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-        <div id="chat-messages-area" class="scrollable" style="flex: 1; padding: 25px 20px; display: flex; flex-direction: column; gap: 15px; background: var(--bg-pure);">
-            </div>
-
-        <div id="typing-indicator" style="padding: 5px 25px; font-size: 10px; font-weight: 800; color: var(--accent); display: none; background: var(--bg-pure);">TARGET IS TYPING...</div>
-
-        <footer style="padding: 15px 20px calc(var(--safe-bottom) + 20px); background: var(--bg-soft); border-top: var(--border-thin); display: flex; align-items: center; gap: 12px;">
-            <div style="flex: 1; background: var(--bg-input); border-radius: 30px; padding: 5px 5px 5px 20px; border: var(--border-thin); display: flex; align-items: center;">
-                <input type="text" id="chat-input-field" style="flex: 1; background: transparent; border: none; color: white; padding: 10px 0; font-size: 15px;" placeholder="Send encrypted packet...">
-                <div onclick="executeSendMessage()" style="width: 42px; height: 42px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; margin-left: 10px; box-shadow: 0 4px 15px var(--accent-glow);">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><line x1="22" y1="2" x2="11" y2="13"></line><polyline points="22 2 15 22 11 13 2 9 22 2"></polyline></svg>
-                </div>
-            </div>
-        </footer>
-    </div>
-
-    <div id="layer-search" class="app-layer" style="z-index: 100;">
-        <div style="padding: calc(var(--safe-top) + 50px) 20px 15px; background: var(--bg-soft); display: flex; align-items: center; gap: 15px; border-bottom: var(--border-thin);">
-            <div onclick="closeSearchView()" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            </div>
-            <input type="text" id="search-input-field" style="flex: 1; background: transparent; border: none; color: white; font-size: 18px; font-weight: 600;" placeholder="Search Node ID..." autofocus>
-        </div>
-        <div id="search-results-area" class="scrollable" style="flex: 1; padding: 10px;">
-            </div>
-    </div>
-        <script type="module">
-        // IMPORT FIREBASE MODULES
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getDatabase, ref, set, push, onValue, update, serverTimestamp, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-        // CONFIGURATION DATA (YOUR PROJECT)
-                const firebaseConfig = {
+    <script>
+        // FIREBASE CONFIGURATION
+        const firebaseConfig = {
             apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
             authDomain: "zchat-56639.firebaseapp.com",
             databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "zchat-56639",
-            appId: "1:773931983053:web:a1c825be9a972e53dcc984"
+            storageBucket: "zchat-56639.firebasestorage.app",
+            messagingSenderId: "773931983053",
+            appId: "1:773931983053:web:a1c825be9a972e53dcc984",
+            measurementId: "G-ZDMK1DWV6S"
         };
 
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        // INITIALIZE SYSTEM
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
+        let currentUser = null;
+        let lastMessageTime = 0;
+        let blockedUsers = [];
+        let mutedUsers = [];
 
-        // GLOBAL APPLICATION STATE
-        const State = {
-            ME: null,
-            ACTIVE_CHAT_UID: null,
-            ACTIVE_CHAT_NAME: null,
-            IS_BOOTED: false,
-            TYPING_TIMEOUT: null
-        };
-
-        // --- UTILITY ENGINE ---
-        const UI = {
-            toast: (msg) => {
-                const el = document.getElementById('main-toast');
-                document.getElementById('toast-msg').innerText = msg.toUpperCase();
-                el.classList.add('show');
-                setTimeout(() => el.classList.remove('show'), 3000);
-            },
-            showLayer: (id) => {
-                document.querySelectorAll('.app-layer').forEach(l => l.classList.remove('layer-active'));
-                document.getElementById(id).classList.add('layer-active');
-            },
-            getAvatarColor: (name) => {
-                const colors = ['#0084ff', '#30d158', '#ff453a', '#ffd60a', '#af52de', '#ff9f0a'];
-                let hash = 0;
-                for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-                return colors[Math.abs(hash) % colors.length];
-            }
-        };
-
-        // --- AUTH ENGINE ---
-        window.toggleAuthMode = (mode) => {
-            document.getElementById('form-login').style.display = mode === 'LOGIN' ? 'block' : 'none';
-            document.getElementById('form-reg').style.display = mode === 'REG' ? 'block' : 'none';
-        };
-
-        window.handleRegister = async () => {
-            const u = document.getElementById('reg-user').value.trim().toLowerCase();
-            const p = document.getElementById('reg-pass').value;
-            const c = document.getElementById('reg-conf').value;
-
-            if (u.length < 5) return UI.toast("ID_TOO_SHORT");
-            if (p.length < 6) return UI.toast("PASS_TOO_WEAK");
-            if (p !== c) return UI.toast("PASS_MISMATCH");
-
-            UI.toast("CREATING_IDENTITY...");
-            try {
-                // Check if username exists
-                const userCheck = await get(ref(db, `usernames/${u}`));
-                if (userCheck.exists()) return UI.toast("ID_ALREADY_TAKEN");
-
-                const res = await createUserWithEmailAndPassword(auth, `${u}@zpro.io`, p);
-                const userData = {
-                    uid: res.user.uid,
-                    username: u,
-                    status: 'online',
-                    bio: 'Secure node user.',
-                    avatarColor: UI.getAvatarColor(u),
-                    createdAt: serverTimestamp()
-                };
-
-                await set(ref(db, `users/${res.user.uid}`), userData);
-                await set(ref(db, `usernames/${u}`), res.user.uid);
-                
-                UI.toast("NODE_INITIALIZED");
-                location.reload();
-            } catch (err) {
-                UI.toast("AUTH_FAILED: " + err.code);
-            }
-        };
-
-        window.handleLogin = async () => {
-            const u = document.getElementById('auth-user').value.trim().toLowerCase();
-            const p = document.getElementById('auth-pass').value;
-
-            if (!u || !p) return UI.toast("DATA_INCOMPLETE");
-
-            UI.toast("AUTHORIZING...");
-            try {
-                await signInWithEmailAndPassword(auth, `${u}@zpro.io`, p);
-            } catch (err) {
-                UI.toast("ACCESS_DENIED");
-            }
-        };
-
-        window.executeLogout = () => {
-            if (confirm("DISCONNECT FROM NETWORK?")) {
-                signOut(auth).then(() => location.reload());
-            }
-        };
-
-        // --- NAVIGATION HANDLERS ---
-        window.openSearchView = () => UI.showLayer('layer-search');
-        window.closeSearchView = () => UI.showLayer('layer-main');
-        window.closeChatView = () => {
-            UI.showLayer('layer-main');
-            State.ACTIVE_CHAT_UID = null;
-        };
-
-        // --- CORE SYSTEM BOOT ---
-        onAuthStateChanged(auth, async (user) => {
-            const prog = document.getElementById('boot-progress');
-            const stat = document.getElementById('boot-status');
-
+        // Auth Logic
+        auth.onAuthStateChanged(user => {
+            document.getElementById('loading-screen').style.display = 'none';
             if (user) {
-                stat.innerText = "RETRIEVING_USER_PACKETS...";
-                prog.style.width = "60%";
-
-                const snap = await get(ref(db, `users/${user.uid}`));
-                if (snap.exists()) {
-                    State.ME = snap.val();
-                    prog.style.width = "100%";
-                    stat.innerText = "HANDSHAKE_COMPLETE";
-
-                    // Sync UI
-                    document.getElementById('my-display-name').innerText = State.ME.username.toUpperCase();
-                    const av = document.getElementById('my-profile-pic');
-                    av.innerText = State.ME.username[0].toUpperCase();
-                    av.style.backgroundColor = State.ME.avatarColor;
-
-                    setTimeout(() => {
-                        UI.showLayer('layer-main');
-                        document.getElementById('layer-boot').style.display = 'none';
-                        renderInbox();
-                    }, 800);
-                }
+                currentUser = user;
+                showApp();
+                setupPresence();
+                listenMessages();
+                updateOnlineCount();
             } else {
-                setTimeout(() => {
-                    UI.showLayer('layer-auth');
-                    document.getElementById('layer-boot').style.display = 'none';
-                }, 1000);
+                showAuth();
             }
         });
 
-        // --- SEARCH ENGINE ---
-        document.getElementById('search-input-field').oninput = async (e) => {
-            const val = e.target.value.trim().toLowerCase();
-            const area = document.getElementById('search-results-area');
-            area.innerHTML = '';
+        function toggleAuth(isReg) {
+            document.getElementById('login-form').style.display = isReg ? 'none' : 'block';
+            document.getElementById('register-form').style.display = isReg ? 'block' : 'none';
+        }
 
-            if (val.length < 3) return;
+        async function handleRegister() {
+            const user = document.getElementById('reg-user').value;
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
+            const confirm = document.getElementById('reg-confirm').value;
 
-            const q = query(ref(db, 'users'), orderByChild('username'), equalTo(val));
-            const snap = await get(q);
+            if (!user || !email || pass.length < 6) return alert("Valid data required (Pass min 6 chars)");
+            if (pass !== confirm) return alert("Passwords do not match");
+
+            try {
+                const res = await auth.createUserWithEmailAndPassword(email, pass);
+                await res.user.updateProfile({ displayName: user });
+                await db.ref('users/' + res.user.uid).set({ username: user, status: 'online' });
+                location.reload();
+            } catch (e) { alert(e.message); }
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            try { await auth.signInWithEmailAndPassword(email, pass); } catch (e) { alert(e.message); }
+        }
+
+        function handleLogout() { auth.signOut().then(() => location.reload()); }
+
+        // Core App Logic
+        function showApp() {
+            document.getElementById('auth-interface').style.display = 'none';
+            document.getElementById('app-interface').style.display = 'grid';
+            document.getElementById('my-username').innerText = currentUser.displayName;
+            document.getElementById('my-initial').innerText = currentUser.displayName.charAt(0).toUpperCase();
+        }
+
+        function showAuth() {
+            document.getElementById('auth-interface').style.display = 'flex';
+            document.getElementById('app-interface').style.display = 'none';
+        }
+
+        // Messaging Logic
+        function sendMessage() {
+            const now = Date.now();
+            if (now - lastMessageTime < 1500) return alert("Anti-spam: Wait a moment");
             
-            if (!snap.exists()) {
-                area.innerHTML = `<p style="text-align:center; color:var(--text-ghost); margin-top:20px; font-size:12px;">NO NODE FOUND</p>`;
-                return;
-            }
+            const input = document.getElementById('msg-input');
+            const val = input.value.trim();
+            if (!val) return;
 
-            snap.forEach(child => {
-                if (child.key === State.ME.uid) return;
-                const d = child.val();
-                const row = document.createElement('div');
-                row.className = 'anim-fade';
-                row.style = "padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: var(--border-thin); cursor: pointer;";
-                row.innerHTML = `
-                    <div style="width:40px; height:40px; border-radius:50%; background:${d.avatarColor}; display:flex; align-items:center; justify-content:center; font-weight:800;">${d.username[0].toUpperCase()}</div>
-                    <div style="flex:1">
-                        <p style="font-weight:800; font-size:15px;">${d.username.toUpperCase()}</p>
-                        <p style="font-size:10px; color:var(--text-secondary);">${d.bio}</p>
-                    </div>
-                `;
-                row.onclick = () => {
-                    closeSearchView();
-                    window.openChatView(d.uid, d.username, d.avatarColor);
-                };
-                area.appendChild(row);
+            db.ref('messages').push({
+                uid: currentUser.uid,
+                username: currentUser.displayName,
+                text: val,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
             });
-        };
 
-        // --- CHAT ENGINE ---
-        window.openChatView = (uid, name, color) => {
-            State.ACTIVE_CHAT_UID = uid;
-            State.ACTIVE_CHAT_NAME = name;
-            
-            document.getElementById('chat-target-name').innerText = name.toUpperCase();
-            const av = document.getElementById('chat-target-avatar');
-            av.innerText = name[0].toUpperCase();
-            av.style.backgroundColor = color;
-            
-            UI.showLayer('layer-chat');
+            input.value = '';
+            lastMessageTime = now;
+        }
 
-            // Setup Realtime Listener
-            const chatID = [State.ME.uid, uid].sort().join('_');
-            const msgRef = ref(db, `messages/${chatID}`);
-            
-            onValue(msgRef, (snap) => {
-                const area = document.getElementById('chat-messages-area');
-                area.innerHTML = '';
-                
-                if (!snap.exists()) {
-                    area.innerHTML = `<div style="flex:1; display:flex; align-items:center; justify-content:center; color:var(--text-ghost); font-size:11px; font-weight:700; letter-spacing:1px;">ENCRYPTED CHANNEL ESTABLISHED</div>`;
-                }
-
-                snap.forEach(m => {
-                    const data = m.val();
-                    const isMe = data.sender === State.ME.uid;
-                    const bubble = document.createElement('div');
+        function listenMessages() {
+            db.ref('messages').limitToLast(50).on('value', snapshot => {
+                const container = document.getElementById('message-container');
+                container.innerHTML = '';
+                snapshot.forEach(child => {
+                    const data = child.val();
+                    if (blockedUsers.includes(data.uid)) return;
                     
-                    bubble.className = 'anim-fade';
-                    bubble.style = `
-                        max-width: 80%;
-                        padding: 12px 16px;
-                        border-radius: 20px;
-                        font-size: 14px;
-                        line-height: 1.4;
-                        position: relative;
-                        word-wrap: break-word;
-                        ${isMe ? 
-                            'align-self: flex-end; background: var(--bg-bubble-me); color: white; border-bottom-right-radius: 4px;' : 
-                            'align-self: flex-start; background: var(--bg-bubble-you); color: white; border-bottom-left-radius: 4px;'
-                        }
-                    `;
+                    const isMe = data.uid === currentUser.uid;
+                    const time = new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                     
-                    bubble.innerHTML = `
-                        ${data.text}
-                        <div style="font-size:8px; opacity:0.5; margin-top:5px; text-align:right;">${new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                    const div = document.createElement('div');
+                    div.className = `msg ${isMe ? 'me' : 'them'}`;
+                    div.innerHTML = `
+                        <div class="msg-info">${isMe ? 'You' : data.username}</div>
+                        <div class="msg-text">${data.text}</div>
+                        <div class="msg-time">${time}</div>
+                        ${isMe ? `<span class="material-icons-round msg-actions" onclick="deleteMsg('${child.key}')">delete</span>` : ''}
                     `;
-                    area.appendChild(bubble);
+                    container.appendChild(div);
                 });
-                area.scrollTop = area.scrollHeight;
-            });
-
-            // Listen Typing Status
-            onValue(ref(db, `typing/${uid}/${State.ME.uid}`), (s) => {
-                document.getElementById('typing-indicator').style.display = s.exists() ? 'block' : 'none';
-            });
-        };
-
-        window.executeSendMessage = () => {
-            const inp = document.getElementById('chat-input-field');
-            const txt = inp.value.trim();
-            if (!txt || !State.ACTIVE_CHAT_UID) return;
-
-            const chatID = [State.ME.uid, State.ACTIVE_CHAT_UID].sort().join('_');
-            const payload = {
-                sender: State.ME.uid,
-                text: txt,
-                timestamp: serverTimestamp()
-            };
-
-            push(ref(db, `messages/${chatID}`), payload);
-            
-            // Update Inbox
-            const inboxData = { lastMsg: txt, timestamp: serverTimestamp() };
-            update(ref(db, `inbox/${State.ME.uid}/${State.ACTIVE_CHAT_UID}`), inboxData);
-            update(ref(db, `inbox/${State.ACTIVE_CHAT_UID}/${State.ME.uid}`), inboxData);
-            
-            inp.value = '';
-            set(ref(db, `typing/${State.ME.uid}/${State.ACTIVE_CHAT_UID}`), null);
-        };
-
-        // --- INBOX ENGINE ---
-        function renderInbox() {
-            onValue(ref(db, `inbox/${State.ME.uid}`), (snap) => {
-                const area = document.getElementById('inbox-render-area');
-                area.innerHTML = '';
-                
-                if (!snap.exists()) {
-                    area.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-ghost); font-size:12px; font-weight:700;">NO TRANSMISSIONS YET</div>`;
-                    return;
+                container.scrollTop = container.scrollHeight;
+                if (!document.hasFocus() && snapshot.numChildren() > 0) {
+                    new Notification("ZChat Pro: New Message");
                 }
-
-                let sorted = [];
-                snap.forEach(child => sorted.push({id: child.key, ...child.val()}));
-                sorted.sort((a, b) => b.timestamp - a.timestamp);
-
-                sorted.forEach(async (chat) => {
-                    const uSnap = await get(ref(db, `users/${chat.id}`));
-                    const u = uSnap.val();
-                    const row = document.createElement('div');
-                    row.className = 'anim-fade';
-                    row.style = "padding: 18px 25px; display:flex; align-items:center; gap:15px; border-bottom: var(--border-thin); cursor:pointer;";
-                    row.innerHTML = `
-                        <div style="width:50px; height:50px; border-radius:50%; background:${u.avatarColor}; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:18px;">${u.username[0].toUpperCase()}</div>
-                        <div style="flex:1; overflow:hidden;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                                <h4 style="font-weight:800; font-size:15px;">${u.username.toUpperCase()}</h4>
-                                <span style="font-size:10px; color:var(--text-ghost);">${new Date(chat.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
-                            </div>
-                            <p style="font-size:13px; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${chat.lastMsg}</p>
-                        </div>
-                    `;
-                    row.onclick = () => window.openChatView(chat.id, u.username, u.avatarColor);
-                    area.appendChild(row);
-                });
             });
         }
 
-        // --- TYPING HANDLER ---
-        document.getElementById('chat-input-field').oninput = () => {
-            if (!State.ACTIVE_CHAT_UID) return;
-            set(ref(db, `typing/${State.ME.uid}/${State.ACTIVE_CHAT_UID}`), true);
-            
-            clearTimeout(State.TYPING_TIMEOUT);
-            State.TYPING_TIMEOUT = setTimeout(() => {
-                set(ref(db, `typing/${State.ME.uid}/${State.ACTIVE_CHAT_UID}`), null);
-            }, 3000);
-        };
+        function deleteMsg(id) {
+            if (confirm("Delete this message?")) db.ref('messages/' + id).remove();
+        }
+
+        // Presence & Theme
+        function setupPresence() {
+            const statusRef = db.ref('users/' + currentUser.uid + '/status');
+            db.ref('.info/connected').on('value', snap => {
+                if (snap.val() === false) return;
+                statusRef.onDisconnect().set('offline');
+                statusRef.set('online');
+            });
+        }
+
+        function updateOnlineCount() {
+            db.ref('users').on('value', snap => {
+                let count = 0;
+                snap.forEach(u => { if (u.val().status === 'online') count++; });
+                document.getElementById('online-count').innerText = count;
+            });
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const newTheme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+        }
+
+        // UI Helpers
+        function checkEnter(e) { if (e.key === 'Enter') sendMessage(); }
+        function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
+        function closeModal(e) { document.getElementById('settings-modal').style.display = 'none'; }
+
+        // Sidebar Toggle Mobile
+        document.getElementById('menu-toggle').onclick = () => {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // Request Notification
+        if (Notification.permission !== "granted") Notification.requestPermission();
+
     </script>
 </body>
 </html>
