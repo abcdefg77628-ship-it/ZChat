@@ -3,154 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZChat v16 Official</title>
+    <title>ZChat | Private Grid</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --biru-wa: #0088cc;
-            --biru-muda: #e1f5fe;
-            --biru-gelap: #005c4b;
-            --bg-chat: #efeae2;
-            --putih: #ffffff;
-            --abu: #f0f2f5;
-            --teks-utama: #111b21;
-            --teks-sekunder: #667781;
+            --accent: #0088cc;
+            --accent-glow: rgba(0, 136, 204, 0.4);
+            --bg-dark: #000000;
+            --surf-1: #0a0a0a;
+            --surf-2: #121212;
+            --border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-dim: #a0a0a0;
+            --me-bubble: #005c4b;
+            --them-bubble: #202c33;
         }
 
-        /* Reset & Base */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background: #dadbd3; height: 100vh; overflow: hidden; color: var(--teks-utama); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-dark); height: 100vh; overflow: hidden; color: var(--text-main); }
         .hidden { display: none !important; }
 
         /* Loader */
         #loader { 
-            position: fixed; inset: 0; background: #f0f2f5; z-index: 10000; 
+            position: fixed; inset: 0; background: #000; z-index: 10000; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
         }
-        .spinner { 
-            width: 40px; height: 40px; border: 4px solid #d1d7db; 
-            border-top: 4px solid var(--biru-wa); border-radius: 50%; 
-            animation: putar 1s linear infinite; 
-        }
-        @keyframes putar { to { transform: rotate(360deg); } }
+        .loading-text { font-family: 'JetBrains Mono'; font-size: 10px; letter-spacing: 4px; color: var(--accent); margin-top: 15px; }
 
-        /* Auth Screen (Login & Register) */
+        /* --- AUTH SCREEN (SEKARANG HITAM PEKAT) --- */
         #scr-auth { 
             display: flex; align-items: center; justify-content: center; 
-            height: 100vh; background: var(--biru-wa); 
+            height: 100vh; background: #000;
         }
         .auth-card { 
-            background: white; padding: 30px; border-radius: 12px; 
-            width: 100%; max-width: 350px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); 
+            background: var(--surf-1); padding: 40px 30px; border-radius: 24px; 
+            width: 100%; max-width: 380px; border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8); text-align: center;
         }
-        .auth-card h2 { text-align: center; margin-bottom: 20px; color: var(--biru-wa); }
-        .auth-tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #ddd; }
-        .tab { 
-            flex: 1; text-align: center; padding: 10px; cursor: pointer; 
-            font-weight: 600; color: var(--teks-sekunder); 
+        .auth-logo { 
+            font-size: 45px; font-weight: 800; color: var(--accent); 
+            margin-bottom: 5px; letter-spacing: -3px; text-shadow: 0 0 20px var(--accent-glow);
         }
-        .tab.active { color: var(--biru-wa); border-bottom: 3px solid var(--biru-wa); }
+        .auth-desc { font-size: 12px; color: var(--text-dim); margin-bottom: 30px; font-family: 'JetBrains Mono'; }
         
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 13px; margin-bottom: 5px; font-weight: 600; }
-        .form-group input { 
-            width: 100%; padding: 12px; border: 1px solid #ddd; 
-            border-radius: 8px; outline: none; font-size: 15px;
+        .auth-tabs { display: flex; background: #000; padding: 5px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border); }
+        .tab { 
+            flex: 1; padding: 10px; cursor: pointer; border-radius: 8px;
+            font-size: 14px; font-weight: 600; color: var(--text-dim); transition: 0.3s;
         }
+        .tab.active { background: var(--accent); color: white; }
+        
+        .form-group { text-align: left; margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 8px; }
+        .form-group input { 
+            width: 100%; padding: 14px; background: #000; border: 1px solid var(--border); 
+            border-radius: 10px; color: white; outline: none; transition: 0.3s; font-size: 16px;
+        }
+        .form-group input:focus { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+
         .btn-auth { 
-            width: 100%; padding: 12px; background: var(--biru-wa); 
-            color: white; border: none; border-radius: 8px; 
-            font-weight: bold; cursor: pointer; margin-top: 10px;
+            width: 100%; padding: 16px; background: var(--accent); 
+            color: white; border: none; border-radius: 12px; 
+            font-weight: 800; cursor: pointer; transition: 0.3s; margin-top: 10px;
         }
 
-        /* App Layout */
-        .app-container { display: flex; width: 100%; height: 100vh; background: white; }
+        /* --- APP LAYOUT --- */
+        .app-container { display: flex; width: 100%; height: 100vh; background: var(--bg-dark); }
         
         /* Sidebar */
         .sidebar { 
-            width: 30%; min-width: 300px; border-right: 1px solid #ddd; 
-            display: flex; flex-direction: column; background: white; 
+            width: 30%; min-width: 320px; border-right: 1px solid var(--border); 
+            display: flex; flex-direction: column; background: var(--surf-1); 
         }
         .side-header { 
-            height: 60px; background: var(--abu); padding: 10px 16px; 
-            display: flex; align-items: center; justify-content: space-between; 
+            height: 70px; padding: 0 20px; display: flex; align-items: center; 
+            justify-content: space-between; border-bottom: 1px solid var(--border);
         }
-        .menu-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #54656f; }
+        .menu-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: white; }
         
-        .search-box { padding: 8px 12px; background: #fff; }
-        .search-inner { 
-            background: #f0f2f5; border-radius: 8px; padding: 6px 12px; 
-            display: flex; align-items: center; 
-        }
-        .search-inner input { border: none; background: none; outline: none; width: 100%; padding: 4px; }
-
         .contact-list { flex: 1; overflow-y: auto; }
         .contact-item { 
-            display: flex; align-items: center; padding: 12px 16px; 
-            cursor: pointer; border-bottom: 1px solid #f5f6f6; 
+            display: flex; align-items: center; padding: 15px 20px; 
+            cursor: pointer; transition: 0.2s; border-bottom: 1px solid rgba(255,255,255,0.02);
         }
-        .contact-item:hover { background: #f5f6f6; }
+        .contact-item:hover { background: #111; }
         .avatar { 
-            width: 45px; height: 45px; background: #0088cc; color: white; 
+            width: 50px; height: 50px; background: var(--accent); color: white; 
             border-radius: 50%; display: flex; align-items: center; 
-            justify-content: center; font-weight: bold; margin-right: 15px; 
+            justify-content: center; font-weight: 800; margin-right: 15px; font-size: 20px;
         }
 
-        /* Main Chat Area */
-        .chat-main { flex: 1; display: flex; flex-direction: column; background: var(--bg-chat); }
+        /* Chat Area */
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: #0b141a; }
         .chat-header { 
-            height: 60px; background: var(--abu); padding: 10px 16px; 
-            display: flex; align-items: center; border-left: 1px solid #ddd; 
+            height: 70px; background: var(--surf-1); padding: 0 20px; 
+            display: flex; align-items: center; border-bottom: 1px solid var(--border);
         }
         .chat-messages { 
-            flex: 1; padding: 20px; overflow-y: auto; 
-            display: flex; flex-direction: column; gap: 5px;
-            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            flex: 1; padding: 25px; overflow-y: auto; 
+            display: flex; flex-direction: column; gap: 10px;
+            background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            background-blend-mode: overlay; background-color: #0b141a;
         }
         .msg { 
-            max-width: 65%; padding: 8px 12px; border-radius: 8px; 
-            font-size: 14.5px; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); 
+            max-width: 70%; padding: 10px 15px; border-radius: 12px; 
+            font-size: 15px; line-height: 1.4; position: relative;
         }
-        .m-me { align-self: flex-end; background: #dcf8c6; }
-        .m-them { align-self: flex-start; background: white; }
+        .m-me { align-self: flex-end; background: var(--me-bubble); color: white; border-bottom-right-radius: 2px; }
+        .m-them { align-self: flex-start; background: var(--them-bubble); color: white; border-bottom-left-radius: 2px; }
 
-        .chat-input-bar { padding: 10px 16px; background: var(--abu); display: flex; gap: 10px; }
-        .input-wrap { 
-            flex: 1; background: white; border-radius: 25px; 
-            padding: 5px 15px; display: flex; align-items: center; 
-        }
-        .input-wrap input { border: none; outline: none; width: 100%; padding: 8px; }
-        .btn-send { 
-            background: var(--biru-wa); color: white; border: none; 
-            width: 45px; height: 45px; border-radius: 50%; cursor: pointer; 
-        }
+        .chat-input-area { padding: 15px 20px; background: var(--surf-1); display: flex; gap: 12px; align-items: center; }
+        .input-wrap { flex: 1; background: #2a3942; border-radius: 25px; padding: 5px 20px; }
+        .input-wrap input { width: 100%; border: none; background: none; color: white; padding: 10px 0; outline: none; font-size: 15px; }
+        .btn-send { background: var(--accent); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 18px; }
 
-        /* Hamburger Menu Panel */
+        /* Hamburger Panel */
         #side-panel { 
             position: fixed; left: -300px; top: 0; bottom: 0; width: 280px; 
-            background: white; z-index: 5000; box-shadow: 5px 0 15px rgba(0,0,0,0.1); 
-            transition: 0.3s ease; padding: 20px; 
+            background: var(--surf-1); z-index: 5000; border-right: 1px solid var(--border);
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 20px; 
         }
         #side-panel.open { left: 0; }
-        .panel-close { text-align: right; font-size: 24px; cursor: pointer; }
-        .panel-item { padding: 15px 0; border-bottom: 1px solid #eee; cursor: pointer; }
-
-        /* Admin Modal */
-        .modal { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.5); 
-            z-index: 6000; display: flex; align-items: center; justify-content: center; 
-        }
-        .modal-box { 
-            background: white; width: 90%; max-width: 450px; 
-            border-radius: 12px; overflow: hidden; 
-        }
-        .modal-head { padding: 15px; background: #333; color: white; display: flex; justify-content: space-between; }
-        .modal-body { padding: 15px; max-height: 400px; overflow-y: auto; }
+        .panel-item { padding: 15px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; color: var(--text-dim); transition: 0.3s; }
+        .panel-item:hover { background: #1a1a1a; color: white; }
 
         @media (max-width: 768px) {
             .sidebar { width: 100%; }
@@ -161,80 +141,71 @@
 </head>
 <body>
 
-    <div id="loader"><div class="spinner"></div></div>
+    <div id="loader">
+        <div class="auth-logo">Z.</div>
+        <div class="loading-text">INITIALIZING_GRID...</div>
+    </div>
 
     <div id="side-panel">
-        <div class="panel-close" onclick="toggleMenu()">✕</div>
-        <h3 style="margin: 20px 0;">Pengaturan</h3>
-        <div class="panel-item">
-            <label>Bahasa / Language</label>
-            <select id="lang-sel" onchange="ubahBahasa()" style="width: 100%; padding: 8px; margin-top: 10px;">
-                <option value="id">Bahasa Indonesia</option>
-                <option value="en">English</option>
-            </select>
-        </div>
-        <div class="panel-item" onclick="exit()">Keluar Akun</div>
+        <div onclick="toggleMenu()" style="cursor:pointer; margin-bottom: 40px; color: var(--accent);">✕ TUTUP</div>
+        <div class="panel-item" onclick="alert('Fitur segera hadir!')">Profil Saya</div>
+        <div class="panel-item" onclick="toggleLang()">Ganti Bahasa (ID/EN)</div>
+        <div class="panel-item" style="color: #ff4b4b;" onclick="exit()">Keluar Sesi</div>
     </div>
 
-    <div id="scr-auth" class="screen">
+    <div id="scr-auth">
         <div class="auth-card">
-            <h2 id="auth-title">ZChat</h2>
+            <div class="auth-logo">ZChat</div>
+            <p class="auth-desc">SECURE_NODE_ACCESS</p>
+            
             <div class="auth-tabs">
-                <div id="tab-login" class="tab active" onclick="switchAuth('login')">Masuk</div>
-                <div id="tab-reg" class="tab" onclick="switchAuth('reg')">Daftar</div>
+                <div id="tab-login" class="tab active" onclick="switchAuth('login')">MASUK</div>
+                <div id="tab-reg" class="tab" onclick="switchAuth('reg')">DAFTAR</div>
             </div>
             
             <div class="form-group">
-                <label id="l-user">Nama Pengguna</label>
-                <input type="text" id="auth-user" placeholder="Username...">
+                <label>Username</label>
+                <input type="text" id="auth-user" placeholder="Nama Akun" spellcheck="false">
             </div>
             <div class="form-group">
-                <label id="l-pass">Kata Sandi</label>
-                <input type="password" id="auth-pass" placeholder="Password...">
+                <label>Password</label>
+                <input type="password" id="auth-pass" placeholder="••••••••">
             </div>
             
-            <button id="btn-auth-action" class="btn-auth" onclick="handleAuth()">MASUK SEKARANG</button>
+            <button id="btn-auth-action" class="btn-auth" onclick="handleAuth()">LOGIN_TO_GRID</button>
         </div>
     </div>
 
-    <div id="scr-app" class="screen hidden">
+    <div id="scr-app" class="hidden">
         <div class="app-container">
-            
             <aside class="sidebar">
                 <header class="side-header">
                     <button class="menu-btn" onclick="toggleMenu()">☰</button>
-                    <b id="my-display-name">ZChat</b>
-                    <div>
-                        <button id="adm-trigger" class="hidden" onclick="openAdm()" style="background:none; border:none; cursor:pointer; font-size:20px;">🛡️</button>
-                    </div>
+                    <b style="letter-spacing: 1px;">Z_GRID</b>
+                    <button id="adm-trigger" class="hidden" onclick="openAdm()" style="background:none; border:none; color:var(--accent); cursor:pointer;">🛡️</button>
                 </header>
-                
-                <div class="search-box">
-                    <div class="search-inner">
+                <div class="search-area">
+                    <div class="search-wrap">
                         <input type="text" placeholder="Cari teman chat..." id="search-input">
                     </div>
                 </div>
-
                 <div id="node-list" class="contact-list"></div>
             </aside>
 
             <main class="chat-main" id="chat-area">
-                <div id="chat-blank" style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#8696a0; text-align:center;">
-                    <div style="width:100px; height:100px; border:2px solid #ddd; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:40px; margin-bottom:20px;">Z</div>
-                    <h2 id="t-blank-head">ZChat untuk Web</h2>
-                    <p id="t-blank-body">Pilih kontak untuk mulai berkirim pesan.<br>Aman, Cepat, dan Privat.</p>
+                <div id="chat-blank" style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#555;">
+                    <div class="auth-logo" style="opacity: 0.2; filter: grayscale(1);">Z</div>
+                    <p>Pilih pesan untuk memulai dekripsi.</p>
                 </div>
 
                 <div id="chat-window" class="hidden" style="height:100%; display:flex; flex-direction:column;">
                     <header class="chat-header">
-                        <button onclick="closeChat()" class="mobile-only" style="background:none; border:none; font-size:20px; margin-right:15px; cursor:pointer;">←</button>
-                        <div class="avatar" id="peer-avatar">?</div>
-                        <b id="peer-name">Username</b>
+                        <button onclick="closeChat()" class="menu-btn" style="margin-right: 15px;">←</button>
+                        <div class="avatar" id="peer-avatar" style="width:40px; height:40px; font-size:16px;">?</div>
+                        <b id="peer-name">User</b>
                     </header>
-
                     <div id="chat-flow" class="chat-messages"></div>
-
-                    <footer class="chat-input-bar">
+                    <footer class="chat-input-area">
                         <div class="input-wrap">
                             <input type="text" id="msg-in" placeholder="Ketik pesan..." autocomplete="off">
                         </div>
@@ -242,111 +213,71 @@
                     </footer>
                 </div>
             </main>
-
         </div>
     </div>
 
-    <div id="scr-adm" class="modal hidden">
-        <div class="modal-box">
-            <div class="modal-head">
-                <h3>Panel Admin</h3>
+    <div id="scr-adm" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9000; display:flex; align-items:center; justify-content:center;">
+        <div style="background:#111; width:90%; max-width:500px; border-radius:15px; border:1px solid var(--border); overflow:hidden;">
+            <div style="padding:20px; background:var(--accent); display:flex; justify-content:space-between;">
+                <b>ROOT_ACCESS_CONSOLE</b>
                 <button onclick="closeAdm()" style="background:none; border:none; color:white; cursor:pointer;">✕</button>
             </div>
-            <div id="adm-list" class="modal-body"></div>
+            <div id="adm-list" style="padding:20px; max-height:400px; overflow-y:auto;"></div>
         </div>
     </div>
 
     <script>
-        // --- KONFIGURASI FIREBASE ---
+        // --- FIREBASE INITIALIZATION ---
         const firebaseConfig = { databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
         const MASTER = "zZerr44";
-        let me = null;
-        let peer = null;
-        let mode = 'login';
+        let me = null, peer = null, mode = 'login';
 
-        // KAMUS BAHASA
-        const i18n = {
-            id: {
-                l_user: "Nama Pengguna", l_pass: "Kata Sandi", b_login: "MASUK SEKARANG", b_reg: "DAFTAR AKUN",
-                t_blank_head: "ZChat untuk Web", t_blank_body: "Pilih kontak untuk mulai berkirim pesan.", msg_placeholder: "Ketik pesan..."
-            },
-            en: {
-                l_user: "Username", l_pass: "Password", b_login: "LOGIN NOW", b_reg: "REGISTER ACCOUNT",
-                t_blank_head: "ZChat for Web", t_blank_body: "Select a contact to start messaging.", msg_placeholder: "Type a message..."
-            }
-        };
-
-        // --- AUTH LOGIC ---
+        // --- AUTH FUNCTIONS ---
         function switchAuth(m) {
             mode = m;
             document.getElementById('tab-login').classList.toggle('active', m === 'login');
             document.getElementById('tab-reg').classList.toggle('active', m === 'reg');
-            ubahBahasa();
-        }
-
-        function ubahBahasa() {
-            const l = document.getElementById('lang-sel').value;
-            const t = i18n[l];
-            document.getElementById('l-user').innerText = t.l_user;
-            document.getElementById('l-pass').innerText = t.l_pass;
-            document.getElementById('btn-auth-action').innerText = (mode === 'login' ? t.b_login : t.b_reg);
-            document.getElementById('t-blank-head').innerText = t.t_blank_head;
-            document.getElementById('t-blank-body').innerHTML = t.t_blank_body;
-            document.getElementById('msg-in').placeholder = t.msg_placeholder;
+            document.getElementById('btn-auth-action').innerText = m === 'login' ? 'LOGIN_TO_GRID' : 'REGISTER_NODE';
         }
 
         async function handleAuth() {
-            const user = document.getElementById('auth-user').value.trim().toLowerCase();
-            const pass = document.getElementById('auth-pass').value.trim();
+            const userIn = document.getElementById('auth-user').value.toLowerCase().replace(/\s/g, '');
+            const passIn = document.getElementById('auth-pass').value; // JANGAN DI TRIM BIAR SANDI UNIK TETEP BISA
 
-            if (user.length < 3 || pass.length < 3) return alert("Username/Password minimal 3 karakter");
+            if (!userIn || !passIn) return alert("Lengkapi data!");
 
             document.getElementById('loader').classList.remove('hidden');
-            const ref = db.ref('users/' + user);
+            const ref = db.ref('users/' + userIn);
             const snap = await ref.once('value');
 
             if (mode === 'login') {
-                if (!snap.exists()) {
-                    alert("User tidak ditemukan!");
-                } else {
-                    const data = snap.val();
-                    if (data.status === 'banned') {
-                        alert("Akun diblokir!");
-                    } else if (data.pass !== pass) {
-                        alert("Password salah!");
-                    } else {
-                        loginSukses(data);
-                        return;
-                    }
-                }
-            } else {
                 if (snap.exists()) {
-                    alert("Username sudah terdaftar!");
-                } else {
-                    const newUser = {
-                        user: user,
-                        pass: pass,
-                        status: 'active',
-                        uid: 'Z-' + Math.floor(Math.random() * 999999)
-                    };
+                    const data = snap.val();
+                    if (data.pass === passIn) { // Cek Password Tanpa Trim
+                        me = data;
+                        localStorage.setItem('z_sess', JSON.stringify(data));
+                        location.reload();
+                    } else {
+                        alert("Password salah!");
+                    }
+                } else { alert("User tidak terdaftar!"); }
+            } else {
+                if (snap.exists()) { alert("Username sudah ada!"); }
+                else {
+                    const newUser = { user: userIn, pass: passIn, status: 'active', uid: 'ID-' + Math.floor(Math.random()*9999) };
                     await ref.set(newUser);
-                    loginSukses(newUser);
-                    return;
+                    me = newUser;
+                    localStorage.setItem('z_sess', JSON.stringify(newUser));
+                    location.reload();
                 }
             }
             document.getElementById('loader').classList.add('hidden');
         }
 
-        function loginSukses(data) {
-            me = data;
-            localStorage.setItem('z_sess', JSON.stringify(data));
-            location.reload();
-        }
-
-        // --- APP LOGIC ---
+        // --- APP ENGINE ---
         window.onload = () => {
             const saved = localStorage.getItem('z_sess');
             if (saved) {
@@ -354,24 +285,19 @@
                 db.ref('users/' + session.user).once('value', s => {
                     if (s.exists() && s.val().status !== 'banned') {
                         me = s.val();
-                        initApp();
+                        runApp();
                     } else { exit(); }
                 });
             } else {
-                document.getElementById('loader').classList.add('hidden');
+                setTimeout(() => document.getElementById('loader').classList.add('hidden'), 1000);
             }
         };
 
-        function initApp() {
+        function runApp() {
             document.getElementById('scr-auth').classList.add('hidden');
             document.getElementById('scr-app').classList.remove('hidden');
-            document.getElementById('my-display-name').innerText = me.user.toUpperCase();
-            
-            if (me.user === MASTER.toLowerCase()) {
-                document.getElementById('adm-trigger').classList.remove('hidden');
-            }
+            if (me.user === MASTER.toLowerCase()) document.getElementById('adm-trigger').classList.remove('hidden');
 
-            // List Kontak Real-time
             db.ref('users').on('value', s => {
                 const list = document.getElementById('node-list');
                 list.innerHTML = "";
@@ -381,13 +307,7 @@
                         const div = document.createElement('div');
                         div.className = 'contact-item';
                         div.onclick = () => openChat(u.user);
-                        div.innerHTML = `
-                            <div class="avatar">${u.user[0].toUpperCase()}</div>
-                            <div class="contact-info">
-                                <b>${u.user}</b><br>
-                                <small style="color:#667781">${u.uid}</small>
-                            </div>
-                        `;
+                        div.innerHTML = `<div class="avatar">${u.user[0].toUpperCase()}</div><div><b>${u.user}</b><br><small style="color:#555">Online</small></div>`;
                         list.appendChild(div);
                     }
                 });
@@ -395,72 +315,58 @@
             document.getElementById('loader').classList.add('hidden');
         }
 
-        function openChat(userName) {
-            peer = userName;
+        function openChat(name) {
+            peer = name;
             document.getElementById('chat-blank').classList.add('hidden');
             document.getElementById('chat-window').classList.remove('hidden');
             document.getElementById('chat-area').classList.add('active');
-            document.getElementById('peer-name').innerText = userName;
-            document.getElementById('peer-avatar').innerText = userName[0].toUpperCase();
+            document.getElementById('peer-name').innerText = name;
+            document.getElementById('peer-avatar').innerText = name[0].toUpperCase();
 
-            const roomId = [me.user, userName].sort().join('___');
-            db.ref('chats/' + roomId).on('value', s => {
+            const rid = [me.user, name].sort().join('___');
+            db.ref('chats/' + rid).off();
+            db.ref('chats/' + rid).on('value', s => {
                 const flow = document.getElementById('chat-flow');
                 flow.innerHTML = "";
-                s.forEach(msgSnap => {
-                    const m = msgSnap.val();
-                    const div = document.createElement('div');
-                    div.className = `msg ${m.s === me.user ? 'm-me' : 'm-them'}`;
-                    div.innerText = m.t;
-                    flow.appendChild(div);
+                s.forEach(snap => {
+                    const m = snap.val();
+                    flow.innerHTML += `<div class="msg ${m.s === me.user ? 'm-me' : 'm-them'}">${m.t}</div>`;
                 });
                 flow.scrollTop = flow.scrollHeight;
             });
         }
 
         function sendMsg() {
-            const txt = document.getElementById('msg-in').value.trim();
-            if (!txt || !peer) return;
-
-            const roomId = [me.user, peer].sort().join('___');
-            db.ref('chats/' + roomId).push({
-                s: me.user,
-                t: txt,
-                ts: Date.now()
-            });
+            const t = document.getElementById('msg-in').value;
+            if (!t || !peer) return;
+            const rid = [me.user, peer].sort().join('___');
+            db.ref('chats/' + rid).push({ s: me.user, t: t, ts: Date.now() });
             document.getElementById('msg-in').value = "";
         }
 
-        // --- UTILS ---
         function toggleMenu() { document.getElementById('side-panel').classList.toggle('open'); }
         function closeChat() { document.getElementById('chat-area').classList.remove('active'); }
         function exit() { localStorage.clear(); location.reload(); }
-
+        
         // --- ADMIN ---
         function openAdm() {
             document.getElementById('scr-adm').classList.remove('hidden');
             db.ref('users').on('value', s => {
                 const list = document.getElementById('adm-list');
                 list.innerHTML = "";
-                s.forEach(uSnap => {
-                    const u = uSnap.val();
-                    const isB = u.status === 'banned';
-                    list.innerHTML += `
-                        <div class="adm-card" style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
-                            <span><b>${u.user}</b> (${u.pass})</span>
-                            <div>
-                                <button onclick="ban('${u.user}', '${isB?'active':'banned'}')" style="padding:5px;">${isB?'Unban':'Ban'}</button>
-                                <button onclick="delUser('${u.user}')" style="padding:5px; background:red; color:white;">Del</button>
-                            </div>
-                        </div>`;
+                s.forEach(u => {
+                    const usr = u.val();
+                    list.innerHTML += `<div style="padding:10px; border-bottom:1px solid #222; display:flex; justify-content:space-between;">
+                        <span>${usr.user} (${usr.pass})</span>
+                        <button onclick="ban('${usr.user}')" style="color:red; background:none; border:none; cursor:pointer;">BAN</button>
+                    </div>`;
                 });
             });
         }
-        async function ban(user, st) { if(user !== MASTER.toLowerCase()) await db.ref('users/'+user+'/status').set(st); }
-        async function delUser(user) { if(user !== MASTER.toLowerCase() && confirm("Hapus permanen?")) await db.ref('users/'+user).remove(); }
-        function closeAdm() { document.getElementById('scr-adm').classList.add('hidden'); db.ref('users').off(); }
+        async function ban(n) { if(n !== MASTER.toLowerCase()) await db.ref('users/'+n+'/status').set('banned'); }
+        function closeAdm() { document.getElementById('scr-adm').classList.add('hidden'); }
 
-        // Enter Listener
+        // Enter Key
         document.getElementById('msg-in').addEventListener("keypress", e => { if(e.key === "Enter") sendMsg(); });
     </script>
 </body>
