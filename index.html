@@ -2,563 +2,347 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZChat Premium | Encrypted</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZChat - v1.0</title>
     <style>
-        /* =========================================
-           1. CORE ATOMIC DESIGN
-           ========================================= */
+        /* === CSS GLOBAL & TEMA === */
         :root {
-            --p-blue: #007bff;
-            --p-black: #000000;
-            --s-gray: #0d1117;
-            --t-gray: #161b22;
-            --border: #30363d;
-            --text-dim: #8b949e;
-            --text-main: #c9d1d9;
-            --white: #ffffff;
-            --danger: #f85149;
-            --success: #3fb950;
-            --warning: #d29922;
-            --shadow: 0 8px 24px rgba(0,0,0,0.5);
+            /* Default Dark Theme */
+            --bg-color: #0d1117;
+            --text-color: #ffffff;
+            --capsule-bg: rgba(255, 255, 255, 0.1);
+            --primary-blue: #007aff;
+            --glow-blue: rgba(0, 122, 255, 0.5);
+            --chat-bubble-me: #007aff;
+            --chat-bubble-other: #2c2c2e;
+            --panel-bg: rgba(13, 17, 23, 0.85);
         }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
+        .theme-white {
+            --bg-color: #f2f2f7;
+            --text-color: #000000;
+            --capsule-bg: rgba(0, 0, 0, 0.05);
+            --primary-blue: #007aff;
+            --glow-blue: rgba(0, 122, 255, 0.3);
+            --chat-bubble-me: #007aff;
+            --chat-bubble-other: #e5e5ea;
+            --panel-bg: rgba(255, 255, 255, 0.85);
         }
 
-        body, html {
-            background-color: var(--p-black);
-            color: var(--text-main);
-            height: 100vh; width: 100vw;
+        body {
+            margin: 0; padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             overflow: hidden;
-        }
-
-        /* =========================================
-           2. ANIMATION SYSTEM
-           ========================================= */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-        /* =========================================
-           3. UI COMPONENTS (MODAL & TOAST)
-           ========================================= */
-        #z-toast {
-            position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);
-            background: var(--p-blue); color: white; padding: 15px 30px;
-            border-radius: 50px; font-weight: bold; z-index: 1000000;
-            transition: 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            box-shadow: var(--shadow);
-        }
-
-        .z-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(12px); display: none;
-            justify-content: center; align-items: center; z-index: 99999;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .z-modal {
-            background: var(--s-gray); width: 90%; max-width: 380px;
-            padding: 35px; border-radius: 25px; border: 1px solid var(--border);
-            box-shadow: var(--shadow); animation: scaleIn 0.3s ease;
-        }
-
-        .z-modal h2 { color: var(--p-blue); margin-bottom: 10px; font-style: italic; font-size: 24px; }
-        .z-modal p { font-size: 14px; color: var(--text-dim); margin-bottom: 25px; }
-        
-        .z-modal input {
-            width: 100%; padding: 15px; background: var(--p-black);
-            border: 1px solid var(--border); border-radius: 12px;
-            color: white; margin-bottom: 20px; outline: none;
-        }
-
-        .z-modal-footer { display: flex; gap: 10px; }
-        .z-btn { flex: 1; padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; transition: 0.2s; }
-        .z-btn-ok { background: var(--p-blue); color: white; }
-        .z-btn-no { background: var(--t-gray); color: var(--text-main); }
-
-        /* =========================================
-           4. AUTHENTICATION (CLEAN STYLE)
-           ========================================= */
-        #auth-container {
-            height: 100vh; display: flex; justify-content: center; align-items: center;
-            padding: 20px; background: radial-gradient(circle at center, #0d1117 0%, #000 100%);
-        }
-
-        .auth-card {
-            width: 100%; max-width: 340px; text-align: center;
-            animation: slideUp 0.6s ease;
-        }
-
-        .auth-logo {
-            font-size: 60px; font-weight: 900; color: var(--p-blue);
-            font-style: italic; letter-spacing: -3px; margin-bottom: 50px;
-            text-shadow: 0 0 20px rgba(0, 123, 255, 0.4);
-        }
-
-        .auth-field { margin-bottom: 15px; }
-        .auth-field input {
-            width: 100%; padding: 18px; background: var(--s-gray);
-            border: 1px solid var(--border); border-radius: 16px;
-            color: white; outline: none; font-size: 15px;
-        }
-        .auth-field input:focus { border-color: var(--p-blue); }
-
-        .btn-auth {
-            width: 100%; padding: 18px; background: var(--p-blue);
-            color: white; border: none; border-radius: 16px;
-            font-weight: 900; cursor: pointer; margin-top: 10px;
-        }
-
-        /* =========================================
-           5. MAIN INTERFACE (SIDEBAR & CHAT)
-           ========================================= */
-        #main-app {
-            display: none; height: 100vh; width: 100vw;
-            grid-template-columns: 350px 1fr;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            background: var(--s-gray); border-right: 1px solid var(--border);
-            display: flex; flex-direction: column;
-        }
-
-        .sidebar-header {
-            padding: 25px; border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between;
-        }
-
-        .profile-section { display: flex; align-items: center; gap: 12px; }
-        .my-avatar {
-            width: 45px; height: 45px; border-radius: 50%;
-            background: var(--t-gray); border: 2px solid var(--p-blue);
             display: flex; justify-content: center; align-items: center;
-            font-weight: bold; color: var(--p-blue); overflow: hidden;
+            height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        .contact-list { flex: 1; overflow-y: auto; padding: 10px; }
-        .user-item {
-            display: flex; align-items: center; padding: 15px;
-            border-radius: 18px; cursor: pointer; margin-bottom: 8px;
-            transition: 0.2s; border: 1px solid transparent;
+        /* Background Grid Animasi */
+        .bg-grid-blue {
+            position: absolute; width: 200%; height: 200%;
+            background-image: 
+                linear-gradient(var(--glow-blue) 1px, transparent 1px),
+                linear-gradient(90deg, var(--glow-blue) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: moveGrid 10s linear infinite;
+            z-index: -1; opacity: 0.3;
         }
-        .user-item:hover { background: var(--t-gray); border-color: var(--border); }
-        .user-item.active { background: rgba(0, 123, 255, 0.1); border-color: var(--p-blue); }
+        @keyframes moveGrid { 0% { transform: translate(0, 0); } 100% { transform: translate(-40px, -40px); } }
 
-        .u-info { margin-left: 15px; }
-        .u-info h4 { font-size: 15px; color: var(--white); }
-        .u-info p { font-size: 11px; color: var(--text-dim); }
+        .hidden { display: none !important; }
 
-        /* Chat Window */
-        .chat-container { display: flex; flex-direction: column; height: 100%; background: var(--p-black); }
-        .chat-nav {
-            height: 80px; padding: 0 30px; background: var(--s-gray);
-            border-bottom: 1px solid var(--border); display: flex;
-            align-items: center; justify-content: space-between;
-        }
-
-        .chat-feed {
-            flex: 1; overflow-y: auto; padding: 30px;
-            display: flex; flex-direction: column; gap: 12px;
+        /* UI Kapsul */
+        .capsule-container, .panel-container {
+            background: var(--panel-bg);
+            backdrop-filter: blur(15px);
+            padding: 30px; border-radius: 30px;
+            width: 90%; max-width: 450px; text-align: center;
+            box-shadow: 0 0 20px var(--glow-blue);
         }
 
+        .input-capsule, .btn-capsule {
+            width: 100%; padding: 15px; margin: 10px 0;
+            border-radius: 50px; border: none; outline: none;
+            font-size: 16px; box-sizing: border-box;
+            font-family: inherit;
+        }
+        .input-capsule { background: var(--capsule-bg); color: var(--text-color); }
+        .btn-capsule { background: var(--primary-blue); color: white; cursor: pointer; font-weight: bold; transition: transform 0.2s; }
+        .btn-capsule:active { transform: scale(0.95); }
+        .btn-capsule.danger { background: #ff3b30; }
+        .btn-capsule.warning { background: #ff9500; }
+        .btn-capsule.success { background: #34c759; }
+
+        /* Full Screen UI */
+        .full-screen { 
+            width: 100%; height: 100%; position: absolute; top: 0; left: 0; 
+            display: flex; flex-direction: column; 
+            background: var(--bg-color);
+        }
+
+        /* Header & Jam */
+        .header {
+            background: var(--panel-bg); padding: 15px 20px;
+            border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            backdrop-filter: blur(10px); z-index: 10;
+        }
+        .user-info p { margin: 0; font-weight: bold; font-size: 14px; }
+        .role-badge { font-size: 10px; background: var(--primary-blue); padding: 3px 8px; border-radius: 10px; color: white;}
+        #digital-clock { font-size: 20px; font-weight: bold; margin-bottom: 2px;}
+        #date-display { font-size: 11px; color: gray; }
+
+        /* Tab Menu Bawah */
+        .bottom-nav {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--panel-bg); backdrop-filter: blur(10px);
+            display: flex; gap: 10px; padding: 10px 20px; border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 85%; max-width: 400px;
+            justify-content: space-around;
+        }
+        .nav-item {
+            color: var(--text-color); cursor: pointer; font-size: 14px; font-weight: 500;
+            padding: 10px 15px; border-radius: 30px; transition: 0.3s;
+        }
+        .nav-item.active { background: var(--primary-blue); color: white; }
+
+        /* Area Konten */
+        .content-area { flex-grow: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
+
+        /* Chat Buble iPhone Style */
+        .chat-container { display: flex; flex-direction: column; gap: 10px; }
         .bubble {
-            max-width: 65%; padding: 14px 20px; border-radius: 20px;
-            font-size: 14.5px; line-height: 1.5; position: relative;
+            max-width: 70%; padding: 12px 16px; border-radius: 20px; font-size: 15px;
+            line-height: 1.4; position: relative;
         }
-        .b-me { align-self: flex-end; background: var(--p-blue); color: white; border-bottom-right-radius: 4px; }
-        .b-them { align-self: flex-start; background: var(--t-gray); color: var(--white); border-bottom-left-radius: 4px; border: 1px solid var(--border); }
-
-        .chat-input-bar {
-            padding: 25px 35px; background: var(--s-gray);
-            border-top: 1px solid var(--border); display: flex; gap: 15px;
-        }
-        .input-box {
-            flex: 1; background: var(--p-black); border-radius: 50px;
-            padding: 12px 25px; border: 1px solid var(--border);
-        }
-        .input-box input { width: 100%; background: transparent; border: none; color: white; outline: none; }
+        .bubble.me { background: var(--chat-bubble-me); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .bubble.other { background: var(--chat-bubble-other); color: var(--text-color); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .bubble-time { font-size: 10px; opacity: 0.7; margin-top: 5px; text-align: right; display: block; }
         
-        .btn-send {
-            width: 48px; height: 48px; background: var(--p-blue);
-            border: none; border-radius: 50%; cursor: pointer;
-            display: flex; justify-content: center; align-items: center; color: white;
+        /* List Item (Kontak / Admin User List) */
+        .list-item {
+            background: var(--capsule-bg); padding: 15px; border-radius: 20px;
+            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
         }
 
-        /* =========================================
-           6. MODERN ADMIN GRID
-           ========================================= */
-        #admin-panel {
-            position: fixed; inset: 0; background: var(--p-black);
-            z-index: 100000; display: none; padding: 40px; overflow-y: auto;
+        /* Notifikasi Toast */
+        #toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 15px 30px;
+            border-radius: 50px; z-index: 9999; font-weight: bold; transition: 0.3s;
         }
 
-        .adm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-        .adm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        
-        .adm-card {
-            background: var(--s-gray); padding: 25px; border-radius: 25px;
-            border: 1px solid var(--border); transition: 0.3s;
-        }
-        .adm-card:hover { border-color: var(--p-blue); transform: translateY(-5px); }
-        .adm-card h3 { color: var(--p-blue); margin-bottom: 5px; font-style: italic; }
-        .adm-card p { font-size: 12px; color: var(--text-dim); margin-bottom: 20px; }
-        
-        .adm-btn-group { display: flex; gap: 10px; }
-        .adm-btn { flex: 1; padding: 10px; border-radius: 12px; border: none; font-size: 11px; font-weight: bold; cursor: pointer; color: white; }
-
-        /* =========================================
-           7. DRAWER MENU
-           ========================================= */
-        #drawer {
-            position: fixed; top: 0; right: -350px; width: 320px; height: 100%;
-            background: var(--s-gray); border-left: 1px solid var(--p-blue);
-            z-index: 90000; transition: 0.5s cubic-bezier(0.77, 0, 0.175, 1);
-            padding: 50px 30px;
-        }
-        .drawer-item {
-            padding: 18px; border-radius: 15px; background: var(--t-gray);
-            margin-bottom: 12px; cursor: pointer; display: flex; align-items: center; gap: 15px;
-        }
-        .drawer-item:hover { color: var(--p-blue); }
-
-        /* MOBILE FIX */
-        @media (max-width: 768px) {
-            #main-app { grid-template-columns: 1fr; }
-            .sidebar { width: 100%; }
-            .chat-container { position: fixed; inset: 0; z-index: 50; display: none; }
-        }
     </style>
 </head>
-<body>
+<body class="theme-dark" id="body-theme">
+    
+    <div class="bg-grid-blue"></div>
 
-    <div id="z-toast">ZChat Status</div>
+    <div id="toast" class="hidden">Notifikasi di sini</div>
 
-    <div id="z-ov" class="z-overlay">
-        <div class="z-modal">
-            <h2 id="mz-title">ZChat</h2>
-            <p id="mz-desc"></p>
-            <div id="mz-in-wrap" style="display:none">
-                <input type="text" id="mz-input" placeholder="Ketik di sini...">
-            </div>
-            <div class="z-modal-footer">
-                <button class="z-btn z-btn-no" onclick="closeZModal()">BATAL</button>
-                <button class="z-btn z-btn-ok" id="mz-confirm">OKE</button>
-            </div>
+    <div id="auth-screen" class="capsule-container">
+        <h1 style="color: var(--primary-blue); margin-bottom: 5px;">ZChat</h1>
+        <p style="margin-top: 0; font-size: 14px; color: gray;">End-to-End Encrypted</p>
+        
+        <div id="login-form">
+            <input type="text" id="login-username" placeholder="Username" class="input-capsule">
+            <input type="password" id="login-password" placeholder="Password" class="input-capsule">
+            <button onclick="login()" class="btn-capsule">LOGIN</button>
+            <p style="color: var(--primary-blue); cursor: pointer; font-size: 14px;" onclick="toggleAuth()">Belum punya akun? Ayo daftar</p>
+        </div>
+
+        <div id="register-form" class="hidden">
+            <input type="text" id="reg-username" placeholder="Buat Username" class="input-capsule">
+            <input type="password" id="reg-password" placeholder="Buat Password" class="input-capsule">
+            <button onclick="register()" class="btn-capsule">DAFTAR</button>
+            <p style="color: var(--primary-blue); cursor: pointer; font-size: 14px;" onclick="toggleAuth()">Sudah punya akun? Login</p>
         </div>
     </div>
 
-    <div id="auth-container">
-        <div class="auth-card" id="login-box">
-            <div class="auth-logo">ZChat</div>
-            <div class="auth-field"><input type="text" id="l-u" placeholder="Username"></div>
-            <div class="auth-field"><input type="password" id="l-p" placeholder="Password"></div>
-            <button class="btn-auth" onclick="handleLogin()">LOGIN</button>
-            <p style="margin-top:30px; font-size:13px; color:var(--text-dim)">Baru? <span style="color:var(--p-blue); cursor:pointer" onclick="toggleA('r')">Buat Akun</span></p>
+    <div id="main-menu" class="hidden full-screen">
+        <div class="header">
+            <div class="user-info">
+                <p>USERNAME: <span id="display-usn">User123</span></p>
+                <span class="role-badge" id="display-role">USER</span>
+            </div>
+            <div style="text-align: right;">
+                <div id="digital-clock">00:00:00</div>
+                <div id="date-display">Hari, Tanggal</div>
+            </div>
         </div>
-        <div class="auth-card" id="reg-box" style="display:none">
-            <div class="auth-logo">ZChat</div>
-            <div class="auth-field"><input type="text" id="r-u" placeholder="Username Baru"></div>
-            <div class="auth-field"><input type="password" id="r-p" placeholder="Password (Min. 6)"></div>
-            <button class="btn-auth" onclick="handleReg()">DAFTAR</button>
-            <p style="margin-top:30px; font-size:13px; color:var(--text-dim)">Sudah ada akun? <span style="color:var(--p-blue); cursor:pointer" onclick="toggleA('l')">Login</span></p>
-        </div>
-    </div>
 
-    <div id="main-app">
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <div class="profile-section">
-                    <div class="my-avatar" id="my-ava">Z</div>
-                    <div id="my-name-display" style="font-weight:bold; font-size:14px">User</div>
+        <div class="content-area">
+            
+            <div id="tab-chat" class="tab-content chat-container">
+                <div style="text-align: center; margin-bottom: 20px; font-size: 12px; color: gray;">
+                    🔒 Pesan dienkripsi secara end-to-end.
                 </div>
-                <div onclick="toggleDrawer(true)" style="cursor:pointer">
-                    <svg width="26" height="26" fill="var(--p-blue)" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+                <div class="bubble other">
+                    Halo bro! Udah nyoba fitur baru ZChat?
+                    <span class="bubble-time">10:45 AM</span>
+                </div>
+                <div class="bubble me">
+                    Udah dong, UI-nya keren parah kayak iPhone asli 🚀
+                    <span class="bubble-time">10:46 AM <span style="color: #34c759;">✓✓</span></span>
                 </div>
             </div>
-            <div class="contact-list" id="user-list-ui"></div>
-        </div>
 
-        <div class="chat-container" id="chat-mob-view">
-            <div class="chat-nav">
-                <div style="display:flex; align-items:center; gap:15px">
-                    <div id="back-btn" onclick="closeChatMob()" style="display:none; cursor:pointer">
-                        <svg width="24" fill="var(--p-blue)" viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+            <div id="tab-kontak" class="tab-content hidden">
+                <h3>Tambah Teman</h3>
+                <div style="display:flex; gap: 10px;">
+                    <input type="text" placeholder="Username teman..." class="input-capsule">
+                    <button class="btn-capsule" style="width: 80px;">ADD</button>
+                </div>
+                <h3>Request Teman Masuk</h3>
+                <div class="list-item">
+                    <span><strong>Zerr4F</strong> ingin menambahkanmu</span>
+                    <div style="display:flex; gap: 5px;">
+                        <button class="btn-capsule success" style="padding: 5px 10px; margin:0;">Setuju</button>
+                        <button class="btn-capsule danger" style="padding: 5px 10px; margin:0;">Tolak</button>
                     </div>
-                    <div>
-                        <h4 id="target-title">Pilih Teman</h4>
-                        <div style="display:flex; align-items:center; gap:5px">
-                            <div style="width:6px; height:6px; background:var(--success); border-radius:50%"></div>
-                            <span style="font-size:10px; color:var(--success)">ACTIVE</span>
-                        </div>
-                    </div>
                 </div>
             </div>
-            <div class="chat-feed" id="chat-stream">
-                <div style="text-align:center; margin-top:50px; opacity:0.3">
-                    <div class="auth-logo" style="font-size:30px">ZChat</div>
-                    <p>Mulai obrolan pribadi sekarang</p>
+
+            <div id="tab-setting" class="tab-content hidden">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="width: 80px; height: 80px; background: var(--capsule-bg); border-radius: 50%; margin: 0 auto; line-height: 80px;">Foto</div>
+                    <button class="btn-capsule" style="width: auto; padding: 5px 15px; font-size: 12px; margin-top: 10px;">Upload Image</button>
                 </div>
+                
+                <h3>Pengaturan Aplikasi</h3>
+                <div class="list-item">
+                    <span>Tema Aplikasi</span>
+                    <button onclick="toggleTheme()" class="btn-capsule" style="width: auto; padding: 8px 15px; margin:0;">Ganti Tema</button>
+                </div>
+                <div class="list-item">
+                    <span>Laporkan User</span>
+                    <button class="btn-capsule warning" style="width: auto; padding: 8px 15px; margin:0;">Lapor</button>
+                </div>
+
+                <div style="margin-top: 30px; text-align: center; border-top: 1px solid var(--capsule-bg); padding-top: 20px;">
+                    <h3 style="margin-bottom: 5px;">Menu Developer</h3>
+                    <p style="margin: 0; color: gray; font-size: 14px;">ZChat</p>
+                    <p style="margin: 5px 0; color: gray; font-size: 14px;">Version : 1.0</p>
+                    <p style="margin: 5px 0; color: gray; font-size: 14px;">Developer : Zero, Zerr4F</p>
+                    <p style="margin: 5px 0; color: gray; font-size: 14px;">Social Media : COMING SOON</p>
+                </div>
+                <button onclick="logout()" class="btn-capsule danger" style="margin-top: 20px;">LOGOUT</button>
             </div>
-            <div class="chat-input-bar">
-                <div class="input-box"><input type="text" id="msg-input" placeholder="Tulis pesan rahasia..."></div>
-                <button class="btn-send" onclick="sendMsg()">➤</button>
-            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="switchTab('chat', this)">💬 Chat</div>
+            <div class="nav-item" onclick="switchTab('kontak', this)">👥 Kontak</div>
+            <div class="nav-item" onclick="switchTab('setting', this)">⚙️ Setting</div>
         </div>
     </div>
 
-    <div id="drawer">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:50px">
-            <h2 style="color:var(--p-blue)">MENU</h2>
-            <span onclick="toggleDrawer(false)" style="cursor:pointer; font-size:24px">✕</span>
+    <div id="admin-panel" class="hidden full-screen">
+        <div class="header" style="background: #3a0000;">
+            <div class="user-info">
+                <p>SUPER ADMIN</p>
+                <span class="role-badge" style="background: #ff3b30;">DevzZerr44F</span>
+            </div>
+            <button onclick="logout()" class="btn-capsule" style="width: auto; padding: 5px 15px; margin: 0; background: transparent; border: 1px solid white;">Exit</button>
         </div>
-        <div class="drawer-item" onclick="actionFriend()">Cari Teman</div>
-        <div class="drawer-item" onclick="actionPass()">Ganti Password</div>
-        <div class="drawer-item" id="adm-trigger" style="display:none; background:linear-gradient(90deg, #007bff, #00d4ff); color:white; font-weight:bold" onclick="openAdmin()">ADMIN PANEL</div>
-        <div class="drawer-item" style="margin-top:50px; color:var(--danger)" onclick="confirmLogout()">LOGOUT</div>
-    </div>
 
-    <div id="admin-panel">
-        <div class="adm-header">
-            <h1 style="color:var(--p-blue)">ZChat Controller</h1>
-            <button class="z-btn z-btn-ok" style="width:auto; padding:10px 30px" onclick="closeAdmin()">BACK</button>
+        <div class="content-area">
+            <h2 style="color: #ff3b30;">Control Panel</h2>
+            <p style="font-size: 12px; color: gray;">Mute, Ban, Blacklist, Hapus Akun</p>
+            
+            <div class="list-item" style="border-left: 5px solid #ff3b30;">
+                <div>
+                    <strong>User123</strong><br>
+                    <span style="font-size: 12px; color: gray;">IP: 192.168.1.100</span>
+                </div>
+                <div style="display:flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; width: 60%;">
+                    <button class="btn-capsule warning" onclick="showToast('User123 di Mute!')" style="padding: 5px 10px; margin:0; font-size: 12px; width: auto;">Mute</button>
+                    <button class="btn-capsule danger" onclick="showToast('User123 di Banned!')" style="padding: 5px 10px; margin:0; font-size: 12px; width: auto;">Ban</button>
+                    <button class="btn-capsule" style="background: #8e8e93; padding: 5px 10px; margin:0; font-size: 12px; width: auto;">Hapus</button>
+                    <button class="btn-capsule success" onclick="showToast('User123 Unbanned!')" style="padding: 5px 10px; margin:0; font-size: 12px; width: auto;">Unban/Unmute</button>
+                </div>
+            </div>
         </div>
-        <div class="adm-grid" id="adm-grid-ui"></div>
     </div>
 
     <script>
-        // =========================================
-        // 8. FIREBASE & CORE LOGIC
-        // =========================================
-        const config = {
-            apiKey: "AIzaSyD-1wEkNvg1pGy-klwSRcNbsAQRZYvJevM",
-            authDomain: "zchat-56639.firebaseapp.com",
-            databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "zchat-56639",
-            storageBucket: "zchat-56639.firebasestorage.app",
-            messagingSenderId: "773931983053",
-            appId: "1:773931983053:web:a1c825be9a972e53dcc984",
-            measurementId: "G-ZDMK1DWV6S"
-        };
-        firebase.initializeApp(config);
-        const db = firebase.database();
-        let myAuth = null, activeChat = null;
+        // Real-time Clock Logic
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('digital-clock').innerText = now.toLocaleTimeString('id-ID');
+            document.getElementById('date-display').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            setTimeout(updateClock, 1000);
+        }
+        updateClock();
 
-        // --- UTILS (ANTI-UNDEFINED) ---
-        function clean(val, fallback = "") {
-            if (val === undefined || val === null) return fallback;
-            return val;
+        // UI Toggle Login/Register
+        function toggleAuth() {
+            document.getElementById('login-form').classList.toggle('hidden');
+            document.getElementById('register-form').classList.toggle('hidden');
         }
 
-        function toast(m) {
-            const t = document.getElementById('z-toast');
-            t.innerText = m; t.style.bottom = '40px';
-            setTimeout(() => t.style.bottom = '-100px', 3000);
-        }
+        // Dummy Login Logic (Integrasikan dengan Firebase dari kode sebelumnya)
+        function login() {
+            const usn = document.getElementById('login-username').value;
+            if (!usn) { showToast("Masukkan Username!"); return; }
 
-        function openZModal(title, desc, isInput, onConfirm) {
-            document.getElementById('mz-title').innerText = title;
-            document.getElementById('mz-desc').innerText = desc;
-            document.getElementById('mz-in-wrap').style.display = isInput ? 'block' : 'none';
-            document.getElementById('z-ov').style.display = 'flex';
-            document.getElementById('mz-confirm').onclick = () => {
-                const val = document.getElementById('mz-input').value;
-                onConfirm(val); closeZModal();
-            };
-        }
-
-        function closeZModal() {
-            document.getElementById('z-ov').style.display = 'none';
-            document.getElementById('mz-input').value = "";
-        }
-
-        function toggleA(v) {
-            document.getElementById('login-box').style.display = v === 'l' ? 'block' : 'none';
-            document.getElementById('reg-box').style.display = v === 'r' ? 'block' : 'none';
-        }
-
-        function toggleDrawer(s) {
-            document.getElementById('drawer').style.right = s ? '0' : '-350px';
-        }
-
-        // --- AUTH ENGINE ---
-        async function handleReg() {
-            const u = document.getElementById('r-u').value.trim(), p = document.getElementById('r-p').value;
-            if(u.length < 3 || p.length < 6) return toast("Data minimal 3-6 karakter!");
-            const s = await db.ref('users/'+u).once('value');
-            if(s.exists()) return toast("Username sudah ada!");
-            await db.ref('users/'+u).set({
-                username: u, password: p, 
-                banned: false, crash: false, 
-                bio: "Available on ZChat"
-            });
-            toast("Berhasil Daftar!"); toggleA('l');
-        }
-
-        async function handleLogin() {
-            const u = document.getElementById('l-u').value.trim(), p = document.getElementById('l-p').value;
-            if(!u || !p) return toast("Isi semua bidang!");
-            const s = await db.ref('users/'+u).once('value');
-            if(!s.exists() || s.val().password !== p) return toast("Salah ID/Password!");
-            if(s.val().banned) return toast("AKUN DIBANNED!");
-            myAuth = s.val();
-            localStorage.setItem('z_sess_v4', JSON.stringify(myAuth));
-            bootApp();
-        }
-
-        // --- MAIN APP ENGINE ---
-        function bootApp() {
-            if(!myAuth) return;
-            document.getElementById('auth-container').style.display = 'none';
-            document.getElementById('main-app').style.display = 'grid';
+            document.getElementById('auth-screen').classList.add('hidden');
             
-            // Sidebar Profile Init
-            const name = clean(myAuth.username, "User");
-            document.getElementById('my-name-display').innerText = name;
-            document.getElementById('my-ava').innerText = name.charAt(0).toUpperCase();
+            if (usn === "DevzZerr44F") {
+                // Admin Flow
+                document.getElementById('admin-panel').classList.remove('hidden');
+                showToast("Welcome Admin DevzZerr44F", true);
+            } else {
+                // User Flow
+                document.getElementById('main-menu').classList.remove('hidden');
+                document.getElementById('display-usn').innerText = usn;
+                showToast("Login Berhasil!");
+            }
+        }
+
+        function logout() {
+            location.reload(); // Refresh untuk kembali ke menu awal
+        }
+
+        // Tab Navigation Menu Utama
+        function switchTab(tabName, element) {
+            // Hilangkan active dari semua tombol nav
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            // Sembunyikan semua tab konten
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             
-            if(name === "DevzZerr44F") document.getElementById('adm-trigger').style.display = 'block';
-
-            // Realtime Security
-            db.ref('users/'+name).on('value', s => {
-                const d = s.val();
-                if(!d) return;
-                if(d.banned) { localStorage.removeItem('z_sess_v4'); location.reload(); }
-                if(d.crash) { 
-                    db.ref('users/'+name).update({crash: false}); 
-                    document.body.innerHTML = "<div style='background:red; color:white; padding:50px; height:100vh'><h1>FATAL_ERROR_CRASH</h1></div>";
-                    while(true); 
-                }
-            });
-
-            // Contact List (Zero Undefined)
-            db.ref('users').on('value', snap => {
-                const list = document.getElementById('user-list-ui');
-                list.innerHTML = "";
-                snap.forEach(child => {
-                    const u = child.val();
-                    const uName = clean(u.username, "Unknown");
-                    if(uName !== name) {
-                        const div = document.createElement('div');
-                        div.className = 'user-item';
-                        div.onclick = () => loadChat(uName);
-                        div.innerHTML = `
-                            <div class="my-avatar" style="border-color:#333; color:#555">${uName.charAt(0).toUpperCase()}</div>
-                            <div class="u-info">
-                                <h4>${uName}</h4>
-                                <p>${clean(u.bio, "Hey there!")}</p>
-                            </div>
-                        `;
-                        list.appendChild(div);
-                    }
-                });
-            });
+            // Munculkan yang dipilih
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
         }
 
-        function loadChat(targetName) {
-            activeChat = targetName;
-            document.getElementById('target-title').innerText = targetName;
-            if(window.innerWidth <= 768) {
-                document.getElementById('chat-mob-view').style.display = 'flex';
-                document.getElementById('back-btn').style.display = 'block';
+        // Toggle Tema Gelap/Terang
+        function toggleTheme() {
+            const body = document.getElementById('body-theme');
+            if(body.classList.contains('theme-dark')) {
+                body.classList.remove('theme-dark');
+                body.classList.add('theme-white');
+                showToast("Tema diubah ke White");
+            } else {
+                body.classList.remove('theme-white');
+                body.classList.add('theme-dark');
+                showToast("Tema diubah ke Dark");
             }
-            const chatID = [myAuth.username, targetName].sort().join("_");
-            db.ref('chats/'+chatID).on('value', snap => {
-                const stream = document.getElementById('chat-stream');
-                stream.innerHTML = "";
-                snap.forEach(msg => {
-                    const d = msg.val();
-                    const sender = clean(d.sender);
-                    const text = clean(d.text, "...");
-                    stream.innerHTML += `<div class="bubble ${sender === myAuth.username ? 'b-me' : 'b-them'}">${text}</div>`;
-                });
-                stream.scrollTop = stream.scrollHeight;
-            });
         }
 
-        function closeChatMob() {
-            document.getElementById('chat-mob-view').style.display = 'none';
+        // Toast Notification System
+        function showToast(message, isAdmin = false) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.style.background = isAdmin ? "#ff3b30" : "var(--primary-blue)";
+            toast.classList.remove('hidden');
+            setTimeout(() => { toast.classList.add('hidden'); }, 3000);
         }
-
-        function sendMsg() {
-            const inp = document.getElementById('msg-input');
-            if(!inp.value || !activeChat) return;
-            const chatID = [myAuth.username, activeChat].sort().join("_");
-            db.ref('chats/'+chatID).push({
-                sender: myAuth.username,
-                text: inp.value,
-                time: Date.now()
-            });
-            inp.value = "";
-        }
-
-        // --- ADMIN MODULAR ENGINE ---
-        function openAdmin() {
-            document.getElementById('admin-panel').style.display = 'block';
-            db.ref('users').on('value', snap => {
-                const grid = document.getElementById('adm-grid-ui');
-                grid.innerHTML = "";
-                snap.forEach(child => {
-                    const u = child.val();
-                    const user = clean(u.username, "NULL");
-                    const pass = clean(u.password, "HIDDEN");
-                    const banStat = u.banned === true;
-                    
-                    grid.innerHTML += `
-                        <div class="adm-card">
-                            <h3>${user}</h3>
-                            <p>Password: ${pass}</p>
-                            <div style="margin-bottom:15px">
-                                <span style="font-size:10px; padding:4px 8px; border-radius:5px; background:${banStat?'var(--danger)':'var(--success)'}; color:white">
-                                    ${banStat?'BANNED':'ACTIVE'}
-                                </span>
-                            </div>
-                            <div class="adm-btn-group">
-                                <button class="adm-btn" style="background:var(--danger)" onclick="admExec('${user}','ban')">BAN</button>
-                                <button class="adm-btn" style="background:var(--success)" onclick="admExec('${user}','unban')">UNBAN</button>
-                                <button class="adm-btn" style="background:var(--warning)" onclick="admExec('${user}','crash')">CRASH</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            });
-        }
-
-        function admExec(t, act) {
-            openZModal("Admin Action", `Yakin lakukan ${act.toUpperCase()} pada ${t}?`, false, () => {
-                const ref = db.ref('users/'+t);
-                if(act === 'ban') ref.update({banned: true});
-                if(act === 'unban') ref.update({banned: false});
-                if(act === 'crash') ref.update({crash: true});
-                toast("Command Sent!");
-            });
-        }
-
-        function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
-        function actionFriend() { openZModal("Cari Teman", "Masukkan Username:", true, (v) => toast("Mencari " + clean(v))); }
-        function actionPass() { openZModal("Keamanan", "Password Baru:", true, (v) => { if(v.length >= 6) { db.ref('users/'+myAuth.username).update({password: v}); toast("Selesai!"); } }); }
-        function confirmLogout() { openZModal("Logout", "Keluar dari sesi ini?", false, () => { localStorage.removeItem('z_sess_v4'); location.reload(); }); }
-
-        // --- INITIALIZER ---
-        window.onload = () => {
-            const saved = localStorage.getItem('z_sess_v4');
-            if(saved) {
-                myAuth = JSON.parse(saved);
-                bootApp();
-            }
-        };
-
-        document.getElementById('msg-input').onkeyup = (e) => { if(e.key === 'Enter') sendMsg(); };
     </script>
 </body>
-</html>
+                </html>
+                        
