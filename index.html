@@ -3,401 +3,384 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZChat Quantum v16</title>
+    <title>ZChat</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
+
     <div id="loader">
-        <div class="loader-content">
-            <div class="spin"></div>
-            <div class="load-text">ESTABLISHING_SECURE_GRID...</div>
-            <div class="load-bar"><div class="load-progress"></div></div>
-        </div>
+        <div class="loader-spinner"></div>
     </div>
 
-    <div id="scr-start">
-        <div class="auth-container">
-            <div class="glitch-box">
-                <h1 class="logo">Z.</h1>
-                <div class="glitch-line"></div>
+    <div id="scr-start" class="screen">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="app-icon">Z</div>
+                <h1>Welcome to ZChat</h1>
+                <p>Simple. Secure. Reliable.</p>
             </div>
-            <div class="auth-form">
-                <p class="form-label">IDENTITY_REGISTRATION</p>
-                <input type="text" id="nick-in" class="os-input" placeholder="Enter_Unique_UID..." autocomplete="off" spellcheck="false">
-                <div class="auth-info">No password required. Identity is auto-mapped to your local storage.</div>
-                <button onclick="joinGrid()" class="btn-main">INITIALIZE_CONNECTION</button>
+            <div class="login-body">
+                <label>Username</label>
+                <input type="text" id="nick-in" placeholder="Enter your name..." maxlength="15">
+                <button onclick="join()" class="btn-primary">START CHATTING</button>
             </div>
-            <div class="system-status">
-                <span>ENCRYPTION: AES-256</span>
-                <span>STATUS: READY</span>
+            <div class="login-footer">
+                <p>No password needed. Your identity is saved on this device.</p>
             </div>
         </div>
     </div>
 
-    <div id="scr-app" class="hidden">
-        <header class="main-header">
-            <div class="header-left">
-                <div class="pulse-dot"></div>
-                <span class="brand">Z_QUANTUM_V16</span>
-            </div>
-            <div class="header-right">
-                <div id="adm-trigger" class="hidden" onclick="openAdmin()">
-                    <span class="adm-icon">ROOT</span>
+    <div id="scr-app" class="screen hidden">
+        <div class="app-container">
+            
+            <aside class="sidebar">
+                <header class="side-header">
+                    <div class="user-profile">
+                        <div class="avatar" id="my-avatar">?</div>
+                        <b id="my-name">Me</b>
+                    </div>
+                    <div class="header-actions">
+                        <button id="adm-trigger" class="btn-icon hidden" onclick="openAdm()" title="Admin Console">
+                            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                        </button>
+                        <button class="btn-icon" onclick="exit()" title="Logout">
+                            <svg viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+                        </button>
+                    </div>
+                </header>
+                
+                <div class="search-bar">
+                    <div class="search-input">
+                        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                        <input type="text" placeholder="Search or start new chat">
+                    </div>
                 </div>
-                <button onclick="terminateSession()" class="btn-kill">EXIT</button>
-            </div>
-        </header>
 
-        <div class="dashboard-content">
-            <div class="section-header">
-                <span class="label">ACTIVE_NODES</span>
-                <span id="node-count">0 UNITS</span>
-            </div>
-            <div id="node-list" class="grid-layout">
+                <div id="node-list" class="contact-list">
+                    </div>
+            </aside>
+
+            <main class="chat-area">
+                <div id="chat-welcome" class="chat-empty">
+                    <div class="empty-content">
+                        <div class="empty-icon">Z</div>
+                        <h2>ZChat for Web</h2>
+                        <p>Select a contact to start messaging.<br>End-to-end encrypted on Z-Grid.</p>
+                    </div>
                 </div>
-        </div>
 
-        <footer class="system-bar">
-            <div class="ticker">
-                <span id="sys-log">Grid initialized. Waiting for packet...</span>
-            </div>
-        </footer>
-    </div>
+                <div id="chat-window" class="chat-window hidden">
+                    <header class="chat-header">
+                        <button class="btn-back" onclick="closeChat()">←</button>
+                        <div class="chat-info">
+                            <div class="avatar" id="chat-avatar">?</div>
+                            <div>
+                                <b id="peer-name">Username</b>
+                                <span class="status online">online</span>
+                            </div>
+                        </div>
+                    </header>
 
-    <div id="scr-chat" class="hidden">
-        <header class="chat-header">
-            <button onclick="closeChat()" class="btn-back">
-                <span class="arrow">←</span> BACK_TO_GRID
-            </button>
-            <div class="target-info">
-                <span id="peer-id">NODE_UNKNOWN</span>
-                <small>SECURE_TUNNEL_ACTIVE</small>
-            </div>
-            <div class="header-action">
-                <div class="secure-icon"></div>
-            </div>
-        </header>
+                    <div id="chat-flow" class="chat-messages">
+                        </div>
 
-        <div id="chat-flow" class="message-container">
-            </div>
-
-        <div class="chat-controls">
-            <div class="input-wrapper">
-                <textarea id="msg-in" class="chat-input" placeholder="Type encrypted packet..." rows="1"></textarea>
-                <button onclick="sendPacket()" class="btn-send">
-                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="scr-adm" class="hidden">
-        <div class="adm-wrapper">
-            <div class="adm-nav">
-                <div class="adm-title">MASTER_ROOT_ACCESS</div>
-                <div class="adm-actions">
-                    <button onclick="sendGlobalBroadcast()" class="btn-adm-action">BROADCAST</button>
-                    <button onclick="closeAdmin()" class="btn-adm-close">CLOSE</button>
+                    <footer class="chat-input-area">
+                        <div class="input-container">
+                            <button class="btn-emoji">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5s.67 1.5 1.5 1.5zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+                            </button>
+                            <input type="text" id="msg-in" placeholder="Type a message" spellcheck="false">
+                            <button class="btn-send" onclick="send()">
+                                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                            </button>
+                        </div>
+                    </footer>
                 </div>
-            </div>
-            <div class="adm-stats">
-                <div class="stat-item">DATABASE: <span id="db-size">OK</span></div>
-                <div class="stat-item">TRAFFIC: <span id="traffic-load">LOW</span></div>
-            </div>
-            <div id="adm-list" class="adm-user-list">
-                </div>
+            </main>
+
         </div>
     </div>
 
-    <div id="bc-overlay" class="hidden">
-        <div class="bc-content">
-            <div class="bc-header">SYSTEM_BROADCAST</div>
-            <div id="bc-msg" class="bc-body">...</div>
-            <button onclick="hideBC()" class="bc-btn">ACKNOWLEDGE</button>
+    <div id="scr-adm" class="screen hidden">
+        <div class="adm-container">
+            <header class="adm-header">
+                <h2>Manage Users</h2>
+                <button class="btn-close" onclick="closeAdm()">✕</button>
+            </header>
+            <div id="adm-list" class="adm-list">
+                </div>
+            <div class="adm-footer">
+                <button onclick="broadcast()">BROADCAST MESSAGE</button>
+            </div>
         </div>
     </div>
     <style>
-    /* --- SYSTEM VARIABLES --- */
     :root {
-        --bg-black: #000000;
-        --bg-surf: #050505;
-        --bg-card: #0a0a0a;
-        --accent: #0070f3;
-        --accent-glow: rgba(0, 112, 243, 0.4);
-        --border: rgba(255, 255, 255, 0.07);
-        --text-main: #ffffff;
-        --text-dim: #666666;
-        --danger: #ff3b30;
-        --success: #34c759;
-        --gold: #ffcf40;
-        --font-mono: 'JetBrains Mono', monospace;
+        --wa-bg: #f0f2f5;
+        --wa-side: #ffffff;
+        --wa-header: #f0f2f5;
+        --wa-accent: #008069;
+        --wa-blue: #00a884;
+        --wa-text: #111b21;
+        --wa-msg-me: #dcf8c6;
+        --wa-msg-them: #ffffff;
+        --border: #e9edef;
+        --shadow: rgba(11, 20, 26, 0.08);
     }
 
-    /* --- BASE RESET --- */
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
-    body { 
-        background-color: var(--bg-black); color: var(--text-main); 
-        font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; 
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', 'Roboto', sans-serif; }
+    body { background: #dadbd3; height: 100vh; overflow: hidden; color: var(--wa-text); }
     .hidden { display: none !important; }
 
-    /* --- LOADER STYLE --- */
-    #loader { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; transition: 0.5s ease-in-out; }
-    .loader-content { text-align: center; }
-    .spin { width: 30px; height: 30px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: s 0.6s linear infinite; margin: 0 auto 20px; }
-    .load-text { font-family: var(--font-mono); font-size: 10px; color: var(--accent); letter-spacing: 3px; margin-bottom: 15px; }
-    .load-bar { width: 150px; height: 2px; background: var(--border); margin: 0 auto; overflow: hidden; }
-    .load-progress { width: 40%; height: 100%; background: var(--accent); animation: p 1.5s ease-in-out infinite; }
-    @keyframes s { to { transform: rotate(360deg); } }
-    @keyframes p { 0% { transform: translateX(-150%); } 100% { transform: translateX(250%); } }
+    /* LOADER */
+    #loader { position: fixed; inset: 0; background: #f0f2f5; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+    .loader-spinner { width: 40px; height: 40px; border: 3px solid #cbd5e0; border-top-color: #00a884; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* --- START SCREEN STYLE --- */
-    #scr-start { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; background: radial-gradient(circle at center, #080808 0%, #000 100%); }
-    .auth-container { width: 100%; max-width: 320px; }
-    .logo { font-size: 80px; font-weight: 900; color: var(--accent); letter-spacing: -6px; text-shadow: 0 0 30px var(--accent-glow); margin-bottom: 10px; }
-    .glitch-box { position: relative; margin-bottom: 40px; text-align: center; }
-    .form-label { font-family: var(--font-mono); font-size: 9px; color: var(--dim); letter-spacing: 2px; margin-bottom: 10px; }
-    .os-input { width: 100%; background: var(--bg-card); border: 1px solid var(--border); padding: 16px; border-radius: 12px; color: #fff; font-family: var(--font-mono); font-size: 14px; margin-bottom: 15px; outline: none; transition: 0.3s; }
-    .os-input:focus { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
-    .auth-info { font-size: 10px; color: var(--dim); line-height: 1.5; margin-bottom: 25px; text-align: center; }
-    .btn-main { width: 100%; padding: 16px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-weight: 900; font-size: 12px; letter-spacing: 1px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-    .btn-main:hover { transform: translateY(-2px); box-shadow: 0 15px 30px var(--accent-glow); }
-    .system-status { display: flex; justify-content: space-between; margin-top: 40px; font-family: var(--font-mono); font-size: 8px; color: var(--dim); border-top: 1px solid var(--border); padding-top: 15px; }
+    /* LOGIN SCREEN */
+    #scr-start { display: flex; align-items: center; justify-content: center; height: 100vh; background: #111b21; }
+    .login-card { background: white; width: 90%; max-width: 400px; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; }
+    .app-icon { width: 60px; height: 60px; background: #00a884; color: white; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; margin: 0 auto 20px; }
+    .login-card h1 { font-size: 24px; margin-bottom: 10px; }
+    .login-card p { color: #667781; font-size: 14px; margin-bottom: 30px; }
+    .login-body { text-align: left; }
+    .login-body label { display: block; font-size: 12px; color: #00a884; font-weight: bold; margin-bottom: 5px; }
+    .login-body input { width: 100%; padding: 12px; border: 1px solid #e9edef; border-radius: 8px; font-size: 16px; margin-bottom: 20px; outline: none; }
+    .btn-primary { width: 100%; padding: 14px; background: #00a884; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
+    .login-footer { margin-top: 20px; font-size: 11px; color: #8696a0; }
 
-    /* --- DASHBOARD STYLE --- */
-    .main-header { height: 65px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
-    .brand { font-weight: 900; font-size: 18px; color: var(--accent); letter-spacing: -1px; }
-    .pulse-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success); margin-right: 12px; animation: pulse 2s infinite; }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-    .btn-kill { background: transparent; border: 1px solid var(--danger); color: var(--danger); font-size: 10px; font-weight: 800; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
-    
-    .dashboard-content { flex: 1; padding: 25px; overflow-y: auto; }
-    .section-header { display: flex; justify-content: space-between; margin-bottom: 20px; font-family: var(--font-mono); font-size: 10px; color: var(--dim); }
-    .grid-layout { display: flex; flex-direction: column; gap: 12px; }
-    .node-card { background: var(--bg-card); padding: 18px; border-radius: 15px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
-    .node-card:hover { border-color: var(--accent); transform: scale(1.02); }
-    .node-card b { font-size: 15px; letter-spacing: 0.5px; }
-    .node-card span { font-size: 9px; color: var(--accent); font-family: var(--font-mono); }
+    /* APP CONTAINER */
+    .app-container { display: flex; width: 100%; height: 100vh; max-width: 1600px; margin: 0 auto; background: white; }
+    .sidebar { width: 30%; min-width: 300px; border-right: 1px solid var(--border); display: flex; flex-direction: column; background: var(--wa-side); }
+    .chat-area { flex: 1; background: #efeae2; position: relative; display: flex; flex-direction: column; }
 
-    /* --- CHAT INTERFACE STYLE --- */
-    #scr-chat { position: fixed; inset: 0; background: var(--bg-black); z-index: 5000; display: flex; flex-direction: column; }
-    .chat-header { height: 65px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; }
-    .btn-back { background: transparent; border: none; color: var(--accent); font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    .target-info { text-align: center; }
-    .target-info span { display: block; font-weight: 900; font-size: 14px; text-transform: uppercase; }
-    .target-info small { font-size: 8px; color: var(--success); font-family: var(--font-mono); }
+    /* SIDEBAR */
+    .side-header { height: 60px; padding: 10px 16px; background: var(--wa-header); display: flex; justify-content: space-between; align-items: center; }
+    .user-profile { display: flex; align-items: center; gap: 12px; }
+    .avatar { width: 40px; height: 40px; background: #dfe5e7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #54656f; font-size: 18px; text-transform: uppercase; }
+    .header-actions { display: flex; gap: 8px; }
+    .btn-icon { background: none; border: none; padding: 8px; cursor: pointer; border-radius: 50%; color: #54656f; }
+    .btn-icon svg { width: 24px; height: 24px; fill: currentColor; }
+    .btn-icon:hover { background: rgba(0,0,0,0.05); }
 
-    .message-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: radial-gradient(#111 0.5px, transparent 0.5px); background-size: 20px 20px; }
-    .msg { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
-    .m-me { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px var(--accent-glow); }
-    .m-them { align-self: flex-start; background: var(--bg-card); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+    .search-bar { padding: 8px 12px; }
+    .search-input { background: #f0f2f5; border-radius: 8px; display: flex; align-items: center; padding: 0 12px; }
+    .search-input svg { width: 18px; fill: #54656f; }
+    .search-input input { flex: 1; border: none; background: none; padding: 8px 12px; font-size: 14px; outline: none; }
 
-    .chat-controls { padding: 15px 20px 35px; background: var(--bg-surf); border-top: 1px solid var(--border); }
-    .input-wrapper { display: flex; align-items: center; gap: 12px; background: #000; padding: 8px 15px; border-radius: 25px; border: 1px solid var(--border); }
-    .chat-input { flex: 1; background: transparent; border: none; color: #fff; outline: none; padding: 10px 0; font-size: 14px; resize: none; font-family: 'Inter', sans-serif; }
-    .btn-send { background: var(--accent); border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-    .btn-send svg { width: 18px; fill: #fff; }
+    .contact-list { flex: 1; overflow-y: auto; }
+    .contact-item { padding: 12px 16px; display: flex; align-items: center; gap: 15px; cursor: pointer; border-bottom: 1px solid #f5f6f6; transition: 0.2s; }
+    .contact-item:hover { background: #f5f6f6; }
+    .contact-info { flex: 1; }
+    .contact-info b { font-size: 16px; display: block; }
+    .contact-info p { font-size: 13px; color: #667781; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* --- ADMIN & BROADCAST STYLE --- */
-    #scr-adm { position: fixed; inset: 0; background: #000; z-index: 9000; padding: 30px 20px; overflow-y: auto; }
-    .adm-user-list { display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
-    .adm-card { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: 18px; }
-    .adm-btn-group { display: flex; gap: 10px; margin-top: 15px; }
-    .adm-btn-group button { flex: 1; padding: 10px; border-radius: 8px; border: none; font-size: 10px; font-weight: 800; cursor: pointer; }
-    
-    #bc-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10001; display: flex; align-items: center; justify-content: center; padding: 40px; }
-    .bc-content { background: var(--gold); color: #000; width: 100%; max-width: 400px; padding: 30px; border-radius: 20px; text-align: center; }
-    .bc-header { font-weight: 900; font-size: 12px; margin-bottom: 15px; letter-spacing: 2px; }
-    .bc-body { font-size: 16px; font-weight: 700; margin-bottom: 25px; line-height: 1.4; }
-    .bc-btn { background: #000; color: #fff; border: none; padding: 12px 25px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+    /* CHAT WINDOW */
+    .chat-empty { display: flex; align-items: center; justify-content: center; height: 100%; text-align: center; }
+    .empty-icon { font-size: 60px; color: #e9edef; font-weight: bold; margin-bottom: 10px; }
+    .empty-content h2 { font-weight: 300; color: #41525d; margin-bottom: 8px; }
+    .empty-content p { font-size: 14px; color: #667781; line-height: 1.6; }
 
-    .system-bar { height: 30px; background: #050505; border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 15px; }
-    .ticker { font-family: var(--font-mono); font-size: 8px; color: #444; overflow: hidden; white-space: nowrap; }
-            </style>
-            <script>
-    // --- DATABASE CONFIGURATION ---
-    const firebaseConfig = { databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app" };
-    firebase.initializeApp(firebaseConfig);
+    .chat-window { height: 100%; display: flex; flex-direction: column; }
+    .chat-header { height: 60px; padding: 10px 16px; background: var(--wa-header); display: flex; align-items: center; gap: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); z-index: 10; }
+    .btn-back { display: none; background: none; border: none; font-size: 20px; cursor: pointer; }
+    .chat-info { display: flex; align-items: center; gap: 12px; }
+    .chat-info b { font-size: 16px; }
+    .chat-info span { font-size: 12px; display: block; color: #667781; }
+
+    .chat-messages { flex: 1; padding: 20px 5% 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-blend-mode: overlay; }
+    .msg { max-width: 65%; padding: 8px 12px; font-size: 14.5px; border-radius: 8px; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); margin-bottom: 2px; }
+    .m-me { align-self: flex-end; background: var(--wa-msg-me); border-top-right-radius: 0; }
+    .m-them { align-self: flex-start; background: var(--wa-msg-them); border-top-left-radius: 0; }
+
+    .chat-input-area { padding: 10px 16px; background: #f0f2f5; }
+    .input-container { display: flex; align-items: center; gap: 10px; background: white; padding: 5px 15px; border-radius: 25px; }
+    .input-container input { flex: 1; border: none; padding: 10px; outline: none; font-size: 15px; }
+    .btn-emoji, .btn-send { background: none; border: none; cursor: pointer; color: #54656f; display: flex; }
+    .btn-send { color: #00a884; }
+    .btn-send svg { width: 24px; }
+
+    /* ADMIN AREA */
+    #scr-adm { background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 9000; position: fixed; inset: 0; }
+    .adm-container { background: white; width: 100%; max-width: 500px; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; max-height: 80vh; }
+    .adm-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+    .adm-list { flex: 1; overflow-y: auto; padding: 10px; }
+    .adm-card { padding: 15px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .adm-user-info b { display: block; font-size: 16px; }
+    .adm-user-info span { font-size: 11px; color: #888; }
+    .adm-btns { display: flex; gap: 5px; }
+    .btn-ban { padding: 6px 12px; background: #ff4d4f; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; }
+    .btn-del { padding: 6px 12px; background: #333; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; }
+    .adm-footer { padding: 15px; border-top: 1px solid #eee; }
+    .adm-footer button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 6px; font-weight: bold; }
+
+    @media (max-width: 768px) {
+        .sidebar { width: 100%; }
+        .chat-area { display: none; position: fixed; inset: 0; z-index: 100; }
+        .chat-area.active { display: flex; }
+        .btn-back { display: block; }
+    }
+    </style>
+    <script>
+    // --- FIREBASE CONFIG ---
+    const config = { databaseURL: "https://zchat-56639-default-rtdb.asia-southeast1.firebasedatabase.app" };
+    firebase.initializeApp(config);
     const db = firebase.database();
     
-    // MASTER CONFIG
-    const MASTER_UID = "zZerr44";
-    let currentUser = null;
-    let activePeer = null;
+    // Master Admin Username
+    const MASTER = "zZerr44"; 
+    let me = null;
+    let peer = null;
 
-    // --- UTILITY FUNCTIONS ---
     const $ = id => document.getElementById(id);
-    const log = msg => { $("sys-log").innerText = `> ${msg}`; console.log(`[SYS] ${msg}`); };
-    const toggleL = s => { $("loader").style.opacity = s ? '1' : '0'; setTimeout(() => $("loader").classList.toggle('hidden', !s), 500); };
 
-    // --- IDENTITY & CONNECTION ---
-    async function joinGrid() {
-        const nick = $("nick-in").value.trim().toLowerCase();
-        if(!nick || nick.length < 3) return alert("IDENTITY_TOO_SHORT");
+    // JOIN GRID
+    async function join() {
+        const name = $('nick-in').value.trim();
+        if(name.length < 2) return alert("Name too short");
 
-        toggleL(true);
-        const ref = db.ref('u/' + nick);
+        $('loader').classList.remove('hidden');
+        const ref = db.ref('u/' + name.toLowerCase());
         const snap = await ref.once('value');
 
-        if(snap.exists()) {
-            const data = snap.val();
-            if(data.status === 'banned') {
-                alert("ACCESS_DENIED: YOUR_IDENTITY_IS_BANNED");
-                toggleL(false); return;
-            }
-            // Re-connect existing node
-            currentUser = data;
-        } else {
-            // Register new node
-            currentUser = {
-                u: nick,
-                status: 'active',
-                joined: Date.now(),
-                uid: 'NOD-' + Math.random().toString(36).substr(2, 9).toUpperCase()
-            };
-            await ref.set(currentUser);
+        if(snap.exists() && snap.val().status === 'banned') {
+            alert("This identity has been suspended.");
+            $('loader').classList.add('hidden');
+            return;
         }
 
-        localStorage.setItem('z_node', JSON.stringify(currentUser));
+        if(!snap.exists()) {
+            await ref.set({
+                name: name,
+                status: 'active',
+                uid: 'ID-' + Math.floor(Math.random()*999999),
+                lastSeen: Date.now()
+            });
+        }
+
+        localStorage.setItem('z_sess', name.toLowerCase());
         location.reload();
     }
 
+    // ON LOAD SCRIPT
     window.onload = () => {
-        const saved = localStorage.getItem('z_node');
+        const saved = localStorage.getItem('z_sess');
         if(saved) {
-            currentUser = JSON.parse(saved);
-            initializeDashboard();
+            db.ref('u/' + saved).once('value', s => {
+                if(s.exists() && s.val().status !== 'banned') {
+                    me = s.val();
+                    initApp();
+                } else {
+                    localStorage.clear();
+                    $('loader').classList.add('hidden');
+                }
+            });
         } else {
-            toggleL(false);
+            $('loader').classList.add('hidden');
         }
     };
 
-    function initializeDashboard() {
-        $("scr-start").classList.add('hidden');
-        $("scr-app").classList.remove('hidden');
-        
-        // Show Admin Trigger if Root
-        if(currentUser.u === MASTER_UID.toLowerCase()) {
-            $("adm-trigger").classList.remove('hidden');
+    function initApp() {
+        $('scr-start').classList.add('hidden');
+        $('scr-app').classList.remove('hidden');
+        $('my-name').innerText = me.name;
+        $('my-avatar').innerText = me.name[0];
+
+        if(me.name.toLowerCase() === MASTER.toLowerCase()) {
+            $('adm-trigger').classList.remove('hidden');
         }
 
-        log(`Authenticated as ${currentUser.u.toUpperCase()}`);
-        listenNodes();
-        listenBroadcasts();
-        toggleL(false);
-    }
-
-    // --- CORE REAL-TIME LISTENERS ---
-    function listenNodes() {
-        db.ref('u').on('value', snap => {
-            const list = $("node-list");
+        // Listen to Contacts
+        db.ref('u').on('value', s => {
+            const list = $('node-list');
             list.innerHTML = "";
-            let count = 0;
-
-            snap.forEach(child => {
-                const node = child.val();
-                if(node.u !== currentUser.u && node.status !== 'banned') {
-                    count++;
-                    const div = document.createElement('div');
-                    div.className = 'node-card';
-                    div.onclick = () => openChat(node.u);
-                    div.innerHTML = `
-                        <div class="node-info">
-                            <b>${node.u.toUpperCase()}</b>
-                            <p>${node.uid}</p>
+            s.forEach(child => {
+                const user = child.val();
+                if(user.name.toLowerCase() !== me.name.toLowerCase() && user.status !== 'banned') {
+                    const item = document.createElement('div');
+                    item.className = 'contact-item';
+                    item.onclick = () => openChat(user.name);
+                    item.innerHTML = `
+                        <div class="avatar">${user.name[0]}</div>
+                        <div class="contact-info">
+                            <b>${user.name}</b>
+                            <p>${user.uid}</p>
                         </div>
-                        <span>● CONNECTED</span>
                     `;
-                    list.appendChild(div);
+                    list.appendChild(item);
                 }
             });
-            $("node-count").innerText = `${count} UNITS`;
         });
+
+        $('loader').classList.add('hidden');
     }
 
-    function listenBroadcasts() {
-        db.ref('broadcast').on('value', snap => {
-            if(snap.exists()) {
-                const data = snap.val();
-                // Only show if it's new (simple timestamp check)
-                if(Date.now() - data.t < 10000) {
-                    $("bc-msg").innerText = data.m;
-                    $("bc-overlay").classList.remove('hidden');
-                }
-            }
-        });
-    }
+    // CHAT LOGIC
+    function openChat(name) {
+        peer = name;
+        $('peer-name').innerText = name;
+        $('chat-avatar').innerText = name[0];
+        $('chat-welcome').classList.add('hidden');
+        $('chat-window').classList.remove('hidden');
+        document.querySelector('.chat-area').classList.add('active');
 
-    // --- MESSAGING SYSTEM ---
-    function openChat(peerU) {
-        activePeer = peerU;
-        $("peer-id").innerText = peerU.toUpperCase();
-        $("scr-chat").classList.remove('hidden');
-        
-        const tunnelId = [currentUser.u, peerU].sort().join('___');
-        db.ref('m/' + tunnelId).on('value', snap => {
-            const flow = $("chat-flow");
+        const room = [me.name.toLowerCase(), name.toLowerCase()].sort().join('_');
+        db.ref('m/' + room).on('value', s => {
+            const flow = $('chat-flow');
             flow.innerHTML = "";
-            snap.forEach(msgSnap => {
-                const m = msgSnap.val();
+            s.forEach(snap => {
+                const m = snap.val();
                 const div = document.createElement('div');
-                div.className = `msg ${m.s === currentUser.u ? 'm-me' : 'm-them'}`;
+                div.className = `msg ${m.s === me.name.toLowerCase() ? 'm-me' : 'm-them'}`;
                 div.innerText = m.t;
                 flow.appendChild(div);
             });
             flow.scrollTop = flow.scrollHeight;
         });
-        log(`Tunnel opened to ${peerU}`);
     }
 
-    function sendPacket() {
-        const inp = $("msg-in");
-        const val = inp.value.trim();
-        if(!val || !activePeer) return;
+    function send() {
+        const msg = $('msg-in').value.trim();
+        if(!msg || !peer) return;
 
-        const tunnelId = [currentUser.u, activePeer].sort().join('___');
-        db.ref('m/' + tunnelId).push({
-            s: currentUser.u,
-            t: val,
+        const room = [me.name.toLowerCase(), peer.toLowerCase()].sort().join('_');
+        db.ref('m/' + room).push({
+            s: me.name.toLowerCase(),
+            t: msg,
             ts: Date.now()
         });
-        inp.value = "";
-        inp.style.height = 'auto';
+        $('msg-in').value = "";
     }
 
     function closeChat() {
-        $("scr-chat").classList.add('hidden');
-        if(activePeer) {
-            const tunnelId = [currentUser.u, activePeer].sort().join('___');
-            db.ref('m/' + tunnelId).off();
+        document.querySelector('.chat-area').classList.remove('active');
+        if(peer) {
+            const room = [me.name.toLowerCase(), peer.toLowerCase()].sort().join('_');
+            db.ref('m/' + room).off();
         }
-        activePeer = null;
     }
 
-    // --- ADMIN SYSTEM ---
-    function openAdmin() {
-        $("scr-adm").classList.remove('hidden');
-        db.ref('u').on('value', snap => {
-            const list = $("adm-list");
+    // ADMIN LOGIC
+    function openAdm() {
+        $('scr-adm').classList.remove('hidden');
+        db.ref('u').on('value', s => {
+            const list = $('adm-list');
             list.innerHTML = "";
-            snap.forEach(uSnap => {
-                const user = uSnap.val();
-                const isBanned = user.status === 'banned';
+            s.forEach(snap => {
+                const u = snap.val();
+                const isBanned = u.status === 'banned';
                 const card = document.createElement('div');
                 card.className = 'adm-card';
                 card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between;">
-                        <b>${user.u}</b>
-                        <span style="color:${isBanned?'red':'green'}">${user.status}</span>
+                    <div class="adm-user-info">
+                        <b>${u.name}</b>
+                        <span>UID: ${u.uid} | ${u.status}</span>
                     </div>
-                    <div style="font-size:10px; color:#555; margin-top:5px;">UID: ${user.uid}</div>
-                    <div class="adm-btn-group">
-                        <button onclick="toggleBan('${user.u}', '${isBanned?'active':'banned'}')" style="background:#222; color:#fff">
-                            ${isBanned ? 'RESTORE' : 'BAN_NODE'}
-                        </button>
-                        <button onclick="purgeNode('${user.u}')" style="background:var(--danger); color:#fff">DELETE</button>
+                    <div class="adm-btns">
+                        <button class="btn-ban" onclick="toggleBan('${u.name.toLowerCase()}', '${isBanned?'active':'banned'}')">${isBanned?'Unban':'Ban'}</button>
+                        <button class="btn-del" onclick="delUser('${u.name.toLowerCase()}')">Del</button>
                     </div>
                 `;
                 list.appendChild(card);
@@ -405,35 +388,27 @@
         });
     }
 
-    async function toggleBan(u, status) {
-        if(u === MASTER_UID.toLowerCase()) return alert("ROOT_PROTECTED");
-        await db.ref('u/' + u + '/status').set(status);
-        log(`Node ${u} status changed to ${status}`);
+    async function toggleBan(id, st) {
+        if(id === MASTER.toLowerCase()) return;
+        await db.ref('u/' + id + '/status').set(st);
     }
 
-    async function purgeNode(u) {
-        if(u === MASTER_UID.toLowerCase()) return alert("ROOT_PROTECTED");
-        if(confirm(`PERMANENTLY DELETE NODE ${u}?`)) {
-            await db.ref('u/' + u).remove();
-            log(`Node ${u} purged from database`);
-        }
+    async function delUser(id) {
+        if(id === MASTER.toLowerCase()) return;
+        if(confirm("Delete user " + id + "?")) await db.ref('u/' + id).remove();
     }
 
-    function sendGlobalBroadcast() {
+    function broadcast() {
         const m = prompt("Enter Broadcast Message:");
-        if(m) db.ref('broadcast').set({ m: m, t: Date.now() });
+        if(m) alert("Broadcast feature coming soon with global listener!");
     }
 
-    // --- SYSTEM UTILS ---
-    function closeAdmin() { $("scr-adm").classList.add('hidden'); db.ref('u').off(); }
-    function hideBC() { $("bc-overlay").classList.add('hidden'); }
-    function terminateSession() { if(confirm("Terminate connection?")) { localStorage.clear(); location.reload(); } }
-    
-    // Auto-resize textarea
-    $("msg-in").addEventListener("input", function() {
-        this.style.height = "auto";
-        this.style.height = (this.scrollHeight) + "px";
-    });
+    function closeAdm() { $('scr-adm').classList.add('hidden'); db.ref('u').off(); }
+    function exit() { localStorage.clear(); location.reload(); }
+
+    // ENTER KEY SUPPORT
+    $('msg-in')?.addEventListener("keyup", e => { if(e.key === "Enter") send(); });
+    $('nick-in')?.addEventListener("keyup", e => { if(e.key === "Enter") join(); });
 </script>
 </body>
 </html>
