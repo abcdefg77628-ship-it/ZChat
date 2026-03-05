@@ -46,7 +46,6 @@
             margin: 0 auto;
         }
         
-        /* Screen container */
         .screen {
             display: none;
             flex-direction: column;
@@ -66,7 +65,6 @@
             100% { opacity: 1; transform: translateY(0); }
         }
         
-        /* Header dengan back button */
         .header {
             padding: 16px 16px;
             display: flex;
@@ -116,20 +114,18 @@
             stroke-width: 2;
         }
         
-        /* Content area dengan scroll yang benar */
         .content {
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             padding: 16px;
-            height: calc(100% - 70px - 60px); /* Header height + bottom nav */
+            height: calc(100% - 70px - 60px);
         }
         
         .content.full {
-            height: calc(100% - 70px); /* Tanpa bottom nav */
+            height: calc(100% - 70px);
         }
         
-        /* Bottom navigation */
         .bottom-nav {
             display: flex;
             justify-content: space-around;
@@ -171,7 +167,6 @@
             stroke-width: 1.8; 
         }
         
-        /* Toast notifications */
         .toast-container {
             position: absolute;
             top: 16px;
@@ -206,7 +201,6 @@
             to { opacity:1; transform:translateX(0); } 
         }
         
-        /* Auth card */
         .auth-card {
             background: #1b2332;
             border-radius: 36px;
@@ -215,6 +209,7 @@
             box-shadow: 0 20px 40px -10px black;
             border: 1px solid #2c3547;
             animation: fadeIn 0.3s;
+            width: 100%;
         }
         
         .auth-tabs {
@@ -245,7 +240,6 @@
             box-shadow: 0 2px 6px #0a0e16;
         }
         
-        /* Input group */
         .input-group {
             margin-bottom: 24px;
             position: relative;
@@ -289,7 +283,7 @@
             box-shadow: 0 10px 20px -8px #1e3a8a80;
             margin-top: 12px;
             -webkit-tap-highlight-color: transparent;
-                    }
+        }
         
         .btn-primary:active { background: #1d4ed8; }
         .btn-secondary {
@@ -303,7 +297,6 @@
             -webkit-tap-highlight-color: transparent;
         }
         
-        /* Friend item */
         .friend-item {
             display: flex;
             align-items: center;
@@ -348,7 +341,6 @@
             margin-left: auto;
         }
         
-        /* Hamburger menu */
         .menu-overlay {
             position: absolute;
             top: 0;
@@ -411,7 +403,6 @@
         
         .menu-item:hover { background: #1e2b40; }
         
-        /* Search component */
         .search-box {
             display: flex;
             gap: 8px;
@@ -435,7 +426,6 @@
         
         .search-box input::placeholder { color: #5a6a82; }
         
-        /* Chat */
         .chat-container {
             flex: 1;
             overflow-y: auto;
@@ -461,7 +451,7 @@
             background: #2563eb;
             color: white;
             border-bottom-right-radius: 6px;
-        }
+                    }
         
         .message.other {
             align-self: flex-start;
@@ -511,7 +501,6 @@
             flex-shrink: 0;
         }
         
-        /* Admin panel */
         .admin-stat {
             background: #1c2538;
             border-radius: 28px;
@@ -542,7 +531,6 @@
         
         .admin-user-item button.danger { background: #b91c1c; }
         
-        /* Loading screen */
         .loading-screen {
             position: absolute; 
             inset:0; 
@@ -569,11 +557,20 @@
         
         .hidden { display: none !important; }
         
-        /* Empty state */
         .empty-state {
             text-align: center;
             color: #7b8aa5;
             padding: 40px 20px;
+        }
+
+        .debug-info {
+            font-size: 0.8rem;
+            color: #9aa9c1;
+            text-align: center;
+            margin-top: 10px;
+            padding: 8px;
+            background: #1a2332;
+            border-radius: 20px;
         }
     </style>
 </head>
@@ -633,27 +630,28 @@
                 <div id="loginFields">
                     <div class="input-group">
                         <label>Username</label>
-                        <input type="text" id="loginUsername" placeholder="username">
+                        <input type="text" id="loginUsername" placeholder="username" autocomplete="off">
                     </div>
                     <div class="input-group">
                         <label>Password</label>
-                        <input type="password" id="loginPassword" placeholder="••••••">
+                        <input type="password" id="loginPassword" placeholder="••••••" autocomplete="off">
                     </div>
                     <button class="btn-primary" id="loginBtn">Log in</button>
+                    <div class="debug-info" id="loginDebug" style="display:none;"></div>
                 </div>
                 
                 <div id="registerFields" style="display:none;">
                     <div class="input-group">
                         <label>Username</label>
-                        <input type="text" id="regUsername" placeholder="username">
+                        <input type="text" id="regUsername" placeholder="username" autocomplete="off">
                     </div>
                     <div class="input-group">
                         <label>Password</label>
-                        <input type="password" id="regPassword" placeholder="min 6 chars">
+                        <input type="password" id="regPassword" placeholder="min 6 chars" autocomplete="off">
                     </div>
                     <div class="input-group">
                         <label>Confirm</label>
-                        <input type="password" id="regConfirm" placeholder="confirm">
+                        <input type="password" id="regConfirm" placeholder="confirm" autocomplete="off">
                     </div>
                     <button class="btn-primary" id="registerBtn">Register</button>
                 </div>
@@ -690,7 +688,7 @@
         </div>
     </div>
 
-    <!-- FRIENDS PAGE (dengan back button) -->
+    <!-- FRIENDS PAGE -->
     <div id="friendsScreen" class="screen">
         <div class="header">
             <button class="back-btn" onclick="goBackToChat()">
@@ -712,7 +710,7 @@
         </div>
     </div>
 
-    <!-- FRIEND REQUESTS PAGE (dengan back button) -->
+    <!-- FRIEND REQUESTS PAGE -->
     <div id="friendRequestsScreen" class="screen">
         <div class="header">
             <button class="back-btn" onclick="goBackToChat()">
@@ -727,8 +725,8 @@
         <div class="content" id="requestsListContainer"></div>
     </div>
 
-    <!-- PROFILE PAGE (dengan back button) -->
-     <div id="profileScreen" class="screen">
+    <!-- PROFILE PAGE -->
+    <div id="profileScreen" class="screen">
         <div class="header">
             <button class="back-btn" onclick="goBackToChat()">
                 <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
@@ -754,7 +752,7 @@
         </div>
     </div>
 
-    <!-- SETTINGS PAGE (dengan back button) -->
+    <!-- SETTINGS PAGE -->
     <div id="settingsScreen" class="screen">
         <div class="header">
             <button class="back-btn" onclick="goBackToChat()">
@@ -779,7 +777,7 @@
         </div>
     </div>
 
-    <!-- ADMIN PANEL (dengan back button) -->
+    <!-- ADMIN PANEL -->
     <div id="adminPanelScreen" class="screen">
         <div class="header">
             <button class="back-btn" onclick="goBackToChat()">
@@ -794,7 +792,7 @@
         <div class="content" id="adminPanelContent"></div>
     </div>
 
-    <!-- CHAT ROOM VIEW (dengan back button) -->
+    <!-- CHAT ROOM VIEW -->
     <div id="chatRoomScreen" class="screen">
         <div class="header">
             <button class="back-btn" onclick="closeChatRoom()">
@@ -831,7 +829,7 @@
     };
     
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-    import { getDatabase, ref, set, push, onValue, update, remove, get, child, query, orderByChild, equalTo, onDisconnect, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+    import { getDatabase, ref, set, push, onValue, update, remove, get, child } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
     
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
@@ -840,8 +838,6 @@
     // Global State
     let currentUser = null;
     let currentChatFriend = null;
-    let friendRequestsListener = null;
-    let messagesListener = null;
 
     // Helper Functions
     function showToast(msg, isError = false) {
@@ -869,10 +865,6 @@
 
     window.closeChatRoom = function() { 
         if (currentChatFriend) {
-            if (messagesListener) {
-                messagesListener();
-                messagesListener = null;
-            }
             currentChatFriend = null;
         }
         showScreen('chatScreen'); 
@@ -882,65 +874,247 @@
     function setSession(user) { 
         localStorage.setItem('zchat_user', user); 
         localStorage.setItem('zchat_login', 'true'); 
+        console.log('Session saved for:', user);
     }
     
     function clearSession() { 
         localStorage.removeItem('zchat_user'); 
         localStorage.removeItem('zchat_login'); 
         currentUser = null; 
-    }
+        console.log('Session cleared');
+            }
 
     async function isBanned(username) {
-        const snap = await get(child(ref(db), `users/${username}`));
-        return snap.exists() && snap.val().banned === true;
+        try {
+            const snap = await get(child(ref(db), `users/${username}`));
+            return snap.exists() && snap.val().banned === true;
+        } catch (error) {
+            console.error('Error checking ban:', error);
+            return false;
+        }
     }
 
-    // Add Friend Function
-    window.addFriend = async function(searchUsername) {
-        if (!searchUsername || searchUsername === currentUser) {
-            showToast('Username tidak valid', true);
-            return false;
+    // LOGIN FUNCTION - FIXED
+    document.getElementById('loginBtn').addEventListener('click', async ()=>{
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        
+        console.log('Login attempt - Username:', username, 'Password:', password);
+        
+        if (!username || !password) {
+            showToast('Isi username dan password', true);
+            return;
         }
         
-        const snap = await get(child(ref(db), `users/${searchUsername}`));
-        if (!snap.exists()) {
-            showToast('User tidak ditemukan', true);
-            return false;
-        }
-        
-        const friendSnap = await get(child(ref(db), `users/${currentUser}/friends/${searchUsername}`));
-        if (friendSnap.exists()) {
-            showToast('Sudah berteman', true);
-            return false;
-        }
-        
-        // Cek apakah sudah pernah mengirim request
-        const requestsSnap = await get(child(ref(db), `friendRequests/${searchUsername}`));
-        let alreadySent = false;
-        if (requestsSnap.exists()) {
-            Object.values(requestsSnap.val()).forEach(req => {
-                if (req.from === currentUser && req.status === 'pending') alreadySent = true;
+        try {
+            // Cek banned dulu
+            if (await isBanned(username)) {
+                showToast('Akun Anda telah dibanned oleh admin', true);
+                return;
+            }
+            
+            // Ambil data user dari Firebase
+            const userRef = ref(db, `users/${username}`);
+            const snapshot = await get(userRef);
+            
+            console.log('User exists:', snapshot.exists());
+            
+            if (!snapshot.exists()) {
+                showToast('Username tidak ditemukan', true);
+                return;
+            }
+            
+            const userData = snapshot.val();
+            console.log('Stored password:', userData.password);
+            console.log('Input password:', password);
+            
+            // Validasi password
+            if (userData.password !== password) {
+                showToast('Password salah', true);
+                return;
+            }
+            
+            // Login berhasil
+            currentUser = username;
+            setSession(username);
+            
+            // Update status online
+            await update(ref(db), { 
+                [`users/${username}/online`]: true,
+                [`users/${username}/lastSeen`]: Date.now() 
             });
+            
+            showToast(`Selamat datang, ${username}!`);
+            
+            // Sembunyikan loading
+            document.getElementById('loadingScreen').style.opacity = '0';
+            setTimeout(()=>document.getElementById('loadingScreen').classList.add('hidden'), 400);
+            
+            // Tampilkan chat screen
+            showScreen('chatScreen');
+            
+            // Setup fitur realtime
+            setupRealTimeFeatures();
+            
+            // Tampilkan menu admin jika user adalah admin
+            if (username === 'DevzZerr44F') {
+                document.getElementById('adminMenuItem').style.display = 'flex';
+            } else {
+                document.getElementById('adminMenuItem').style.display = 'none';
+            }
+            
+            // Clear input
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            showToast('Error: ' + error.message, true);
         }
-        
-        if (alreadySent) {
-            showToast('Request sudah dikirim', true);
-            return false;
-        }
-        
-        const reqRef = push(ref(db, `friendRequests/${searchUsername}`));
-        await set(reqRef, { 
-            from: currentUser, 
-            status: 'pending', 
-            timestamp: Date.now() 
-        });
-        
-        showToast(`Request sent to ${searchUsername}`);
-        document.getElementById('friendSearchInput').value = '';
-        return true;
-    };
+    });
 
-    // Login/Register
+    // REGISTER FUNCTION - FIXED
+    document.getElementById('registerBtn').addEventListener('click', async ()=>{
+        const username = document.getElementById('regUsername').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const confirm = document.getElementById('regConfirm').value;
+        
+        console.log('Register attempt:', username);
+        
+        if (!username || !password || !confirm) {
+            showToast('Isi semua field', true);
+            return;
+        }
+        
+        if (password.length < 6) {
+            showToast('Password minimal 6 karakter', true);
+            return;
+        }
+        
+        if (password !== confirm) {
+            showToast('Password tidak cocok', true);
+            return;
+        }
+        
+        try {
+            // Cek apakah username sudah ada
+            const userRef = ref(db, `users/${username}`);
+            const snapshot = await get(userRef);
+            
+            if (snapshot.exists()) {
+                showToast('Username sudah digunakan', true);
+                return;
+            }
+            
+            // Buat user baru
+            const newUser = {
+                username: username,
+                password: password,
+                bio: 'Halo! Saya menggunakan Zchat',
+                avatar: '',
+                online: false,
+                banned: false,
+                friends: {},
+                lastSeen: Date.now()
+            };
+            
+            await set(userRef, newUser);
+            
+            console.log('User registered:', username);
+            showToast('Registrasi berhasil, silakan login');
+            
+            // Switch ke tab login
+            document.getElementById('tabLoginBtn').click();
+            
+            // Clear input
+            document.getElementById('regUsername').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('regConfirm').value = '';
+            
+        } catch (error) {
+            console.error('Register error:', error);
+            showToast('Error: ' + error.message, true);
+        }
+    });
+
+    // AUTO LOGIN - FIXED
+    window.addEventListener('load', async ()=>{
+        const stored = localStorage.getItem('zchat_user');
+        const isLoggedIn = localStorage.getItem('zchat_login');
+        
+        console.log('Auto login check:', stored, isLoggedIn);
+        
+        if (stored && isLoggedIn === 'true') {
+            try {
+                // Cek apakah user masih ada di database
+                const userRef = ref(db, `users/${stored}`);
+                const snapshot = await get(userRef);
+                
+                if (!snapshot.exists()) {
+                    console.log('User not found in database');
+                    clearSession();
+                    showScreen('loginScreen');
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    return;
+                }
+                
+                // Cek banned
+                if (snapshot.val().banned === true) {
+                    console.log('User is banned');
+                    clearSession();
+                    showToast('Akun Anda telah dibanned oleh admin', true);
+                    showScreen('loginScreen');
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    return;
+                }
+                
+                // Auto login sukses
+                currentUser = stored;
+                console.log('Auto login successful for:', currentUser);
+                
+                // Update status online
+                await update(ref(db), { 
+                    [`users/${currentUser}/online`]: true,
+                    [`users/${currentUser}/lastSeen`]: Date.now() 
+                });
+                
+                showScreen('chatScreen');
+                
+                if (currentUser === 'DevzZerr44F') {
+                    document.getElementById('adminMenuItem').style.display = 'flex';
+                }
+                
+                setupRealTimeFeatures();
+                
+            } catch (error) {
+                console.error('Auto login error:', error);
+                clearSession();
+                showScreen('loginScreen');
+            }
+        } else {
+            showScreen('loginScreen');
+        }
+        
+        document.getElementById('loadingScreen').classList.add('hidden');
+    });
+
+    // LOGOUT
+    document.getElementById('logoutBtn').addEventListener('click', async ()=>{
+        if (currentUser) {
+            try {
+                await update(ref(db), { 
+                    [`users/${currentUser}/online`]: false, 
+                    [`users/${currentUser}/lastSeen`]: Date.now() 
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+        clearSession(); 
+        location.reload();
+    });
+
+    // Tab switching
     document.getElementById('tabLoginBtn').addEventListener('click', ()=>{
         document.getElementById('tabLoginBtn').classList.add('active');
         document.getElementById('tabRegisterBtn').classList.remove('active');
@@ -955,138 +1129,75 @@
         document.getElementById('registerFields').style.display = 'block';
     });
 
-    document.getElementById('registerBtn').addEventListener('click', async ()=>{
-        const username = document.getElementById('regUsername').value.trim();
-        const pwd = document.getElementById('regPassword').value;
-        const confirm = document.getElementById('regConfirm').value;
-        
-        if (!username || !pwd || !confirm) return showToast('Isi semua field', true);
-        if (pwd.length < 6) return showToast('Password minimal 6 karakter', true);
-        if (pwd !== confirm) return showToast('Password tidak cocok', true);
-        
-        const userRef = ref(db, `users/${username}`);
-        const snap = await get(userRef);
-        if (snap.exists()) return showToast('Username sudah digunakan', true);
-        
-        await set(userRef, { 
-            username, 
-            password: pwd, 
-            bio: 'Halo! Saya menggunakan Zchat', 
-            avatar: '', 
-            online: false, 
-            banned: false, 
-            friends: {},
-            lastSeen: Date.now()
-                    });
-        
-        showToast('Registrasi berhasil, silakan login');
-        document.getElementById('tabLoginBtn').click();
-        document.getElementById('regUsername').value = '';
-        document.getElementById('regPassword').value = '';
-        document.getElementById('regConfirm').value = '';
-    });
-
-    document.getElementById('loginBtn').addEventListener('click', async ()=>{
-        const username = document.getElementById('loginUsername').value.trim();
-        const pwd = document.getElementById('loginPassword').value;
-        
-        if (!username || !pwd) return showToast('Isi username dan password', true);
-        
-        if (await isBanned(username)) {
-            showToast('Akun Anda telah dibanned oleh admin', true);
-            return;
+    // Add Friend
+    window.addFriend = async function(searchUsername) {
+        if (!searchUsername || searchUsername === currentUser) {
+            showToast('Username tidak valid', true);
+            return false;
         }
         
-        const snap = await get(child(ref(db), `users/${username}`));
-        if (!snap.exists() || snap.val().password !== pwd) {
-            showToast('Username atau password salah', true);
-            return;
-        }
-        
-        currentUser = username;
-        setSession(username);
-        await update(ref(db), { [`users/${username}/online`]: true, [`users/${username}/lastSeen`]: Date.now() });
-        onDisconnect(ref(db, `users/${username}`)).update({ online: false, lastSeen: Date.now() });
-        
-        document.getElementById('loadingScreen').style.opacity = '0';
-        setTimeout(()=>document.getElementById('loadingScreen').classList.add('hidden'), 400);
-        
-        showScreen('chatScreen');
-        setupRealTimeFeatures();
-        
-        if (username === 'DevzZerr44F') {
-            document.getElementById('adminMenuItem').style.display = 'flex';
-        } else {
-            document.getElementById('adminMenuItem').style.display = 'none';
-        }
-        
-        document.getElementById('loginUsername').value = '';
-        document.getElementById('loginPassword').value = '';
-    });
-
-    // Auto Login
-    window.addEventListener('load', async ()=>{
-        const stored = localStorage.getItem('zchat_user');
-        if (stored && localStorage.getItem('zchat_login') === 'true') {
-            if (await isBanned(stored)) { 
-                clearSession(); 
-                showScreen('loginScreen'); 
-                document.getElementById('loadingScreen').classList.add('hidden'); 
-                return; 
+        try {
+            const snap = await get(child(ref(db), `users/${searchUsername}`));
+            if (!snap.exists()) {
+                showToast('User tidak ditemukan', true);
+                return false;
             }
             
-            currentUser = stored;
-            await update(ref(db), { [`users/${currentUser}/online`]: true, [`users/${currentUser}/lastSeen`]: Date.now() });
-            onDisconnect(ref(db, `users/${currentUser}`)).update({ online: false, lastSeen: Date.now() });
-            
-            showScreen('chatScreen');
-            
-            if (currentUser === 'DevzZerr44F') {
-                document.getElementById('adminMenuItem').style.display = 'flex';
+            const friendSnap = await get(child(ref(db), `users/${currentUser}/friends/${searchUsername}`));
+            if (friendSnap.exists()) {
+                showToast('Sudah berteman', true);
+                return false;
             }
             
-            setupRealTimeFeatures();
-        } else { 
-            clearSession(); 
-            showScreen('loginScreen'); 
-        }
-        
-        document.getElementById('loadingScreen').classList.add('hidden');
-    });
-
-    // Logout
-    document.getElementById('logoutBtn').addEventListener('click', async ()=>{
-        if (currentUser) {
-            await update(ref(db), { 
-                [`users/${currentUser}/online`]: false, 
-                [`users/${currentUser}/lastSeen`]: Date.now() 
+            // Cek apakah sudah pernah mengirim request
+            const requestsSnap = await get(child(ref(db), `friendRequests/${searchUsername}`));
+            let alreadySent = false;
+            if (requestsSnap.exists()) {
+                Object.values(requestsSnap.val()).forEach(req => {
+                    if (req.from === currentUser && req.status === 'pending') alreadySent = true;
+                });
+            }
+            
+            if (alreadySent) {
+                showToast('Request sudah dikirim', true);
+                return false;
+            }
+            
+            const reqRef = push(ref(db, `friendRequests/${searchUsername}`));
+            await set(reqRef, { 
+                from: currentUser, 
+                status: 'pending', 
+                timestamp: Date.now() 
             });
+            
+            showToast(`Request sent to ${searchUsername}`);
+            document.getElementById('friendSearchInput').value = '';
+            return true;
+            
+        } catch (error) {
+            console.error('Add friend error:', error);
+            showToast('Error: ' + error.message, true);
+            return false;
         }
-        clearSession(); 
-        location.reload();
-    });
+    };
 
-    // Search Friend Button
     document.getElementById('sendRequestBtn')?.addEventListener('click', ()=>{
         const username = document.getElementById('friendSearchInput').value.trim();
         if(username) window.addFriend(username);
     });
 
-    document.getElementById('friendSearchInput')?.addEventListener('keypress', (e)=>{
-        if(e.key === 'Enter') {
-            const username = e.target.value.trim();
-            if(username) window.addFriend(username);
-        }
-    });
-
-    // Setup Real Time Features
+    // Setup realtime features
     function setupRealTimeFeatures() {
         if (!currentUser) return;
         
-        const reqRef = ref(db, `friendRequests/${currentUser}`);
-        if (friendRequestsListener) friendRequestsListener();
+        // Load friends list
+        loadFriendsList();
+        document.getElementById('profileUsername').innerText = currentUser;
+        loadProfile();
         
-        friendRequestsListener = onValue(reqRef, (snap) => {
+        // Listen for friend requests
+        const reqRef = ref(db, `friendRequests/${currentUser}`);
+        onValue(reqRef, (snap) => {
             const reqs = snap.val() ? Object.entries(snap.val()).filter(([_,v]) => v.status === 'pending') : [];
             const badge = document.getElementById('requestBadgeNav');
             const menuBadge = document.getElementById('requestBadgeMenu');
@@ -1103,10 +1214,6 @@
             
             renderRequestsList(reqs);
         });
-        
-        loadFriendsList();
-        document.getElementById('profileUsername').innerText = currentUser;
-        loadProfile();
     }
 
     async function loadFriendsList() {
@@ -1132,10 +1239,9 @@
         for (let f of friends) {
             const fSnap = await get(child(ref(db), `users/${f}`));
             if (!fSnap.exists()) continue;
-            
+                        
             const data = fSnap.val();
             
-            // Chat list
             if (chatContainer) {
                 const div = document.createElement('div');
                 div.className = 'friend-item';
@@ -1150,7 +1256,6 @@
                 chatContainer.appendChild(div);
             }
             
-            // Friends list page
             if (friendsContainer) {
                 const friendDiv = document.createElement('div');
                 friendDiv.className = 'friend-item';
@@ -1179,12 +1284,10 @@
     };
 
     async function loadMessages(friend) {
-        if (messagesListener) messagesListener();
-        
         const roomId = [currentUser, friend].sort().join('_');
         const msgsRef = ref(db, `chats/${roomId}/messages`);
         
-        messagesListener = onValue(msgsRef, (snap) => {
+        onValue(msgsRef, (snap) => {
             const msgs = snap.val() ? Object.values(snap.val()).sort((a,b)=>a.timestamp - b.timestamp) : [];
             renderMessages(msgs);
         });
@@ -1226,12 +1329,6 @@
         });
         
         document.getElementById('messageInput').value = '';
-    });
-
-    document.getElementById('messageInput')?.addEventListener('keypress', (e)=>{
-        if(e.key === 'Enter') {
-            document.getElementById('sendMsgBtn').click();
-        }
     });
 
     // Bottom Navigation
@@ -1365,7 +1462,7 @@
         document.getElementById('newPass').value = '';
     });
 
-    // Dark Mode Toggle
+    // Dark Mode
     document.getElementById('darkModeToggle').addEventListener('click', ()=>{
         document.body.style.background = document.body.style.background === 'black' ? '#0b0f17' : 'black';
         showToast('Dark mode toggled');
@@ -1438,6 +1535,32 @@
             });
         });
     }
+
+    // Enter key for login
+    document.getElementById('loginPassword').addEventListener('keypress', (e)=>{
+        if(e.key === 'Enter') {
+            document.getElementById('loginBtn').click();
+        }
+    });
+
+    document.getElementById('regConfirm').addEventListener('keypress', (e)=>{
+        if(e.key === 'Enter') {
+            document.getElementById('registerBtn').click();
+        }
+    });
+
+    document.getElementById('messageInput')?.addEventListener('keypress', (e)=>{
+        if(e.key === 'Enter') {
+            document.getElementById('sendMsgBtn').click();
+        }
+    });
+
+    document.getElementById('friendSearchInput')?.addEventListener('keypress', (e)=>{
+        if(e.key === 'Enter') {
+            const username = e.target.value.trim();
+            if(username) window.addFriend(username);
+        }
+    });
 </script>
 </body>
 </html>
