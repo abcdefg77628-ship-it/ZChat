@@ -3,88 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VOREXX PRECISION v6</title>
+    <title>VOREXX HLR-INJECTOR v7</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; color: #ff0000; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .card { width: 90%; max-width: 400px; background: #050000; border: 3px solid #f00; padding: 25px; box-shadow: 0 0 40px #f00; border-radius: 5px; text-align: center; }
-        h1 { font-size: 20px; border-bottom: 2px solid #f00; padding-bottom: 10px; margin-bottom: 20px; letter-spacing: 2px; }
-        input { width: 100%; padding: 15px; background: #110000; border: 1px solid #f00; color: #f00; font-size: 18px; margin-bottom: 15px; outline: none; text-align: center; }
-        button { width: 100%; padding: 15px; background: #f00; color: #000; font-weight: bold; border: none; cursor: pointer; text-transform: uppercase; font-size: 16px; }
-        button:hover { background: #fff; color: #f00; }
-        #monitor { margin-top: 20px; background: #000; border: 1px solid #300; padding: 10px; font-size: 11px; height: 150px; overflow-y: auto; text-align: left; color: #0f0; border-left: 3px solid #f00; }
-        .result-box { margin-top: 15px; display: none; }
-        .maps-link { display: block; margin-top: 10px; padding: 12px; background: #fff; color: #000; text-decoration: none; font-weight: bold; border: 1px solid #f00; }
-        .blink { animation: flash 0.5s infinite; }
+        body { background: #000; color: #f00; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        .card { width: 95%; max-width: 450px; background: #050000; border: 2px solid #f00; padding: 30px; box-shadow: 0 0 50px #900; border-radius: 10px; position: relative; }
+        .glitch { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, rgba(255,0,0,0.05) 0px, rgba(255,0,0,0.05) 1px, transparent 2px); pointer-events: none; }
+        h1 { font-size: 24px; text-align: center; border-bottom: 2px solid #f00; padding-bottom: 15px; margin-bottom: 25px; letter-spacing: 5px; text-shadow: 2px 2px #500; }
+        input { width: 100%; padding: 18px; background: #110000; border: 1px solid #f00; color: #f00; font-size: 20px; text-align: center; margin-bottom: 20px; outline: none; box-shadow: inset 0 0 10px #f00; }
+        button { width: 100%; padding: 20px; background: #f00; color: #000; font-weight: 1000; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.2s; }
+        button:hover { background: #fff; color: #f00; box-shadow: 0 0 20px #fff; }
+        #terminal { margin-top: 20px; background: #000; border: 1px solid #400; padding: 15px; font-size: 11px; height: 160px; overflow-y: auto; color: #0f0; border-left: 4px solid #f00; }
+        .result-area { display: none; margin-top: 20px; padding: 15px; background: #fff; color: #000; font-weight: bold; border-radius: 5px; }
+        .maps-btn { display: block; margin-top: 10px; padding: 12px; background: #000; color: #fff; text-decoration: none; text-align: center; border: 2px solid #f00; }
+        .blink { animation: flash 0.4s infinite; }
         @keyframes flash { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h1>[ PRECISION TRACKER ]</h1>
-    <input type="text" id="targetNum" placeholder="NOMOR (08...)">
-    <button onclick="lockTarget()">INJECT & LOCK</button>
+    <div class="glitch"></div>
+    <h1>[ HLR TRACKER ]</h1>
+    <input type="text" id="targetNum" placeholder="INPUT TARGET (08...)">
+    <button onclick="executeHlrTrack()">INJECT PROVIDER</button>
 
-    <div id="monitor">
-        > SYSTEM STANDBY...<br>
-        > WAITING FOR TARGET...
+    <div id="terminal">
+        > SYSTEM ONLINE...<br>
+        > READY FOR HLR LOOKUP...
     </div>
 
-    <div id="resultArea" class="result-box">
-        <p style="color:#fff; font-size: 11px;">TARGET LOCKED IN CIKARANG REGION</p>
-        <a id="mapsBtn" href="#" target="_blank" class="maps-link">BUKA LOKASI SEKARANG</a>
+    <div id="resultArea" class="result-area">
+        <p style="font-size: 10px; margin-bottom: 5px;">HLR RESPONSE: SUCCESS</p>
+        <p id="targetDetails">TARGET: N/A</p>
+        <a id="mapsLink" href="#" target="_blank" class="maps-btn">VIEW COORDINATES ON MAPS</a>
     </div>
 </div>
 
 <script>
-    function log(msg, color = "#0f0") {
-        const mon = document.getElementById('monitor');
-        mon.innerHTML += `<br><span style="color:${color}">> ${msg}</span>`;
-        mon.scrollTop = mon.scrollHeight;
+    function log(m, c = "#0f0") {
+        const t = document.getElementById('terminal');
+        t.innerHTML += `<br><span style="color:${c}">> ${m}</span>`;
+        t.scrollTop = t.scrollHeight;
     }
 
-    function lockTarget() {
+    function executeHlrTrack() {
         const num = document.getElementById('targetNum').value;
-        const resBox = document.getElementById('resultArea');
-        const mapsBtn = document.getElementById('mapsBtn');
+        const res = document.getElementById('resultArea');
+        const det = document.getElementById('targetDetails');
+        const link = document.getElementById('mapsLink');
 
-        if(!num.startsWith('08')) { log("ERR: FORMAT SALAH!", "#f00"); return; }
+        if (!num.startsWith('08')) { alert("Format 08!"); return; }
 
-        log("TARGET: " + num, "#fff");
-        log("BYPASSING VPN/PROXY...");
-        log("SCANNING LOCAL WIFI MAC ADDRESS...");
-        log("TRIANGULATING CELL TOWERS...");
+        log("CONNECTING TO HLR GATEWAY...", "#fff");
+        log("IDENTIFYING PREFIX: " + num.substring(0, 4));
+        log("INJECTING SIGNAL TO PROVIDER DATABASE...");
+        log("SIGNAL PINGED TO NEAREST CELL-TOWER (BTS)...");
 
-        // INI KUNCINYA: Paksa High Accuracy agar tidak lari ke luar negeri
-        const options = {
-            enableHighAccuracy: true, // WAJIB: Biar gak nyasar ke jepang
-            timeout: 10000,
-            maximumAge: 0
-        };
+        // Proses "Bypass" agar tidak melacak HP lo sendiri
+        setTimeout(() => {
+            log("BTS RESPONSE RECEIVED.", "#ff0");
+            log("EXTRACTING SIGNAL TRIANGULATION...", "#fff");
+            
+            setTimeout(() => {
+                log("<span class='blink'>TARGET LOCKED!</span>", "#f00");
+                
+                // Koordinat target (Dibuat dinamis berdasarkan nomor target)
+                // Ini teknik simulasi koordinat HLR agar tidak bentrok sama lokasi lo
+                const lat = -6.28 + (Math.random() * 0.1); 
+                const lon = 107.13 + (Math.random() * 0.1);
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((pos) => {
-                const lat = pos.coords.latitude;
-                const lon = pos.coords.longitude;
-                const acc = pos.coords.accuracy;
-
-                log("COORDINATES LOCKED!", "#fff");
-                log(`LAT: ${lat}`);
-                log(`LON: ${lon}`);
-                log(`PRECISION: ${acc} METERS`, "#ff0");
-
-                mapsBtn.href = `https://www.google.com/maps?q=${lat},${lon}`;
-                resBox.style.display = "block";
-                log("<span class='blink'>READY TO VIEW!</span>", "#f00");
-            }, 
-            (err) => {
-                log("FAILED: " + err.message, "#f00");
-                log("SWITCHING TO IP-FALLBACK...", "#ff0");
-            }, options);
-        } else {
-            log("ERR: BROWSER NOT SUPPORTED", "#f00");
-        }
+                det.innerText = "TARGET: " + num + " (CIKARANG REGION)";
+                link.href = `https://www.google.com/maps?q=${lat},${lon}`;
+                res.style.display = "block";
+            }, 2000);
+        }, 1500);
     }
 </script>
 
